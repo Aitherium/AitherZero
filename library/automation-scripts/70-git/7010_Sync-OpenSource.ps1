@@ -78,6 +78,7 @@ $ExcludePatterns = @(
     'library/automation-scripts/_archive/'
     '0908_Switch-GpuProfile.ps1'
     '0806_AitherOS-Lifecycle.ps1'
+    'Plan Spec'
     'library/reports/'
     'training-data/'
     'OPEN_SOURCE_PLAN.md'
