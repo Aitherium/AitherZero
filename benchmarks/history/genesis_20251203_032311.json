@@ -1,0 +1,16 @@
+{
+  "Models": {},
+  "Timestamp": "2025-12-03T03:23:11.1969778-08:00",
+  "TestRun": "genesis_20251203_032311",
+  "Embedding": {},
+  "GPU": {
+    "name": "NVIDIA GeForce RTX 5080",
+    "vram_total_mb": 16303,
+    "vram_used_mb": 15243,
+    "vram_free_mb": 647,
+    "utilization_percent": 8,
+    "temperature_c": 40,
+    "power_watts": 36,
+    "timestamp": "2025-12-03T03:25:20.751602"
+  }
+}

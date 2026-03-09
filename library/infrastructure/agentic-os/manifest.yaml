@@ -1,0 +1,61 @@
+# manifest.yaml - AgenticOS Base Image
+# Based on Rocky Linux 9/10
+ref: rocky/9/x86_64/agentic-os
+include: manifest-base.yaml
+
+packages:
+  # Core Container Ecosystem
+  - podman
+  - podman-docker
+  - buildah
+  - skopeo
+  - crun
+  - slirp4netns
+  - fuse-overlayfs
+
+  # GPU Integration (NVIDIA CDI)
+  # Note: Requires NVIDIA repository to be enabled in the build environment
+  - nvidia-container-toolkit-base
+  - nvidia-container-toolkit
+  - libnvidia-container-tools
+
+  # SELinux Hardening & Policy Tools
+  - selinux-policy
+  - selinux-policy-targeted
+  - policycoreutils
+  - policycoreutils-python-utils
+  - udica
+  - setools-console
+  - audit
+
+  # Base Utilities & Agent Requirements
+  - git
+  - curl
+  - wget
+  - jq
+  - python3
+  - python3-pip
+  - openssh-server
+  - tmux
+  - htop
+  - net-tools
+  - bind-utils
+
+  # AitherZero Agent Runtime Deps
+  - powershell-preview # If available, or standard powershell
+  - nodejs
+
+repos:
+  - rocky-base
+  - rocky-updates
+  - rocky-extras
+  - nvidia-container-toolkit
+
+postprocess:
+  - |
+    #!/usr/bin/env bash
+    set -e
+    # Enable Podman socket for API access if needed
+    systemctl enable podman.socket
+    # Ensure SELinux is enforcing (default in Rocky, but good to verify)
+    # sed -i 's/^SELINUX=.*/SELINUX=enforcing/' /etc/selinux/config

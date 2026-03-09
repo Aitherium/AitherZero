@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="9" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2025-11-21" time="23:08:38">
+  <environment platform="Linux" user-domain="" clr-version="9.0.10" machine-name="codespaces-e8f8fc" nunit-version="2.5.8.0" os-version="6.8.0-1030-azure" cwd="/workspaces/AitherZero/agents/AitherZeroAutomationAgent" user="vscode" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Success" success="True" time="1.0131" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="/workspaces/AitherZero/AitherZero/tests/unit/AitherZero.Module.Tests.ps1" executed="True" result="Success" success="True" time="1.0131" asserts="0" description="/workspaces/AitherZero/AitherZero/tests/unit/AitherZero.Module.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="AitherZero Module Structure" executed="True" result="Success" success="True" time="0.6429" asserts="0" description="AitherZero Module Structure">
+            <results>
+              <test-suite type="TestFixture" name="AitherZero Module Structure.Module Loading" executed="True" result="Success" success="True" time="0.2629" asserts="0" description="AitherZero Module Structure.Module Loading">
+                <results>
+                  <test-case description="Module manifest exists at the correct path" name="AitherZero Module Structure.Module Loading.Module manifest exists at the correct path" time="0.1008" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Module can be imported" name="AitherZero Module Structure.Module Loading.Module can be imported" time="0.1339" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherZero Module Structure.Exported Functions" executed="True" result="Success" success="True" time="0.4567" asserts="0" description="AitherZero Module Structure.Exported Functions">
+                <results>
+                  <test-suite type="ParameterizedTest" name="AitherZero Module Structure.Exported Functions.Exports function: &lt;FunctionName&gt;" executed="True" result="Success" success="True" time="0.0496" asserts="0" description="Exports function: &lt;FunctionName&gt;">
+                    <results>
+                      <test-case description="Exports function: Get-AitherProjectRoot" name="AitherZero Module Structure.Exported Functions.Exports function: Get-AitherProjectRoot" time="0.0183" asserts="0" success="True" result="Success" executed="True" />
+                      <test-case description="Exports function: Show-AitherDashboard" name="AitherZero Module Structure.Exported Functions.Exports function: Show-AitherDashboard" time="0.0073" asserts="0" success="True" result="Success" executed="True" />
+                      <test-case description="Exports function: Initialize-AitherDashboard" name="AitherZero Module Structure.Exported Functions.Exports function: Initialize-AitherDashboard" time="0.0082" asserts="0" success="True" result="Success" executed="True" />
+                      <test-case description="Exports function: Register-AitherMetrics" name="AitherZero Module Structure.Exported Functions.Exports function: Register-AitherMetrics" time="0.0079" asserts="0" success="True" result="Success" executed="True" />
+                      <test-case description="Exports function: Write-AitherLog" name="AitherZero Module Structure.Exported Functions.Exports function: Write-AitherLog" time="0.0078" asserts="0" success="True" result="Success" executed="True" />
+                    </results>
+                  </test-suite>
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherZero Module Structure.Core Functionality" executed="True" result="Success" success="True" time="0.6294" asserts="0" description="AitherZero Module Structure.Core Functionality">
+                <results>
+                  <test-case description="Get-AitherProjectRoot returns a valid path" name="AitherZero Module Structure.Core Functionality.Get-AitherProjectRoot returns a valid path" time="0.014" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Initialize-AitherDashboard returns a configuration object" name="AitherZero Module Structure.Core Functionality.Initialize-AitherDashboard returns a configuration object" time="0.0415" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

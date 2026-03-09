@@ -1,0 +1,35 @@
+# Grafana Data Sources Auto-Provisioning
+apiVersion: 1
+
+datasources:
+  # Primary Prometheus data source for AitherOS metrics
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: "15s"
+      httpMethod: POST
+      exemplarTraceIdDestinations:
+        - name: traceID
+          datasourceUid: tempo
+          
+  # AitherWatch direct API (for live data)
+  - name: AitherWatch
+    type: prometheus
+    access: proxy
+    url: http://host.docker.internal:8082
+    editable: false
+    jsonData:
+      timeInterval: "10s"
+      httpMethod: GET
+
+  # AitherPulse events API
+  - name: AitherPulse
+    type: grafana-simple-json-datasource
+    access: proxy
+    url: http://host.docker.internal:8081
+    editable: false
+

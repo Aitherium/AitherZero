@@ -1,0 +1,15 @@
+[
+  {
+    "allow": [
+      "read"
+    ],
+    "path": "/etc/agent-config"
+  },
+  {
+    "allow": [
+      "write",
+      "read"
+    ],
+    "path": "/var/log/terra"
+  }
+]

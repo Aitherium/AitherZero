@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="36" errors="0" failures="1" not-run="0" inconclusive="0" ignored="0" skipped="25" invalid="0" date="2026-02-27" time="20:49:01">
+  <environment user="wzns" machine-name="DESKTOP-EG38V5F" clr-version="9.0.10" nunit-version="2.5.8.0" os-version="10.0.26200" user-domain="DESKTOP-EG38V5F" platform="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk1\Partition3" cwd="D:\AitherOS-Fresh" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="1.954" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="D:\AitherOS-Fresh\AitherZero\tests\unit\AitherZero.GPU.Tests.ps1" executed="True" result="Failure" success="False" time="1.3424" asserts="0" description="D:\AitherOS-Fresh\AitherZero\tests\unit\AitherZero.GPU.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="AitherAccel GPU Optimization Service" executed="True" result="Ignored" success="True" time="0.2069" asserts="0" description="AitherAccel GPU Optimization Service">
+            <results>
+              <test-suite type="TestFixture" name="AitherAccel GPU Optimization Service.Service Health" executed="True" result="Ignored" success="True" time="0.1523" asserts="0" description="AitherAccel GPU Optimization Service.Service Health">
+                <results>
+                  <test-case description="Should be running on port 8103" name="AitherAccel GPU Optimization Service.Service Health.Should be running on port 8103" time="0.0798" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should detect GPU hardware" name="AitherAccel GPU Optimization Service.Service Health.Should detect GPU hardware" time="0.0019" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should report VRAM availability" name="AitherAccel GPU Optimization Service.Service Health.Should report VRAM availability" time="0.0023" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should monitor GPU temperature" name="AitherAccel GPU Optimization Service.Service Health.Should monitor GPU temperature" time="0.0029" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherAccel GPU Optimization Service.Model Registry" executed="True" result="Ignored" success="True" time="0.1648" asserts="0" description="AitherAccel GPU Optimization Service.Model Registry">
+                <results>
+                  <test-case description="Should list available model profiles" name="AitherAccel GPU Optimization Service.Model Registry.Should list available model profiles" time="0.0027" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should have LLM model profiles" name="AitherAccel GPU Optimization Service.Model Registry.Should have LLM model profiles" time="0.0018" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should have embedding model profiles" name="AitherAccel GPU Optimization Service.Model Registry.Should have embedding model profiles" time="0.0015" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should indicate which models fit in VRAM" name="AitherAccel GPU Optimization Service.Model Registry.Should indicate which models fit in VRAM" time="0.0015" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherAccel GPU Optimization Service.Optimization Recommendations" executed="True" result="Ignored" success="True" time="0.1762" asserts="0" description="AitherAccel GPU Optimization Service.Optimization Recommendations">
+                <results>
+                  <test-case description="Should provide optimization recommendations" name="AitherAccel GPU Optimization Service.Optimization Recommendations.Should provide optimization recommendations" time="0.0027" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should calculate optimization score" name="AitherAccel GPU Optimization Service.Optimization Recommendations.Should calculate optimization score" time="0.0036" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherAccel GPU Optimization Service.Task Optimization" executed="True" result="Ignored" success="True" time="0.188" asserts="0" description="AitherAccel GPU Optimization Service.Task Optimization">
+                <results>
+                  <test-case description="Should optimize for code tasks" name="AitherAccel GPU Optimization Service.Task Optimization.Should optimize for code tasks" time="0.0035" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should optimize for quick tasks" name="AitherAccel GPU Optimization Service.Task Optimization.Should optimize for quick tasks" time="0.0018" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="AitherParallel Quantization &amp; GPU Monitoring" executed="True" result="Ignored" success="True" time="0.2442" asserts="0" description="AitherParallel Quantization &amp; GPU Monitoring">
+            <results>
+              <test-suite type="TestFixture" name="AitherParallel Quantization &amp; GPU Monitoring.Service Health" executed="True" result="Ignored" success="True" time="0.0097" asserts="0" description="AitherParallel Quantization &amp; GPU Monitoring.Service Health">
+                <results>
+                  <test-case description="Should be running on port 8100" name="AitherParallel Quantization &amp; GPU Monitoring.Service Health.Should be running on port 8100" time="0.0045" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherParallel Quantization &amp; GPU Monitoring.GPU Status" executed="True" result="Ignored" success="True" time="0.0193" asserts="0" description="AitherParallel Quantization &amp; GPU Monitoring.GPU Status">
+                <results>
+                  <test-case description="Should report GPU status" name="AitherParallel Quantization &amp; GPU Monitoring.GPU Status.Should report GPU status" time="0.0037" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherParallel Quantization &amp; GPU Monitoring.Model Profiles" executed="True" result="Ignored" success="True" time="0.0315" asserts="0" description="AitherParallel Quantization &amp; GPU Monitoring.Model Profiles">
+                <results>
+                  <test-case description="Should list model profiles" name="AitherParallel Quantization &amp; GPU Monitoring.Model Profiles.Should list model profiles" time="0.0026" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should recommend models for code tasks" name="AitherParallel Quantization &amp; GPU Monitoring.Model Profiles.Should recommend models for code tasks" time="0.0018" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should recommend models for chat tasks" name="AitherParallel Quantization &amp; GPU Monitoring.Model Profiles.Should recommend models for chat tasks" time="0.0027" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="AitherWorkingMemory GPU Embedding Engine" executed="True" result="Ignored" success="True" time="0.2886" asserts="0" description="AitherWorkingMemory GPU Embedding Engine">
+            <results>
+              <test-suite type="TestFixture" name="AitherWorkingMemory GPU Embedding Engine.Service Health" executed="True" result="Ignored" success="True" time="0.0085" asserts="0" description="AitherWorkingMemory GPU Embedding Engine.Service Health">
+                <results>
+                  <test-case description="Should be running on port 8095" name="AitherWorkingMemory GPU Embedding Engine.Service Health.Should be running on port 8095" time="0.0041" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherWorkingMemory GPU Embedding Engine.GPU Embedding Status" executed="True" result="Ignored" success="True" time="0.017" asserts="0" description="AitherWorkingMemory GPU Embedding Engine.GPU Embedding Status">
+                <results>
+                  <test-case description="Should report GPU embedding availability" name="AitherWorkingMemory GPU Embedding Engine.GPU Embedding Status.Should report GPU embedding availability" time="0.0033" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherWorkingMemory GPU Embedding Engine.Embedding Performance Benchmark" executed="True" result="Ignored" success="True" time="0.027" asserts="0" description="AitherWorkingMemory GPU Embedding Engine.Embedding Performance Benchmark">
+                <results>
+                  <test-case description="Should benchmark embedding performance" name="AitherWorkingMemory GPU Embedding Engine.Embedding Performance Benchmark.Should benchmark embedding performance" time="0.0028" asserts="0" success="False" result="Ignored" executed="False" />
+                  <test-case description="Should show GPU speedup over Ollama" name="AitherWorkingMemory GPU Embedding Engine.Embedding Performance Benchmark.Should show GPU speedup over Ollama" time="0.0018" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherWorkingMemory GPU Embedding Engine.Batch Embedding" executed="True" result="Ignored" success="True" time="0.0344" asserts="0" description="AitherWorkingMemory GPU Embedding Engine.Batch Embedding">
+                <results>
+                  <test-case description="Should perform batch embedding" name="AitherWorkingMemory GPU Embedding Engine.Batch Embedding.Should perform batch embedding" time="0.0028" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherWorkingMemory GPU Embedding Engine.Embedding Stats" executed="True" result="Ignored" success="True" time="0.0408" asserts="0" description="AitherWorkingMemory GPU Embedding Engine.Embedding Stats">
+                <results>
+                  <test-case description="Should track embedding statistics" name="AitherWorkingMemory GPU Embedding Engine.Embedding Stats.Should track embedding statistics" time="0.0023" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Cross-Service GPU Integration" executed="True" result="Ignored" success="True" time="0.3065" asserts="0" description="Cross-Service GPU Integration">
+            <results>
+              <test-suite type="TestFixture" name="Cross-Service GPU Integration.Unified GPU Monitoring" executed="True" result="Ignored" success="True" time="0.0069" asserts="0" description="Cross-Service GPU Integration.Unified GPU Monitoring">
+                <results>
+                  <test-case description="Should have consistent GPU info across services" name="Cross-Service GPU Integration.Unified GPU Monitoring.Should have consistent GPU info across services" time="0.0035" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="Cross-Service GPU Integration.End-to-End Workflow" executed="True" result="Ignored" success="True" time="0.0135" asserts="0" description="Cross-Service GPU Integration.End-to-End Workflow">
+                <results>
+                  <test-case description="Should complete full GPU optimization workflow" name="Cross-Service GPU Integration.End-to-End Workflow.Should complete full GPU optimization workflow" time="0.0026" asserts="0" success="False" result="Ignored" executed="False" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Benchmark Data Persistence" executed="True" result="Failure" success="False" time="0.4683" asserts="0" description="Benchmark Data Persistence">
+            <results>
+              <test-suite type="TestFixture" name="Benchmark Data Persistence.Benchmark Storage" executed="True" result="Failure" success="False" time="0.1564" asserts="0" description="Benchmark Data Persistence.Benchmark Storage">
+                <results>
+                  <test-case description="Should have benchmark directory" name="Benchmark Data Persistence.Benchmark Storage.Should have benchmark directory" time="0.0983" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Should collect benchmark results during tests" name="Benchmark Data Persistence.Benchmark Storage.Should collect benchmark results during tests" time="0.0533" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>Expected the actual value to be greater than 0, but got 0.</message>
+                      <stack-trace>at $script:BenchmarkResults.Results.Keys.Count | Should -BeGreaterThan 0, D:\AitherOS-Fresh\AitherZero\tests\unit\AitherZero.GPU.Tests.ps1:387
+at &lt;ScriptBlock&gt;, D:\AitherOS-Fresh\AitherZero\tests\unit\AitherZero.GPU.Tests.ps1:387</stack-trace>
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="D:\AitherOS-Fresh\AitherZero\tests\unit\AitherZero.Module.Tests.ps1" executed="True" result="Success" success="True" time="0.6115" asserts="0" description="D:\AitherOS-Fresh\AitherZero\tests\unit\AitherZero.Module.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="AitherZero Module Structure" executed="True" result="Success" success="True" time="0.5143" asserts="0" description="AitherZero Module Structure">
+            <results>
+              <test-suite type="TestFixture" name="AitherZero Module Structure.Module Loading" executed="True" result="Success" success="True" time="0.158" asserts="0" description="AitherZero Module Structure.Module Loading">
+                <results>
+                  <test-case description="Module manifest exists at the correct path" name="AitherZero Module Structure.Module Loading.Module manifest exists at the correct path" time="0.0181" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Module can be imported" name="AitherZero Module Structure.Module Loading.Module can be imported" time="0.1353" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherZero Module Structure.Exported Functions" executed="True" result="Success" success="True" time="0.3245" asserts="0" description="AitherZero Module Structure.Exported Functions">
+                <results>
+                  <test-suite type="ParameterizedTest" name="AitherZero Module Structure.Exported Functions.Exports function: &lt;FunctionName&gt;" executed="True" result="Success" success="True" time="0.0433" asserts="0" description="Exports function: &lt;FunctionName&gt;">
+                    <results>
+                      <test-case description="Exports function: Get-AitherProjectRoot" name="AitherZero Module Structure.Exported Functions.Exports function: Get-AitherProjectRoot" time="0.0303" asserts="0" success="True" result="Success" executed="True" />
+                      <test-case description="Exports function: Show-AitherDashboard" name="AitherZero Module Structure.Exported Functions.Exports function: Show-AitherDashboard" time="0.0031" asserts="0" success="True" result="Success" executed="True" />
+                      <test-case description="Exports function: Initialize-AitherDashboard" name="AitherZero Module Structure.Exported Functions.Exports function: Initialize-AitherDashboard" time="0.0026" asserts="0" success="True" result="Success" executed="True" />
+                      <test-case description="Exports function: Register-AitherMetrics" name="AitherZero Module Structure.Exported Functions.Exports function: Register-AitherMetrics" time="0.0036" asserts="0" success="True" result="Success" executed="True" />
+                      <test-case description="Exports function: Write-AitherLog" name="AitherZero Module Structure.Exported Functions.Exports function: Write-AitherLog" time="0.0036" asserts="0" success="True" result="Success" executed="True" />
+                    </results>
+                  </test-suite>
+                </results>
+              </test-suite>
+              <test-suite type="TestFixture" name="AitherZero Module Structure.Core Functionality" executed="True" result="Success" success="True" time="0.4983" asserts="0" description="AitherZero Module Structure.Core Functionality">
+                <results>
+                  <test-case description="Get-AitherProjectRoot returns a valid path" name="AitherZero Module Structure.Core Functionality.Get-AitherProjectRoot returns a valid path" time="0.0192" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Initialize-AitherDashboard returns a configuration object" name="AitherZero Module Structure.Core Functionality.Initialize-AitherDashboard returns a configuration object" time="0.0253" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

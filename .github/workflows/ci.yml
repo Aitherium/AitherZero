@@ -1,0 +1,166 @@
+name: ci
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: PSScriptAnalyzer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          # Fail on errors only; report warnings without blocking
+          $errors = Invoke-ScriptAnalyzer -Path ./src/ -Recurse -Settings PSGallery -Severity Error
+          $warnings = Invoke-ScriptAnalyzer -Path ./src/ -Recurse -Settings PSGallery -Severity Warning
+          if ($warnings.Count -gt 0) {
+            Write-Host "::warning::PSScriptAnalyzer found $($warnings.Count) warning(s):"
+            $warnings | Format-Table -AutoSize
+          }
+          if ($errors.Count -gt 0) {
+            $errors | Format-Table -AutoSize
+            Write-Error "PSScriptAnalyzer found $($errors.Count) error(s)"
+            exit 1
+          }
+
+  test-windows:
+    name: Tests (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module -Name Pester -MinimumVersion 5.5 -Force -Scope CurrentUser
+
+      - name: Build module
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path = './tests/'
+          $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputFormat = 'JUnitXml'
+          $config.TestResult.OutputPath = './test-results/pester-windows.xml'
+          $config.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $config
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-windows
+          path: ./test-results/
+
+  test-linux:
+    name: Tests (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module -Name Pester -MinimumVersion 5.5 -Force -Scope CurrentUser
+
+      - name: Build module
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path = './tests/'
+          $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputFormat = 'JUnitXml'
+          $config.TestResult.OutputPath = './test-results/pester-linux.xml'
+          $config.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $config
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-linux
+          path: ./test-results/
+
+  test-macos:
+    name: Tests (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module -Name Pester -MinimumVersion 5.5 -Force -Scope CurrentUser
+
+      - name: Build module
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path = './tests/'
+          $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputFormat = 'JUnitXml'
+          $config.TestResult.OutputPath = './test-results/pester-macos.xml'
+          $config.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $config
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-macos
+          path: ./test-results/
+
+  validate-scripts:
+    name: Validate Scripts
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Advisory — track violations without blocking PRs
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check script headers
+        shell: pwsh
+        run: |
+          $scripts = Get-ChildItem -Path ./library/automation-scripts/ -Recurse -Filter '*.ps1' |
+            Where-Object { $_.Name -ne '_init.ps1' }
+
+          $issues = @()
+          foreach ($script in $scripts) {
+            $content = Get-Content $script.FullName -Raw
+            if ($content -notmatch '#Requires -Version 7\.0') {
+              $issues += "$($script.Name): Missing #Requires -Version 7.0"
+            }
+            if ($content -notmatch '\[CmdletBinding\(\)\]') {
+              $issues += "$($script.Name): Missing [CmdletBinding()]"
+            }
+          }
+
+          if ($issues.Count -gt 0) {
+            $issues | ForEach-Object { Write-Warning $_ }
+            Write-Error "Found $($issues.Count) script standard violations"
+            exit 1
+          }
+          Write-Host "All $($scripts.Count) scripts pass validation" -ForegroundColor Green

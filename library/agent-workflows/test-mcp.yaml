@@ -1,0 +1,9 @@
+type: sequential
+steps:
+  - type: action
+    name: "Check Version"
+    tool:
+      server: "AitherZeroLocal"
+      name: "Get-AitherVersion"
+      args: {}
+    output: version_info

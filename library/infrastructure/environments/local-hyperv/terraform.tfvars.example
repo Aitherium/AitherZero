@@ -1,0 +1,67 @@
+# AitherOS Local Hyper-V — Default Values
+#
+# Copy this file to terraform.tfvars and customize.
+# This file is committed as a reference; terraform.tfvars is gitignored.
+
+# Path to the custom AitherOS ISO
+iso_path = "C:/ISOs/AitherOS-Server2025-Core.iso"
+
+# Hyper-V connection (localhost, current user)
+hyperv_host = "localhost"
+hyperv_port = 5985
+hyperv_https = false
+
+# Network — Internal switch for isolated testing, or External to bridge
+switch_name      = "AitherSwitch"
+switch_type      = "Internal"
+# physical_adapter = "Ethernet"    # Uncomment + set for External switch
+
+# Storage
+vhd_path       = "C:/VMs/AitherOS"
+default_disk_gb = 80
+
+# Compute defaults
+default_cpu_count    = 4
+default_memory_gb    = 4
+default_memory_min_gb = 2
+default_memory_max_gb = 8
+
+# ─── Node fleet definition ──────────────────
+# Start with a single test node. Add more as needed.
+nodes = [
+  {
+    name              = "aither-node-01"
+    profile           = "Core"
+    cpu_count         = 4
+    memory_gb         = 4
+    memory_max_gb     = 8
+    disk_gb           = 80
+    failover_priority = 5
+    mesh_role         = "standby"
+  },
+  # Uncomment to add a second node:
+  # {
+  #   name              = "aither-node-02"
+  #   profile           = "Minimal"
+  #   cpu_count         = 2
+  #   memory_gb         = 2
+  #   memory_max_gb     = 4
+  #   disk_gb           = 60
+  #   failover_priority = 10
+  #   mesh_role         = "standby"
+  # },
+  # GPU node example:
+  # {
+  #   name              = "aither-gpu-01"
+  #   profile           = "GPU"
+  #   cpu_count         = 8
+  #   memory_gb         = 16
+  #   memory_max_gb     = 32
+  #   disk_gb           = 200
+  #   data_disk         = true
+  #   data_disk_gb      = 500
+  #   failover_priority = 3
+  #   mesh_role         = "standby"
+  #   nested_virt       = true
+  # },
+]

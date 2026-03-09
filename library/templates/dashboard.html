@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AitherZero Dashboard - {{BRANCH_NAME}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .status-pass {
+            color: #198754;
+        }
+
+        .status-fail {
+            color: #dc3545;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            background-color: #343a40;
+            color: white;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h3 class="text-center">AitherZero</h3>
+        <div class="text-center small text-muted mb-4">{{BRANCH_NAME}}</div>
+        <a href="#overview">Overview</a>
+        <a href="#tests">Test Results</a>
+        <a href="#coverage">Code Coverage</a>
+        <a href="#quality">Code Quality</a>
+        <a href="#performance">Performance</a>
+        <hr>
+        <div class="px-3 small">
+            Last Updated:<br>
+            {{TIMESTAMP}}
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Dashboard: {{BRANCH_NAME}}</h1>
+            <div>
+                <span class="badge bg-primary">{{COMMIT_HASH}}</span>
+                <span class="badge bg-secondary">{{PLATFORM}}</span>
+            </div>
+        </div>
+
+        <!-- Overview Cards -->
+        <div id="overview" class="row">
+            <div class="col-md-3">
+                <div class="card text-center p-3">
+                    <h5 class="card-title">Test Pass Rate</h5>
+                    <div class="metric-value {{TEST_STATUS_CLASS}}">{{TEST_PASS_RATE}}%</div>
+                    <p class="card-text">{{TEST_PASSED}} / {{TEST_TOTAL}} Passed</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3">
+                    <h5 class="card-title">Code Coverage</h5>
+                    <div class="metric-value">{{COVERAGE_PERCENT}}%</div>
+                    <p class="card-text">Target: 80%</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3">
+                    <h5 class="card-title">Quality Issues</h5>
+                    <div class="metric-value">{{QUALITY_ISSUES}}</div>
+                    <p class="card-text">PSScriptAnalyzer</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3">
+                    <h5 class="card-title">Build Duration</h5>
+                    <div class="metric-value">{{BUILD_DURATION}}s</div>
+                    <p class="card-text">Total Pipeline Time</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <h5>Test Distribution</h5>
+                    <canvas id="testChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <h5>Code Coverage by Module</h5>
+                    <canvas id="coverageChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Sections -->
+        <div id="tests" class="card p-4 mt-4">
+            <h3>Test Results</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Test Suite</th>
+                            <th>Passed</th>
+                            <th>Failed</th>
+                            <th>Skipped</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{TEST_TABLE_ROWS}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="quality" class="card p-4 mt-4">
+            <h3>Code Quality Analysis</h3>
+            <div class="alert alert-info">
+                <strong>PSScriptAnalyzer Results:</strong> {{QUALITY_SUMMARY}}
+            </div>
+            <ul class="list-group">
+                {{QUALITY_LIST_ITEMS}}
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // Test Chart
+        const ctxTest = document.getElementById('testChart').getContext('2d');
+        new Chart(ctxTest, {
+            type: 'doughnut',
+            data: {
+                labels: ['Passed', 'Failed', 'Skipped'],
+                datasets: [{
+                    data: [{{ TEST_PASSED }}, {{ TEST_FAILED }}, {{ TEST_SKIPPED }}],
+            backgroundColor: ['#198754', '#dc3545', '#ffc107']
+            }]
+        }
+    });
+
+        // Coverage Chart
+        const ctxCov = document.getElementById('coverageChart').getContext('2d');
+        new Chart(ctxCov, {
+            type: 'bar',
+            data: {
+                labels: [{{ COVERAGE_LABELS }}],
+            datasets: [{
+                label: 'Coverage %',
+                data: [{{ COVERAGE_DATA }}],
+            backgroundColor: '#0d6efd'
+        }]
+        },
+            options: {
+            scales: {
+                y: { beginAtZero: true, max: 100 }
+            }
+        }
+    });
+    </script>
+</body>
+
+</html>

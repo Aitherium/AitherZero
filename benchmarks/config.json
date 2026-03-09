@@ -1,0 +1,64 @@
+{
+    "name": "AitherZero Benchmark Configuration",
+    "version": "1.0.0",
+    "description": "Configuration for GPU performance benchmarking and training data collection",
+    
+    "benchmark_suites": {
+        "llm": {
+            "enabled": true,
+            "tests": ["quick_response", "code_generation", "long_context", "parallel_streams"],
+            "iterations": 3
+        },
+        "embedding": {
+            "enabled": true,
+            "tests": ["single_doc", "batch_small", "batch_large", "gpu_vs_ollama"],
+            "batch_sizes": [50, 100, 500, 1000]
+        },
+        "image": {
+            "enabled": true,
+            "tests": ["sdxl_base_20step", "sdxl_lightning_4step", "batch_generation"],
+            "resolutions": ["512x512", "1024x1024"]
+        },
+        "memory": {
+            "enabled": true,
+            "tests": ["vector_search", "cache_performance", "prefetch_accuracy"]
+        }
+    },
+    
+    "storage": {
+        "history_dir": "AitherZero/benchmarks/history",
+        "baselines_dir": "AitherZero/benchmarks/baselines",
+        "reports_dir": "AitherZero/benchmarks/reports",
+        "retention_days": 90
+    },
+    
+    "training_data": {
+        "output_dir": "AitherZero/training-data",
+        "formats": ["jsonl"],
+        "sources": {
+            "transcripts": true,
+            "logs": true,
+            "benchmarks": true,
+            "conversations": true,
+            "reasoning_traces": true
+        },
+        "quality_thresholds": {
+            "min_quality_score": 0.7,
+            "min_response_length": 10,
+            "max_response_length": 4096
+        }
+    },
+    
+    "alerts": {
+        "gpu_temp_warning_c": 80,
+        "gpu_temp_critical_c": 90,
+        "vram_low_threshold_mb": 2048,
+        "performance_regression_threshold": 0.1
+    },
+    
+    "reporting": {
+        "weekly_summary": true,
+        "trend_analysis": true,
+        "export_formats": ["html", "json", "csv"]
+    }
+}
