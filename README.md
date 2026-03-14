@@ -1,277 +1,593 @@
-<div align="center">
+# [FAST] AitherZero - PowerShell Automation Module
 
-# ⚡ AitherZero
+> **Navigation**: [Home](../README.md) > AitherZero
 
-**PowerShell 7+ CI/CD Automation Framework with OpenTofu Infrastructure Abstraction**
+The core PowerShell 7+ automation framework providing infrastructure automation, script orchestration, and quality assurance tools.
 
-[![CI](https://github.com/aitherium/aitherzero/actions/workflows/ci.yml/badge.svg)](https://github.com/aitherium/aitherzero/actions/workflows/ci.yml)
-[![PowerShell 7+](https://img.shields.io/badge/PowerShell-7.0%2B-blue?style=flat-square&logo=powershell)](https://github.com/PowerShell/PowerShell)
-[![License](https://img.shields.io/badge/license-Apache%202.0-green?style=flat-square)](LICENSE)
-[![OpenTofu](https://img.shields.io/badge/OpenTofu-ready-purple?style=flat-square)](https://opentofu.org)
+## [COPY] Table of Contents
 
-Deploy anything. Orchestrate everything. From your terminal or your AI assistant.
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Directory Structure](#directory-structure)
+- [Quick Start](#quick-start)
+- [Module Domains](#module-domains)
+- [Automation Scripts](#automation-scripts)
+- [Playbooks](#playbooks)
+- [Configuration](#configuration)
+- [TDD Workflow](#tdd-workflow)
+- [Development](#development)
 
-[Getting Started](#getting-started) · [Documentation](https://docs.aitherium.com/aitherzero) · [Plugins](#plugins) · [Contributing](CONTRIBUTING.md)
+## Overview
 
-</div>
+AitherZero is a PowerShell module that provides:
 
----
-
-## What is AitherZero?
-
-AitherZero is an **automation framework** that unifies CI/CD, infrastructure-as-code, and deployment orchestration into a single PowerShell module. It's designed to:
-
-- **Abstract away infrastructure complexity** — Define what you want in config, not how to provision it
-- **Work with AI assistants** — Native [MCP server](https://modelcontextprotocol.io) exposes all automation to Copilot, Claude, and other AI tools
-- **Run anywhere** — Windows, Linux, macOS — same scripts, same config
-- **Extend via plugins** — Project-specific automation without forking the framework
-
-```powershell
-# Bootstrap your environment
-./bootstrap.ps1 -Mode New
-
-# Deploy with one command
-Invoke-AitherDeploy -Environment production
-
-# Or let your AI assistant do it via MCP
-# "Deploy the staging environment and run the integration tests"
-```
-
-## Key Features
-
-| Feature | Description |
-|---------|-------------|
-| 🔧 **Script Engine** | 40+ numbered automation scripts with execution history, retry, and parallel support |
-| 📋 **Playbook Orchestrator** | Chain scripts into declarative workflows with dependency awareness |
-| ⚙️ **Configuration System** | Hierarchical config with OS-specific overrides and environment variables |
-| 🏗️ **OpenTofu Abstraction** | Provision cloud infrastructure (GCP, AWS, Azure) through config-driven modules |
-| 🐳 **Docker/K8s Native** | Compose management, image builds, Kubernetes deployment — all config-driven |
-| 🤖 **MCP Server** | 25+ tools exposed to AI coding assistants for hands-free automation |
-| 🔌 **Plugin System** | Extend with project-specific scripts, functions, playbooks, and IaC modules |
-| 🔐 **Secrets Management** | Local DPAPI vault, environment variable injection, GitHub Secrets sync |
-| 📊 **Observability** | Structured logging, metrics, execution history, web dashboard |
-| 🧪 **Quality Pipeline** | PSScriptAnalyzer, Pester tests, script validation, coverage tracking |
+- **178+ Automation Scripts** - Numbered scripts (0000-9999) for systematic execution
+- **Domain-Organized Functions** - Public functions organized by domain
+- **Playbook Orchestration** - Chain scripts together with playbooks
+- **Quality Tools** - PSScriptAnalyzer, Pester tests, validation
+- **Configuration System** - Layered config with local overrides
+- **TDD Workflow** - Dev branch management with validation gates
 
 ## Architecture
 
+See the full architecture overview in `AitherZero/ARCHITECTURE.md`.
+
+## Directory Structure
+
+```text
+AitherZero/
+ AitherZero.psd1 # Module manifest
+ AitherZero.psm1 # Module loader
+ build.ps1 # Build script
+
+ src/ # Source code
+ public/ # Exported functions (by domain)
+ AI/ # AI-related functions
+ Configuration/ # Config management
+ Dashboard/ # Dashboard functions
+ Deployment/ # Deployment tools
+ Execution/ # Script execution
+ Integrations/ # External integrations
+ Logging/ # Logging utilities
+ Orchestration/ # Playbook orchestration
+ Remote/ # Remote execution
+ Security/ # Secrets, SSH keys
+ System/ # System utilities
+ Testing/ # Test utilities
+ private/ # Internal functions
+ Startup.ps1 # Module initialization
+
+ library/ # Resources
+ automation-scripts/ # 178+ numbered scripts
+ playbooks/ # Orchestration playbooks
+ docs/ # Documentation
+ templates/ # Script templates
+
+ config/ # Configuration files
+ config.psd1 # Master configuration
+ config.local.psd1 # Local overrides (gitignored)
+ config.windows.psd1 # Windows-specific
+ config.linux.psd1 # Linux-specific
+ config.macos.psd1 # macOS-specific
+
+ tests/ # Pester tests
+ Unit/
+ Integration/
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Your AI Assistant                     │
-│            (Copilot / Claude / Cursor / etc.)            │
-├───────────────────────┬─────────────────────────────────┤
-│     MCP Protocol      │        Direct CLI               │
-├───────────────────────┴─────────────────────────────────┤
-│                   AitherZero Core                        │
-│  ┌──────────┐ ┌───────────┐ ┌────────┐ ┌────────────┐  │
-│  │ Config   │ │ Orchestr. │ │ Script │ │ Logging &  │  │
-│  │ System   │ │ (Playbook)│ │ Engine │ │ Metrics    │  │
-│  └──────────┘ └───────────┘ └────────┘ └────────────┘  │
-├─────────────────────────────────────────────────────────┤
-│                   Plugin Layer                           │
-│  ┌──────────┐ ┌───────────┐ ┌────────┐ ┌────────────┐  │
-│  │ OpenTofu │ │ Docker/K8s│ │ Cloud  │ │ Your       │  │
-│  │ Modules  │ │ Deploy    │ │ Provid.│ │ Plugin     │  │
-│  └──────────┘ └───────────┘ └────────┘ └────────────┘  │
-├─────────────────────────────────────────────────────────┤
-│              Infrastructure Targets                      │
-│  GCP · AWS · Azure · Docker · Kubernetes · Bare Metal   │
-└─────────────────────────────────────────────────────────┘
-```
 
-## Getting Started
+## Quick Start
 
-### Prerequisites
-
-- **PowerShell 7.4+** — [Install](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
-- **Git**
-- **Docker** (optional, for container features)
-- **OpenTofu** (optional, for infrastructure provisioning)
-
-### Install
-
-```bash
-git clone https://github.com/aitherium/aitherzero.git
-cd aitherzero
-```
+### Import the Module
 
 ```powershell
-# Bootstrap
-./bootstrap.ps1 -Mode New -InstallProfile Minimal -NonInteractive
-
-# Import the module
-Import-Module ./AitherZero.psd1 -Force
+# From repository root
+Import-Module ./AitherZero/AitherZero.psd1 -Force
 
 # Verify
-Get-AitherStatus
+Get-Module AitherZero
 ```
 
-### Your First Automation
+### Run a Script by Number
 
 ```powershell
+# Using the CLI
 # Run a script by number
-Invoke-AitherScript 0011  # Get system fingerprint
+Invoke-AitherScript 0011
 
-# Run a playbook
-Invoke-AitherPlaybook dev-environment
-
-# See available scripts
-Get-AitherScript | Format-Table Number, Name, Category
+# Direct execution
+pwsh -File ./AitherZero/library/automation-scripts/0011_Get-SystemInfo.ps1 -ShowOutput
 ```
 
-### Connect to AI Assistant (MCP)
-
-Add to your `.vscode/mcp.json` or Claude config:
-
-```json
-{
-  "servers": {
-    "aitherzero": {
-      "command": "node",
-      "args": ["./library/integrations/mcp-server/dist/index.js"],
-      "env": {
-        "AITHERZERO_ROOT": "/path/to/aitherzero"
-      }
-    }
-  }
-}
-```
-
-Now your AI assistant can: run scripts, execute playbooks, query config, manage git, deploy infrastructure — all through natural language.
-
-## Configuration
-
-AitherZero is **entirely configuration-driven**. One file controls everything:
+### Run a Playbook
 
 ```powershell
-# config/config.psd1
-@{
-    ProjectContext = @{
-        Name            = 'my-app'
-        ComposeFile     = 'docker-compose.yml'
-        ProjectName     = 'my-app'
-        ContainerPrefix = 'my-app'
-        RegistryURL     = 'ghcr.io/myorg'
-    }
-
-    Container = @{
-        Docker = @{
-            ComposeFile = 'docker-compose.yml'
-            ProjectName = 'my-app'
-        }
-    }
-}
+.\Invoke-AitherPlaybook -Name test-quick
 ```
 
-Override locally with `config/config.local.psd1` (gitignored) or environment variables prefixed with `AITHERZERO_`.
+## Module Domains
 
-## Plugins
+### AI (`src/public/AI/`)
 
-Plugins add project-specific automation:
+AI-related functions for agent management.
 
-```powershell
-# Create a new plugin
-New-AitherPlugin -Name 'my-webapp' -Description 'Deploy my web application'
+| Function | Description |
+|----------|-------------|
+| `Invoke-Agent` | Start an AI agent |
+| `Get-AgentStatus` | Check agent status |
+| `Stop-Agent` | Stop a running agent |
 
-# Register a plugin
-Register-AitherPlugin -Path ./plugins/my-webapp
+### Configuration (`src/public/Configuration/`)
 
-# List plugins
-Get-AitherPlugin
-```
+Configuration management functions.
 
-### Plugin Structure
+| Function | Description |
+|----------|-------------|
+| `Get-AitherConfigs` | Load merged configuration |
+| `Import-ConfigDataFile` | Import .psd1 config files |
+| `Get-ConfigValue` | Get specific config value |
 
-```
-plugins/my-webapp/
-├── plugin.psd1        # Manifest
-├── config/            # Config overlays
-├── scripts/           # Automation scripts
-├── functions/         # PowerShell functions
-├── playbooks/         # Orchestration playbooks
-└── infrastructure/    # OpenTofu modules
-```
+### Logging (`src/public/Logging/`)
 
-See the [Plugin Development Guide](library/docs/PLUGIN-DEVELOPMENT.md) and the `plugins/_template/` directory.
+Logging and output utilities.
+
+| Function | Description |
+|----------|-------------|
+| `Write-ScriptLog` | Write structured log entry |
+| `Write-AitherError` | Write error with context |
+| `Get-LogPath` | Get current log file path |
+
+### Orchestration (`src/public/Orchestration/`)
+
+Script and playbook orchestration.
+
+| Function | Description |
+|----------|-------------|
+| `Invoke-AitherScript` | Run automation script |
+| `Invoke-Playbook` | Run playbook |
+| `Get-AitherScript` | List available scripts |
+
+### Security (`src/public/Security/`)
+
+Security and secrets management.
+
+| Function | Description |
+|----------|-------------|
+| `Get-SecureCredential` | Retrieve stored credential |
+| `Set-SecureCredential` | Store credential securely |
+| `New-SSHKeyPair` | Generate SSH keys |
+
+### Testing (`src/public/Testing/`)
+
+Testing utilities and helpers.
+
+| Function | Description |
+|----------|-------------|
+| `Invoke-PesterTests` | Run Pester tests |
+| `Get-TestCoverage` | Get code coverage |
+| `Assert-ScriptAnalyzer` | Run PSScriptAnalyzer |
 
 ## Automation Scripts
 
-Scripts are organized by category:
+### Script Numbering Convention
 
-| Category | Range | Purpose |
-|----------|-------|---------|
-| `00-bootstrap` | 0000-0099 | System prerequisites, environment setup |
-| `10-devtools` | 1000-1099 | Developer tool installers |
-| `20-build` | 2000-2099 | Container image builds |
-| `30-deploy` | 3000-3099 | Deployment targets (compose, K8s, cloud) |
-| `40-lifecycle` | 4000-4099 | Service start/stop/restart/scale |
-| `50-ai-setup` | 5000-5099 | AI/ML tool setup |
-| `60-monitoring` | 6000-6099 | Observability and alerting |
-| `60-security` | 6000-6099 | Secrets, TLS, network policies |
-| `70-git` | 7000-7099 | Git workflow automation |
-| `70-maintenance` | 7000-7099 | Cleanup, backups, updates |
-| `80-testing` | 8000-8099 | Testing and validation |
+| Range | Category | Examples |
+|-------|----------|----------|
+| 0000-0099 | Environment Setup | `0011_Get-SystemInfo.ps1`, `0014_Initialize-Environment.ps1` |
+| 0100-0199 | Infrastructure | `0105_Install-HyperV.ps1`, `0150_Deploy-AgenticOS.ps1` |
+| 0200-0299 | Dev Tools | `0207_Install-Git.ps1`, `0225_Install-GoogleADK.ps1` |
+| 0400-0499 | Testing/Quality | `0402_Run-UnitTests.ps1`, `0404_Run-PSScriptAnalyzer.ps1` |
+| 0500-0599 | Reporting | `0510_Generate-ProjectReport.ps1`, `0520_Build-Documentation.ps1` |
+| 0600-0699 | Security | `0601_Manage-Secrets.ps1`, `0602_Generate-SSHKeys.ps1` |
+| 0700-0799 | Git/AI/Agents | `0707_Setup-GitHubRunner.ps1`, `0762_Start-AitherNode.ps1` |
+| 0800-0899 | AitherOS Ops | `0800_Start-AitherOS.ps1`, `0801_Stop-AitherOS.ps1` |
+| 0900-0999 | Validation | `0902_Manage-DevBranch.ps1`, `0906_Validate-Syntax.ps1` |
+| 1100+ | Genesis Tests | `1100_Run-GenesisTest.ps1` |
 
-## Playbooks
-
-Playbooks are declarative orchestration:
+### Script Template
 
 ```powershell
-# library/playbooks/ci-pr-validation.psd1
-@{
-    Name  = 'ci-pr-validation'
-    Steps = @(
-        @{ Script = '0906'; Description = 'Validate syntax'; OnFailure = 'Stop' }
-        @{ Script = '0402'; Description = 'Run unit tests'; OnFailure = 'Continue' }
-        @{ Script = '0404'; Description = 'Run PSScriptAnalyzer'; OnFailure = 'Stop' }
-    )
+<#
+.SYNOPSIS
+ Brief description of the script.
+
+.DESCRIPTION
+ Detailed description of what the script does.
+
+.PARAMETER ShowOutput
+ Show output to console (scripts are silent by default).
+
+.EXAMPLE
+ .\0000_My-Script.ps1 -ShowOutput
+
+.NOTES
+ Script Number: 0000
+ Category: Environment
+#>
+[CmdletBinding()]
+param(
+ [switch]$ShowOutput
+)
+
+# Initialize (loads module and config)
+. "$PSScriptRoot/_init.ps1"
+
+# Script implementation
+try {
+ Write-ScriptLog "Starting script..." -Level Info
+
+ # Your code here
+
+ Write-ScriptLog "Script completed successfully" -Level Info
+ exit 0
+}
+catch {
+ Write-AitherError -Message $_.Exception.Message -ErrorRecord $_
+ exit 1
 }
 ```
 
+### Key Scripts
+
+| Script | Description |
+|--------|-------------|
+| `0011_Get-SystemInfo.ps1` | Get system information |
+| `0014_Initialize-Environment.ps1` | Initialize AitherZero environment |
+| `0800_Start-AitherOS.ps1` | Start all AI services |
+| `0801_Stop-AitherOS.ps1` | Stop all AI services |
+| `0402_Run-UnitTests.ps1` | Run Pester tests |
+| `0510_Generate-ProjectReport.ps1` | Generate project report |
+| `0762_Start-AitherNode.ps1` | Start MCP server |
+| `0902_Manage-DevBranch.ps1` | TDD workflow dev branch management |
+| `0906_Validate-Syntax.ps1` | Validate PowerShell syntax |
+| `1100_Run-GenesisTest.ps1` | Full system test (28 phases) |
+
+## Playbooks
+
+Playbooks orchestrate multiple scripts in sequence.
+
+### Playbook Format
+
 ```powershell
-Invoke-AitherPlaybook ci-pr-validation
+# playbooks/my-playbook.psd1
+@{
+ Name = 'my-playbook'
+ Description = 'My custom playbook'
+ Steps = @(
+ @{
+ Script = '0906'
+ Parameters = @{ All = $true }
+ OnFailure = 'Stop'
+ },
+ @{
+ Script = '0402'
+ OnFailure = 'Continue'
+ }
+ )
+}
 ```
 
-## OpenTofu Infrastructure
-
-Provision cloud infrastructure through configuration:
+### Running Playbooks
 
 ```powershell
-# Deploy infrastructure
-Invoke-AitherDeploy -Target gcp -Environment production
+# Run a playbook
+Invoke-AitherPlaybook -Name my-playbook
 
-# Plan changes
-Invoke-AitherDeploy -Target gcp -PlanOnly
-
-# Destroy
-Invoke-AitherDeploy -Target gcp -Destroy
+# With variables
+Invoke-AitherPlaybook -Name test-quick -Variables @{ Verbose = $true }
 ```
 
-OpenTofu modules are in `library/infrastructure/modules/`. Contribute new modules for AWS, Azure, and other providers!
+### Built-in Playbooks
 
-## Contributing
+| Playbook | Description |
+|----------|-------------|
+| `test-quick` | Quick test suite |
+| `genesis-test` | Full system test |
+| `ci-pr-validation` | CI/CD validation |
+| `aither-ecosystem` | Start AI ecosystem |
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+## Configuration
 
-Great first contributions:
-- 🔧 New dev tool installers (`10-devtools/`)
-- 📋 New playbook templates for common CI/CD workflows
-- 🔌 Plugin examples for popular frameworks
-- 🏗️ OpenTofu modules for AWS/Azure
-- 📝 Documentation improvements
-- 🐛 Bug fixes and cross-platform compatibility
+### Config Hierarchy
 
-## License
+```text
+Command-line Parameters (highest priority)
+ ↓
+Environment Variables (AITHERZERO_*)
+ ↓
+config.local.psd1 (User overrides, gitignored)
+ ↓
+config.{os}.psd1 (OS-specific)
+ ↓
+config.psd1 (Master manifest, lowest priority)
+```
 
-[Apache License 2.0](LICENSE) — use it however you want, commercial or personal.
+### Reading Configuration
 
-## Built by [Aitherium](https://aitherium.com)
+```powershell
+# Load merged configuration
+$config = Get-AitherConfigs
 
-AitherZero was extracted from the automation backbone of [AitherOS](https://aitheros.ai), an agentic operating system with 97 microservices. It's been battle-tested deploying complex distributed systems in production.
+# Access nested values
+$comfyEnabled = $config.Features.AI.ComfyUI.Enabled
+$logLevel = $config.Core.Logging.DefaultLevel
+
+# Or use helper
+$value = Get-ConfigValue -Path 'Features.AI.ComfyUI.Enabled'
+```
+
+### Key Config Sections
+
+| Section | Purpose |
+|---------|---------|
+| `Core` | Core settings (paths, logging) |
+| `Features` | Feature flags |
+| `Agents` | AI agent configuration |
+| `Testing` | Test settings |
+| `Dependencies` | External dependencies |
+
+## Development
+
+### Adding a New Function
+
+1. Create file in appropriate domain:
+
+```powershell
+# src/public/MyDomain/My-Function.ps1
+function My-Function {
+ <#
+ .SYNOPSIS
+ Brief description.
+ #>
+ [CmdletBinding()]
+ param(
+ [string]$Parameter
+ )
+
+ # Implementation
+}
+```
+
+2. Export in module manifest (`AitherZero.psd1`):
+
+```powershell
+FunctionsToExport = @(
+ 'My-Function',
+ # ... other functions
+)
+```
+
+### Running Tests
+
+CI uses selective scope detection:
+- Changes under `tests/` run the touched Pester files first.
+- Changes under `src/`, `library/automation-scripts/`, `config/`, or `plugins/` run only the relevant validation jobs.
+- Docs-only changes should not trigger the standalone AitherZero CI workflow.
+
+```powershell
+# All tests
+pwsh -File ./AitherZero/library/automation-scripts/0402_Run-UnitTests.ps1
+
+# Specific test file
+Invoke-Pester ./AitherZero/tests/Unit/MyTest.Tests.ps1
+
+# With coverage
+Invoke-Pester -CodeCoverage ./AitherZero/src/public/*/*.ps1
+```
+
+### Quality Checks
+
+```powershell
+# PSScriptAnalyzer
+pwsh -File ./AitherZero/library/automation-scripts/0404_Run-PSScriptAnalyzer.ps1
+
+# Syntax validation
+pwsh -File ./AitherZero/library/automation-scripts/0906_Validate-Syntax.ps1 -All
+
+# Component quality
+pwsh -File ./AitherZero/library/automation-scripts/0908_Validate-ComponentQuality.ps1 -Path ./src/public/Logging
+```
+
+## Related Documentation
+
+- [Automation Scripts Index](./library/automation-scripts/README.md)
+- [Playbooks Documentation](./library/playbooks/README.md)
+- [Configuration Reference](./config/README.md)
+- [AitherOS Documentation](../AitherOS/README.md)
+- [Main Project README](../README.md)
 
 ---
 
-<div align="center">
+[← Back to Home](../README.md) | [Scripts →](./library/automation-scripts/README.md)
 
-⭐ **Star this repo** if you find it useful · 🔌 **Build a plugin** and share it · 💬 **Join the discussion** in [GitHub Discussions](https://github.com/aitherium/aitherzero/discussions)
+## Full Deployment from Scratch
 
-</div>
+AitherZero provides a **one-command full deployment** experience. Users can go from a bare machine to a fully running AitherOS with all dependencies, runtimes, Ollama, services, and dashboard.
+
+### Quick Start (One-Liner)
+
+**Full AitherOS Deployment (PowerShell 7+):**
+```powershell
+& ([scriptblock]::Create((iwr -useb https://raw.githubusercontent.com/wizzense/AitherZero/main/bootstrap.ps1))) -Playbook genesis-bootstrap
+```
+
+**Install Only (skip full deployment):**
+```powershell
+iwr -useb https://raw.githubusercontent.com/wizzense/AitherZero/main/bootstrap.ps1 | iex
+```
+
+### What This Installs
+
+The `genesis-bootstrap` playbook automatically:
+1. Detects your hardware (GPU, CPU, RAM) and configures optimal settings
+2. Installs all dependencies: Python 3.11+, Node.js 20+, Docker Desktop, Ollama
+3. Configures Ollama with optimal models for your hardware tier
+4. Sets up AitherOS services and Genesis bootloader
+5. Installs system services for persistence across reboots
+6. Opens the Genesis Dashboard at http://localhost:8001/dashboard
+
+### Configuration
+
+All automation is driven by configuration files in `AitherZero/config/`:
+- `config.psd1` - Master configuration (do not edit directly)
+- `config.local.psd1` - Local overrides (gitignored, edit this)
+
+To customize deployment, edit `config.local.psd1`:
+```powershell
+@{
+ Core = @{
+ NonInteractive = $true # No prompts (CI/CD friendly)
+ }
+ Features = @{
+ Development = @{
+ Python = @{ Enabled = $true }
+ Node = @{ Enabled = $true }
+ Docker = @{ Enabled = $true }
+ }
+ AI = @{
+ Ollama = @{ Enabled = $true }
+ ComfyUI = @{ Enabled = $false } # Heavy, optional
+ }
+ }
+}
+```
+
+### Environment Variables
+
+For CI/CD or non-interactive use:
+- `AITHERZERO_NONINTERACTIVE=1` - Skip all prompts
+- `AITHEROS_SKIP_OLLAMA=1` - Skip Ollama/model setup
+- `AITHEROS_SKIP_VEIL=1` - Skip Veil dashboard setup
+
+### Playbooks
+
+Available playbooks in `AitherZero/library/playbooks/`:
+- `genesis-bootstrap` - Full AitherOS deployment
+- `deploy-infrastructure` - Infrastructure/cloud deployment
+- `build` - Build container images only
+- `deploy-local` - Deploy via Docker Compose
+
+Run any playbook:
+```powershell
+./bootstrap.ps1 -Playbook <playbook-name>
+```
+
+
+## Full Deployment from Scratch
+
+AitherZero provides a **one-command full deployment** experience. Users can go from a bare machine to a fully running AitherOS with all dependencies, runtimes, Ollama, services, and dashboard.
+
+### Quick Start (One-Liner)
+
+**Full AitherOS Deployment (PowerShell 7+):**
+```powershell
+& ([scriptblock]::Create((iwr -useb https://raw.githubusercontent.com/wizzense/AitherZero/main/bootstrap.ps1))) -Playbook genesis-bootstrap
+```
+
+**Install Only (skip full deployment):**
+```powershell
+iwr -useb https://raw.githubusercontent.com/wizzense/AitherZero/main/bootstrap.ps1 | iex
+```
+
+### What This Installs
+
+The `genesis-bootstrap` playbook automatically:
+1. Detects your hardware (GPU, CPU, RAM) and configures optimal settings
+2. Installs all dependencies: Python 3.11+, Node.js 20+, Docker Desktop, Ollama
+3. Configures Ollama with optimal models for your hardware tier
+4. Sets up AitherOS services and Genesis bootloader
+5. Installs system services for persistence across reboots
+6. Opens the Genesis Dashboard at http://localhost:8001/dashboard
+
+### Configuration
+
+All automation is driven by configuration files in `AitherZero/config/`:
+- `config.psd1` - Master configuration (do not edit directly)
+- `config.local.psd1` - Local overrides (gitignored, edit this)
+
+To customize deployment, edit `config.local.psd1`:
+```powershell
+@{
+ Core = @{
+ NonInteractive = $true # No prompts (CI/CD friendly)
+ }
+ Features = @{
+ Development = @{
+ Python = @{ Enabled = $true }
+ Node = @{ Enabled = $true }
+ Docker = @{ Enabled = $true }
+ }
+ AI = @{
+ Ollama = @{ Enabled = $true }
+ ComfyUI = @{ Enabled = $false } # Heavy, optional
+ }
+ }
+}
+```
+
+### Environment Variables
+
+For CI/CD or non-interactive use:
+- `AITHERZERO_NONINTERACTIVE=1` - Skip all prompts
+- `AITHEROS_SKIP_OLLAMA=1` - Skip Ollama/model setup
+- `AITHEROS_SKIP_VEIL=1` - Skip Veil dashboard setup
+
+### Playbooks
+
+Available playbooks in `AitherZero/library/playbooks/`:
+- `genesis-bootstrap` - Full AitherOS deployment
+- `deploy-infrastructure` - Infrastructure/cloud deployment
+- `build` - Build container images only
+- `deploy-local` - Deploy via Docker Compose
+
+Run any playbook:
+```powershell
+./bootstrap.ps1 -Playbook <playbook-name>
+```
+
+## Full Deployment from Scratch
+
+AitherZero provides a **one-command full deployment** experience. Users can go from a bare machine to a fully running AitherOS with all dependencies, runtimes, Ollama, services, and dashboard.
+
+### Quick Start (One-Liner)
+
+**Full AitherOS Deployment (PowerShell 7+):**
+```powershell
+& ([scriptblock]::Create((iwr -useb https://raw.githubusercontent.com/wizzense/AitherZero/main/bootstrap.ps1))) -Playbook genesis-bootstrap
+```
+
+### Configuration
+
+All automation is driven by configuration files in `AitherZero/config/`:
+- `config.psd1` - Master configuration (do not edit directly)
+- `config.local.psd1` - Local overrides (gitignored, edit this)
+
+### Environment Variables
+
+For CI/CD or non-interactive use:
+- `AITHERZERO_NONINTERACTIVE=1` - Skip all prompts
+- `AITHEROS_SKIP_OLLAMA=1` - Skip Ollama/model setup
+- `AITHEROS_SKIP_VEIL=1` - Skip Veil dashboard setup
+
+## Full Deployment from Scratch
+
+AitherZero provides a **one-command full deployment** experience. Users can go from a bare machine to a fully running AitherOS with all dependencies, runtimes, Ollama, services, and dashboard.
+
+### Quick Start (One-Liner)
+
+**Full AitherOS Deployment (PowerShell 7+):**
+```powershell
+& ([scriptblock]::Create((iwr -useb https://raw.githubusercontent.com/wizzense/AitherZero/main/bootstrap.ps1))) -Playbook genesis-bootstrap
+```
+
+### Configuration
+
+All automation is driven by configuration files in `AitherZero/config/`:
+- `config.psd1` - Master configuration (do not edit directly)
+- `config.local.psd1` - Local overrides (gitignored, edit this)
+
+### Environment Variables
+
+For CI/CD or non-interactive use:
+- `AITHERZERO_NONINTERACTIVE=1` - Skip all prompts
+- `AITHEROS_SKIP_OLLAMA=1` - Skip Ollama/model setup
+- `AITHEROS_SKIP_VEIL=1` - Skip Veil dashboard setup

@@ -8,7 +8,7 @@
     1. Commits all pending changes in the monorepo
     2. Pushes to origin (AitherOS private)
     3. Syncs AitherZero subtree to the public Aitherium/AitherZero repo
-    4. Optionally syncs to AitherOS-Alpha public repo
+    4. Optionally syncs to aither public repo
     5. Records sync event to deployment history
 
     This is the script that Atlas/Demiurge agents should call when they
@@ -18,7 +18,7 @@
     Commit message. Auto-generates from changes if omitted.
 
 .PARAMETER SyncPublic
-    Also sync to public repos (AitherZero, AitherOS-Alpha). Default: true
+    Also sync to public repos (AitherZero, aither). Default: true
 
 .PARAMETER AitherZeroOnly
     Only sync to the AitherZero public repo (skip Alpha).
@@ -93,7 +93,7 @@ $Repos = @{
     }
     Alpha = @{
         Remote    = 'alpha-public'
-        Url       = 'https://github.com/Aitherium/AitherOS-Alpha.git'
+        Url       = 'https://github.com/Aitherium/aither.git'
         Type      = 'curated'   # Curated file copy (via workflow)
         TargetRef = 'main'
     }
@@ -305,7 +305,7 @@ try {
 
         if (-not $AitherZeroOnly) {
             Write-Host ""
-            Write-Host "  ━━━ Step 4: AitherOS-Alpha sync ━━━" -ForegroundColor Yellow
+            Write-Host "  ━━━ Step 4: aither sync ━━━" -ForegroundColor Yellow
 
             # Alpha sync is done via GitHub Actions workflow (sync-alpha.yml)
             # We trigger it here if gh CLI is available
