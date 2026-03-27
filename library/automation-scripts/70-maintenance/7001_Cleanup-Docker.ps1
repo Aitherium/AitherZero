@@ -160,20 +160,44 @@ switch ($Level) {
             docker container prune -f
             $cleanedSomething = $true
         }
-        
-        # Remove unused images
-        Write-Host "Removing unused images..." -ForegroundColor Gray
-        if ($DryRun) {
-            Write-Host "  Would remove unused images" -ForegroundColor Yellow
-        } else {
-            docker image prune -a -f --filter "until=168h"  # Keep images newer than 1 week
+
+        # Remove dangling images
+        Write-Host "Removing dangling images..." -ForegroundColor Gray
+        if (-not $DryRun) {
+            docker image prune -f
             $cleanedSomething = $true
         }
-        
-        # Clean build cache (but keep recent)
-        Write-Host "Cleaning old build cache..." -ForegroundColor Gray
-        if (-not $DryRun) {
-            docker builder prune -f --filter "until=168h"
+
+        # Remove unused images older than 1 week
+        Write-Host "Removing unused images (older than 7 days)..." -ForegroundColor Gray
+        if ($DryRun) {
+            Write-Host "  Would remove unused images older than 7 days" -ForegroundColor Yellow
+        } else {
+            docker image prune -a -f --filter "until=168h"
+            $cleanedSomething = $true
+        }
+
+        # Clean build cache
+        Write-Host "Cleaning build cache..." -ForegroundColor Gray
+        if ($DryRun) {
+            Write-Host "  Would prune build cache" -ForegroundColor Yellow
+        } else {
+            docker builder prune -f
+            $cleanedSomething = $true
+        }
+
+        # Remove orphaned volumes (not attached to any container)
+        Write-Host "Removing orphaned volumes..." -ForegroundColor Gray
+        if ($DryRun) {
+            $danglingVols = docker volume ls --filter "dangling=true" --format "{{.Name}}" 2>$null
+            if ($danglingVols) {
+                $count = ($danglingVols | Measure-Object).Count
+                Write-Host "  Would remove $count orphaned volume(s)" -ForegroundColor Yellow
+            } else {
+                Write-Host "  No orphaned volumes" -ForegroundColor Green
+            }
+        } else {
+            docker volume prune --all -f
             $cleanedSomething = $true
         }
     }
