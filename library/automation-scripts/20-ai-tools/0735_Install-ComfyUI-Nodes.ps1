@@ -66,6 +66,11 @@ $Nodes = @(
         Name = "DLoRAL"
         Url  = "https://github.com/yjsunnn/DLoRAL.git"
         Desc = "DLoRAL - Decoupled Low-Rank Adaptation for Layout-Aware Video Generation"
+    },
+    @{
+        Name = "ComfyUI-Yedp-Action-Director"
+        Url  = "https://github.com/wizzense/ComfyUI-Yedp-Action-Director.git"
+        Desc = "3D viewport with multi-pass rendering (Pose, Depth, Canny, Normal, Shaded, Alpha, Textured) for ControlNet pipelines"
     }
 )
 

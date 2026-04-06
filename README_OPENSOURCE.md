@@ -266,7 +266,7 @@ Great first contributions:
 
 ## Built by [Aitherium](https://aitherium.com)
 
-AitherZero was extracted from the automation backbone of [AitherOS](https://aitheros.ai), an agentic operating system with 203 microservices. It's been battle-tested deploying complex distributed systems in production.
+AitherZero was extracted from the automation backbone of [AitherOS](https://aitheros.ai), an agentic operating system with 196 microservices. It's been battle-tested deploying complex distributed systems in production.
 
 ---
 
