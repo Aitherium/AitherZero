@@ -149,11 +149,13 @@ if ($Direction -eq 'push') {
             $copied++
         }
 
-        # Use README_OPENSOURCE.md as README.md if it exists
-        $osReadme = Join-Path $AitherZeroRoot 'README_OPENSOURCE.md'
-        if (Test-Path $osReadme) {
-            Copy-Item $osReadme (Join-Path $staging 'README.md') -Force
-        }
+        # NOTE: We used to override README.md with README_OPENSOURCE.md here.
+        # As of 2026-04, the root README.md is the canonical public-facing README.
+        # README_OPENSOURCE.md is kept for reference but is no longer preferred.
+
+        # NOTE: We used to override README.md with README_OPENSOURCE.md here.
+        # As of 2026-04, the root README.md is the canonical public-facing README.
+        # README_OPENSOURCE.md is kept for reference but is no longer preferred.
 
         Write-Host "Copied $copied files, skipped $skipped excluded files"
 
