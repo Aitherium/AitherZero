@@ -160,7 +160,7 @@ process { try {
         if ($hasWriteAitherLog) {
             Write-AitherLog -Level Warning -Message "Error collecting errors for report: $($_.Exception.Message)" -Source $PSCmdlet.MyInvocation.MyCommand.Name
         } else {
-            Write-AitherLog -Level Warning -Message "Error collecting errors for report: $($_.Exception.Message)" -Source 'Export-AitherErrorReport' -Exception $_
+            Write-Warning "Error collecting errors for report: $($_.Exception.Message)"
         }
     }
 }
@@ -239,15 +239,15 @@ end {
     })
 
     <h2>Errors</h2>
-    $(foreach ($error in $errors) {
-        $stackTrace = if ($IncludeStackTraces -and $error.StackTrace) { "<pre>$($error.StackTrace)</pre>" }
+    $(foreach ($err in $errors) {
+        $stackTrace = if ($IncludeStackTraces -and $err.StackTrace) { "<pre>$($err.StackTrace)</pre>" }
     else { "" }
         @"
     <div class="error">
-        <div class="error-header">$($error.Cmdlet) - $($error.Message)</div>
-        <div class="timestamp">$($error.Timestamp)</div>
-        <p><strong>Error ID:</strong> $($error.ErrorId)</p>
-        $(if ($error.Parameters) { "<p><strong>Parameters:</strong> <pre>$($error.Parameters | ConvertTo-Json -Compress)</pre></p>" })
+        <div class="error-header">$($err.Cmdlet) - $($err.Message)</div>
+        <div class="timestamp">$($err.Timestamp)</div>
+        <p><strong>Error ID:</strong> $($err.ErrorId)</p>
+        $(if ($err.Parameters) { "<p><strong>Parameters:</strong> <pre>$($err.Parameters | ConvertTo-Json -Compress)</pre></p>" })
         $stackTrace
     </div>
 "@
@@ -286,13 +286,13 @@ $(($reportData.Environment | ConvertTo-Json -Depth 10))
 Errors:
 -------
 
-$(foreach ($error in $errors) {
+$(foreach ($err in $errors) {
     @"
-[$($error.Timestamp)] $($error.Cmdlet)
-  Error ID: $($error.ErrorId)
-  Message: $($error.Message)
-  $(if ($error.Parameters) { "Parameters: $($error.Parameters | ConvertTo-Json -Compress)`n  " })
-  $(if ($IncludeStackTraces -and $error.StackTrace) { "Stack Trace:`n  $($error.StackTrace -replace "`n", "`n  ")`n  " })
+[$($err.Timestamp)] $($err.Cmdlet)
+  Error ID: $($err.ErrorId)
+  Message: $($err.Message)
+  $(if ($err.Parameters) { "Parameters: $($err.Parameters | ConvertTo-Json -Compress)`n  " })
+  $(if ($IncludeStackTraces -and $err.StackTrace) { "Stack Trace:`n  $($err.StackTrace -replace "`n", "`n  ")`n  " })
 
 "@
 })

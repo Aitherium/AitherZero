@@ -97,8 +97,9 @@ process {
 
         # List all
         return $schedules | ForEach-Object {
+            $scheduleFile = $_
             try {
-                $schedule = Get-Content $_.FullName | ConvertFrom-Json
+                $schedule = Get-Content $scheduleFile.FullName | ConvertFrom-Json
                 $status = 'Unknown'
 
                 if ($IsWindows) {
@@ -117,7 +118,7 @@ process {
             }
             catch {
                 [PSCustomObject]@{
-                    Name = $_.BaseName
+                    Name = $scheduleFile.BaseName
                     Schedule = 'Error'
                     Status = 'Invalid'
                     Enabled = $false

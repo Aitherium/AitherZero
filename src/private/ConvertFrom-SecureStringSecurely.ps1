@@ -42,11 +42,7 @@ function ConvertFrom-SecureStringSecurely {
     finally {
         # Always zero and free the BSTR memory, even if conversion failed
         if ($bstr -ne [IntPtr]::Zero) {
-            # Zero the memory before freeing
-            $length = [Runtime.InteropServices.Marshal]::ReadInt32($bstr, -4)
-            [Runtime.InteropServices.Marshal]::Copy([byte[]](,0), 0, $bstr, $length * 2)
-            
-            # Free the BSTR
+            # ZeroFreeBSTR zeroes the memory then frees it in one call
             [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
         }
     }

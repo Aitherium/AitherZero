@@ -139,7 +139,7 @@ begin {
     # Check config for retention
     try {
         $config = Get-AitherConfigs -ErrorAction SilentlyContinue
-        if ($config.Logging.RetentionDays) {
+        if ($config.Logging.RetentionDays -and -not $PSBoundParameters.ContainsKey('DaysToKeep')) {
             $DaysToKeep = $config.Logging.RetentionDays
         }
     }

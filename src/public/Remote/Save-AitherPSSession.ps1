@@ -121,9 +121,9 @@ process {
             $sessionConfig = @{
                 Name = $Name
                 ComputerName = $sessionToSave.ComputerName
-                Port = if ($sessionToSave.Options.Port) { $sessionToSave.Options.Port } else { if ($sessionToSave.Options.UseSSL) { 5986 } else { 5985 } }
+                Port = if ($sessionToSave.Runspace.ConnectionInfo.Port) { $sessionToSave.Runspace.ConnectionInfo.Port } else { 5985 }
                 UseSSH = $sessionToSave.Transport -eq 'SSH'
-                UseSSL = $sessionToSave.Options.UseSSL
+                UseSSL = ($sessionToSave.Runspace.ConnectionInfo -is [System.Management.Automation.Runspaces.WSManConnectionInfo]) -and $sessionToSave.Runspace.ConnectionInfo.Scheme -eq 'https'
                 ConfigurationName = $sessionToSave.ConfigurationName
                 Description = $Description
                 Created = Get-Date

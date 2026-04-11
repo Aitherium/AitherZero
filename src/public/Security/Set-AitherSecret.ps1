@@ -73,13 +73,13 @@ function Set-AitherSecret {
             Write-AitherLog -Message "Falling back to internal AitherZero credential store" -Level Debug
             if (Get-Command Set-AitherCredential -ErrorAction SilentlyContinue) {
                 try {
-                    # Convert input to PSCredential if possible, as Set-AitherCredential likely expects it
-                    # or handles username/password.
-                    # Assuming Set-AitherCredential takes -Name and -Credential or -UserName/-Password
-
-                    # Simple handling for string secrets -> map to "Secret" username
-                    if ($Secret -is [string] -or $Secret -is [System.Security.SecureString]) {
-                        Set-AitherCredential -Name $Name -UserName "Secret" -Password $Secret
+                    # Convert input to appropriate format for Set-AitherCredential
+                    if ($Secret -is [System.Security.SecureString]) {
+                        Set-AitherCredential -Name $Name -ApiKey $Secret
+                    }
+                    elseif ($Secret -is [string]) {
+                        $secureSecret = ConvertTo-SecureString -String $Secret -AsPlainText -Force
+                        Set-AitherCredential -Name $Name -ApiKey $secureSecret
                     }
                     elseif ($Secret -is [PSCredential]) {
                         Set-AitherCredential -Name $Name -Credential $Secret

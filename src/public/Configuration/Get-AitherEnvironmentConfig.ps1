@@ -96,7 +96,7 @@ process { try {
             if ($hasWriteAitherLog) {
                 Write-AitherLog -Message "No EnvironmentConfiguration section found in config" -Level Warning -Source 'Get-AitherEnvironmentConfig'
             } else {
-                Write-AitherLog -Message "No EnvironmentConfiguration section found in config" -Level Warning -Source 'Get-AitherEnvironmentConfig'
+                Write-Warning "No EnvironmentConfiguration section found in config"
             }
             return $null
         }
@@ -170,8 +170,8 @@ process { try {
             
             # Detect shell config files
             $shellConfigs = @('.bashrc', '.zshrc', '.config/fish/config.fish')
-            foreach ($configFile in $shellConfigs) {
-                $path = Join-Path $env:HOME $configFile
+            foreach ($shellConfigFile in $shellConfigs) {
+                $path = Join-Path $env:HOME $shellConfigFile
                 if (Test-Path $path) {
                     $result.Status.Unix.ShellConfigFiles += $path
                 }
@@ -184,7 +184,7 @@ process { try {
         if ($hasWriteAitherLog) {
             Write-AitherLog -Message "Error retrieving environment configuration: $($_.Exception.Message)" -Level Error -Source 'Get-AitherEnvironmentConfig' -Exception $_
         } else {
-            Write-AitherLog -Level Error -Message "Error retrieving environment configuration: $($_.Exception.Message)" -Source 'Get-AitherEnvironmentConfig' -Exception $_
+            Write-Error "Error retrieving environment configuration: $($_.Exception.Message)"
         }
         throw
     }

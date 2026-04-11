@@ -154,7 +154,7 @@ process { try {
         if ($hasWriteAitherLog) {
             Write-AitherLog -Message "Error generating shell script: $($_.Exception.Message)" -Level Error -Source 'New-AitherLinuxShellScript' -Exception $_
         } else {
-            Write-AitherLog -Level Error -Message "Error generating shell script: $($_.Exception.Message)" -Source 'New-AitherLinuxShellScript' -Exception $_
+            Write-Error "Error generating shell script: $($_.Exception.Message)"
         }
         throw
     }

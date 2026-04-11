@@ -56,7 +56,7 @@ function Sync-AitherServiceConfig {
     # Locate services.yaml
     if (-not $ServicesYamlPath) {
         $root = Get-AitherProjectRoot -ErrorAction SilentlyContinue
-        if (-not $root) { $root = $projectRoot }
+        if (-not $root) { $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent }
         $candidates = @(
             (Join-Path $root "AitherOS/config/services.yaml"),
             (Join-Path $root "config/services.yaml")
@@ -73,7 +73,11 @@ function Sync-AitherServiceConfig {
     # Locate output
     if (-not $OutputPath) {
         $moduleRoot = Get-AitherModuleRoot -ErrorAction SilentlyContinue
-        if (-not $moduleRoot) { $moduleRoot = Join-Path $projectRoot "AitherZero" }
+        if (-not $moduleRoot) {
+            $fallbackRoot = Get-AitherProjectRoot -ErrorAction SilentlyContinue
+            if ($fallbackRoot) { $moduleRoot = Join-Path $fallbackRoot "AitherZero" }
+            else { $moduleRoot = Split-Path $PSScriptRoot -Parent }
+        }
         $OutputPath = Join-Path $moduleRoot "config/services.psd1"
     }
 

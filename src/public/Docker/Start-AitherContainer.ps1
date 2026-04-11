@@ -91,12 +91,15 @@ function Start-AitherContainer {
 
     end {
         # Build the docker compose command
-        $args = @('compose') + $cfg.BaseArgs
+        $dockerArgs = @('compose') + $cfg.BaseArgs
 
         if ($NoCache -and $allNames.Count -gt 0) {
             # Two-step: build --no-cache, then up
-            $buildArgs = $args + @('build', '--no-cache')
-            $serviceArgs = $allNames | ForEach-Object { "aither-$($_.ToLower().TrimStart('aither-'))" }
+            $buildArgs = $dockerArgs + @('build', '--no-cache')
+            $serviceArgs = $allNames | ForEach-Object {
+                $clean = $_.ToLower() -replace '^aither-', ''
+                "aither-$clean"
+            }
             $buildArgs += $serviceArgs
 
             $target = ($serviceArgs -join ', ')
@@ -110,15 +113,18 @@ function Start-AitherContainer {
             }
         }
 
-        $args += 'up'
-        if ($Detach) { $args += '-d' }
-        if ($Build -and -not $NoCache) { $args += '--build' }
-        if ($Wait) { $args += '--wait' }
+        $dockerArgs += 'up'
+        if ($Detach) { $dockerArgs += '-d' }
+        if ($Build -and -not $NoCache) { $dockerArgs += '--build' }
+        if ($Wait) { $dockerArgs += '--wait' }
 
         # Add specific service names if provided
         if ($allNames.Count -gt 0) {
-            $serviceArgs = $allNames | ForEach-Object { "aither-$($_.ToLower().TrimStart('aither-'))" }
-            $args += $serviceArgs
+            $serviceArgs = $allNames | ForEach-Object {
+                $clean = $_.ToLower() -replace '^aither-', ''
+                "aither-$clean"
+            }
+            $dockerArgs += $serviceArgs
             $target = $serviceArgs -join ', '
         }
         else {
@@ -127,7 +133,7 @@ function Start-AitherContainer {
 
         if ($PSCmdlet.ShouldProcess($target, 'Start')) {
             Write-Host "Starting: $target" -ForegroundColor Cyan
-            & docker @args
+            & docker @dockerArgs
 
             if ($LASTEXITCODE -eq 0) {
                 Write-Host "Started successfully." -ForegroundColor Green

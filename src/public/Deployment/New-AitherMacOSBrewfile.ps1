@@ -68,7 +68,7 @@ process { try {
             if ($hasWriteAitherLog) {
                 Write-AitherLog -Message "Brewfile generation is disabled in configuration" -Level Warning -Source 'New-AitherMacOSBrewfile'
             } else {
-                Write-AitherLog -Level Warning -Message "Brewfile generation is disabled in configuration" -Source 'New-AitherMacOSBrewfile'
+                Write-Warning "Brewfile generation is disabled in configuration"
             }
             return $null
         }
@@ -129,7 +129,7 @@ process { try {
         if ($hasWriteAitherLog) {
             Write-AitherLog -Message "Error generating Brewfile: $($_.Exception.Message)" -Level Error -Source 'New-AitherMacOSBrewfile' -Exception $_
         } else {
-            Write-AitherLog -Level Error -Message "Error generating Brewfile: $($_.Exception.Message)" -Source 'New-AitherMacOSBrewfile' -Exception $_
+            Write-Error "Error generating Brewfile: $($_.Exception.Message)"
         }
         throw
     }

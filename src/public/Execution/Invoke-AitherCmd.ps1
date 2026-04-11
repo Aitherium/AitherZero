@@ -37,16 +37,17 @@ function Invoke-AitherCmd {
 
     # --- Configuration & Cache ---
     $CACHE_FILE = "$env:TEMP\aither_services_cache.json"
-    $PYTHON_PATH_WIN = "d:\AitherOS-Fresh\AitherOS\.venv\Scripts\python.exe"
-    $PYTHON_PATH_NIX = "d:\AitherOS-Fresh\AitherOS\.venv\bin\python"
+    $ProjectRoot = if ($env:AITHERZERO_ROOT) { Split-Path $env:AITHERZERO_ROOT -Parent }
+                    elseif (Get-Command Get-AitherProjectRoot -ErrorAction SilentlyContinue) { Get-AitherProjectRoot }
+                    else { Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent }
+    $PYTHON_PATH_WIN = Join-Path $ProjectRoot "AitherOS\.venv\Scripts\python.exe"
+    $PYTHON_PATH_NIX = Join-Path $ProjectRoot "AitherOS/.venv/bin/python"
     
     $PythonExe = if (Test-Path $PYTHON_PATH_WIN) { $PYTHON_PATH_WIN } else { $PYTHON_PATH_NIX }
     if (-not (Test-Path $PythonExe)) {
         # Fallback to system python if venv not found
         $PythonExe = "python"
     }
-
-    $ProjectRoot = "d:\AitherOS-Fresh"
     $HelperScript = "$ProjectRoot\AitherZero\library\helpers\get_services_config.py"
 
     # --- Helper Functions ---

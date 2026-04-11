@@ -162,7 +162,7 @@ begin {
     } else {
         Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
     }
-    $playbooksPath = Join-Path $moduleRoot 'AitherZero' 'library' 'playbooks'
+    $playbooksPath = Join-Path $moduleRoot 'library' 'playbooks'
 }
 
 process {

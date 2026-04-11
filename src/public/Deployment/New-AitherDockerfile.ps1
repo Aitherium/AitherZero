@@ -171,7 +171,7 @@ process { try {
         if ($hasWriteAitherLog) {
             Write-AitherLog -Message "Error generating Dockerfile: $($_.Exception.Message)" -Level Error -Source 'New-AitherDockerfile' -Exception $_
         } else {
-            Write-AitherLog -Level Error -Message "Error generating Dockerfile: $($_.Exception.Message)" -Source 'New-AitherDockerfile' -Exception $_
+            Write-Error "Error generating Dockerfile: $($_.Exception.Message)"
         }
         throw
     }

@@ -159,7 +159,7 @@ process { try {
         if ($hasWriteAitherLog) {
             Write-AitherLog -Message "Error generating deployment artifacts: $($_.Exception.Message)" -Level Error -Source 'New-AitherDeploymentArtifact' -Exception $_
         } else {
-            Write-AitherLog -Message "Error generating deployment artifacts: $($_.Exception.Message)" -Level Error -Source 'New-AitherDeploymentArtifact' -Exception $_
+            Write-Error "Error generating deployment artifacts: $($_.Exception.Message)"
         }
         throw
     }

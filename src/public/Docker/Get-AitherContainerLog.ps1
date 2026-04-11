@@ -94,7 +94,8 @@ function Get-AitherContainerLog {
 
     process {
         foreach ($svc in $Name) {
-            $containerName = "aitheros-$($svc.ToLower().TrimStart('aither-').TrimStart('aitheros-'))"
+            $svcClean = $svc.ToLower() -replace '^aitheros-', '' -replace '^aither-', ''
+            $containerName = "aitheros-$svcClean"
 
             # Verify container exists
             $exists = docker ps -a --format '{{.Names}}' --filter "name=$containerName" 2>$null
@@ -104,14 +105,14 @@ function Get-AitherContainerLog {
             }
 
             # Build docker logs command
-            $args = @('logs')
-            if ($Follow) { $args += '-f' }
-            if ($Tail -and -not $Follow) { $args += @('--tail', $Tail.ToString()) }
-            if ($Follow) { $args += @('--tail', $Tail.ToString()) }  # Show tail before streaming
-            if ($Timestamps) { $args += '--timestamps' }
-            if ($Since) { $args += @('--since', $Since) }
-            if ($Until) { $args += @('--until', $Until) }
-            $args += $containerName
+            $dockerArgs = @('logs')
+            if ($Follow) { $dockerArgs += '-f' }
+            if ($Tail -and -not $Follow) { $dockerArgs += @('--tail', $Tail.ToString()) }
+            if ($Follow) { $dockerArgs += @('--tail', $Tail.ToString()) }  # Show tail before streaming
+            if ($Timestamps) { $dockerArgs += '--timestamps' }
+            if ($Since) { $dockerArgs += @('--since', $Since) }
+            if ($Until) { $dockerArgs += @('--until', $Until) }
+            $dockerArgs += $containerName
 
             if ($Name.Count -gt 1 -and -not $Follow) {
                 Write-Host "`n=== $containerName ===" -ForegroundColor Cyan
@@ -122,15 +123,15 @@ function Get-AitherContainerLog {
                 if ($Search -or $Level) {
                     $filterPattern = if ($Level) { $Level } else { $Search }
                     Write-Host "Streaming $containerName logs (filter: $filterPattern)..." -ForegroundColor DarkGray
-                    & docker @args 2>&1 | Where-Object { $_ -match $filterPattern }
+                    & docker @dockerArgs 2>&1 | Where-Object { $_ -match $filterPattern }
                 }
                 else {
-                    & docker @args
+                    & docker @dockerArgs
                 }
             }
             else {
                 # Batch mode — capture, filter, colorize
-                $logLines = & docker @args 2>&1
+                $logLines = & docker @dockerArgs 2>&1
 
                 if ($Level) {
                     $logLines = $logLines | Where-Object { $_ -match "\b$Level\b" }

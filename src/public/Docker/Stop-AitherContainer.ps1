@@ -79,20 +79,20 @@ function Stop-AitherContainer {
     end {
         if ($All -or ($allNames.Count -eq 0 -and -not $Name)) {
             # Full compose down/stop
-            $args = @('compose') + $cfg.BaseArgs
+            $dockerArgs = @('compose') + $cfg.BaseArgs
 
             if ($Remove) {
-                $args += @('down', '--timeout', $Timeout.ToString())
+                $dockerArgs += @('down', '--timeout', $Timeout.ToString())
                 $action = 'Stop and remove all containers'
             }
             else {
-                $args += @('stop', '--timeout', $Timeout.ToString())
+                $dockerArgs += @('stop', '--timeout', $Timeout.ToString())
                 $action = 'Stop all containers'
             }
 
             if ($PSCmdlet.ShouldProcess('all AitherOS services', $action)) {
                 Write-Host "$action..." -ForegroundColor Yellow
-                & docker @args
+                & docker @dockerArgs
                 if ($LASTEXITCODE -eq 0) {
                     Write-Host 'All services stopped.' -ForegroundColor Green
                 }
@@ -104,7 +104,8 @@ function Stop-AitherContainer {
         else {
             # Stop specific services
             foreach ($svc in $allNames) {
-                $containerName = "aitheros-$($svc.ToLower().TrimStart('aither-').TrimStart('aitheros-'))"
+                $svcClean = $svc.ToLower() -replace '^aitheros-', '' -replace '^aither-', ''
+                $containerName = "aitheros-$svcClean"
 
                 if ($PSCmdlet.ShouldProcess($containerName, 'Stop')) {
                     Write-Host "Stopping $containerName..." -ForegroundColor Yellow

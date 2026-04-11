@@ -80,7 +80,10 @@ function Resolve-AitherServiceUrl {
 
     if (-not $script:_ServiceRegistryCache) {
         $moduleRoot = Get-AitherModuleRoot -ErrorAction SilentlyContinue
-        if (-not $moduleRoot) { $moduleRoot = Join-Path $projectRoot "AitherZero" }
+        if (-not $moduleRoot) {
+            $fallbackRoot = Get-AitherProjectRoot -ErrorAction SilentlyContinue
+            if ($fallbackRoot) { $moduleRoot = Join-Path $fallbackRoot "AitherZero" }
+        }
         $registryPath = Join-Path $moduleRoot "config/services.psd1"
 
         if (Test-Path $registryPath) {

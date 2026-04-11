@@ -238,7 +238,7 @@ process { try {
         if ($hasWriteAitherLog) {
             Write-AitherLog -Message "Error applying environment configuration: $($_.Exception.Message)" -Level Error -Source 'Set-AitherEnvironmentConfig' -Exception $_
         } else {
-            Write-AitherLog -Level Error -Message "Error applying environment configuration: $($_.Exception.Message)" -Source 'Set-AitherEnvironmentConfig' -Exception $_
+            Write-Error "Error applying environment configuration: $($_.Exception.Message)"
         }
         throw
     }

@@ -109,7 +109,7 @@ process { try {
         # Find SSH key files
         $keyFiles = Get-ChildItem -Path $KeyPath -File -ErrorAction SilentlyContinue | 
             Where-Object { 
-                $_.Name -match '^(id_rsa|id_ed25519|id_ecdsa|id_dsa).*\.pub?$' -and
+                $_.Name -match '^(id_rsa|id_ed25519|id_ecdsa|id_dsa)(_[\w-]+)?(\.pub)?$' -and
                 (-not $PublicKeyOnly -or $_.Extension -eq '.pub')
             }
         

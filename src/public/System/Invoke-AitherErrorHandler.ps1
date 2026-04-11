@@ -19,7 +19,7 @@ function Invoke-AitherErrorHandler {
         [switch]$ThrowOnError
     )
 
-    $cmdletName = if ($PSCmdlet) { $PSCmdlet.MyInvocation.MyCommand.Name } else { 'Unknown' }
+    $cmdletName = try { (Get-PSCallStack)[1].Command } catch { 'Unknown' }
     Write-AitherError -ErrorRecord $ErrorRecord -CmdletName $cmdletName -Operation $Operation -Parameters $Parameters -ThrowOnError:$ThrowOnError
 }
 

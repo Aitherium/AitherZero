@@ -63,12 +63,12 @@ function Invoke-AitherCompose {
     $cfg = Get-AitherComposeConfig -Profile $Profile
     if (-not $cfg) { return }
 
-    $args = @('compose') + $cfg.BaseArgs + @($Command)
+    $dockerArgs = @('compose') + $cfg.BaseArgs + @($Command)
 
     if ($ArgumentList) {
-        $args += $ArgumentList
+        $dockerArgs += $ArgumentList
     }
 
-    Write-Verbose "Executing: docker $($args -join ' ')"
-    & docker @args
+    Write-Verbose "Executing: docker $($dockerArgs -join ' ')"
+    & docker @dockerArgs
 }

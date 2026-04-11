@@ -47,6 +47,12 @@
 function Invoke-AitherRetry {
 [CmdletBinding()]
 param(
+    [Parameter(Mandatory)]
+    [scriptblock]$ScriptBlock,
+
+    [Parameter()]
+    [int]$MaxAttempts = 3,
+
     [Parameter()]
     [int]$DelaySeconds = 5,
 

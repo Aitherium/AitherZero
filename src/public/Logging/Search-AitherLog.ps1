@@ -140,7 +140,7 @@ function Search-AitherLog {
 [OutputType([PSCustomObject])]
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory=$false, Position = 0, ValueFromPipeline)]
+    [Parameter(Mandatory=$true, Position = 0, ValueFromPipeline)]
     [ValidateNotNullOrEmpty()]
     [string]$Pattern,
 

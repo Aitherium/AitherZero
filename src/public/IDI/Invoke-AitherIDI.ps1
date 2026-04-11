@@ -158,7 +158,7 @@ function Invoke-AitherIDI {
         Write-Host "`n  ── Running IDI Pipeline ──" -ForegroundColor Cyan
 
         $idiParams = @{
-            Statement   = $Prompt
+            Intent      = $Prompt
             Environment = $Environment
             Provider    = if ($Provider -ne 'auto') { $Provider } else { $null }
             CostLimit   = $CostLimit

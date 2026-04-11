@@ -209,24 +209,18 @@ process { try {
         $keygenArgs += '-f', $privateKeyPath
         
         if ($Passphrase) {
-            # Write passphrase to temporary file for ssh-keygen
-            $tempPassFile = Join-Path ([System.IO.Path]::GetTempPath()) "ssh_pass_$([System.Guid]::NewGuid()).txt"
+            # Convert SecureString to plain text for ssh-keygen
+            $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Passphrase)
             try {
-                $plainPass = [Runtime.InteropServices.Marshal]::PtrToStringBSTR(
-                    [Runtime.InteropServices.Marshal]::SecureStringToBSTR($Passphrase)
-                )
-                $plainPass | Out-File -FilePath $tempPassFile -Encoding ASCII -NoNewline
+                $plainPass = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
                 $keygenArgs += '-N', $plainPass
-                [Runtime.InteropServices.Marshal]::ZeroFreeBSTR([Runtime.InteropServices.Marshal]::SecureStringToBSTR($Passphrase))
             }
             finally {
-                if (Test-Path $tempPassFile) {
-                    Remove-Item $tempPassFile -Force -ErrorAction SilentlyContinue
-                }
+                [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
             }
         }
         else {
-            $keygenArgs += '-N', '""'
+            $keygenArgs += '-N', ''
         }
         
         # Add comment

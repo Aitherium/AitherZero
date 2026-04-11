@@ -277,33 +277,33 @@ function Invoke-AitherAgent {
         }
 
         # Build command arguments
-        $args = @()
+        $cliArgs = @()
         if ($Model) {
-            $args += "--model", $Model
+            $cliArgs += "--model", $Model
         }
         if ($Persona) {
-            $args += "--persona", $Persona
+            $cliArgs += "--persona", $Persona
         }
         if ($Delegate) {
-            $args += "--delegate", $Delegate
+            $cliArgs += "--delegate", $Delegate
         }
         if ($Stream) {
-            $args += "--stream"
+            $cliArgs += "--stream"
         }
         if ($OrchestratorUrl -and $OrchestratorUrl -ne "http://localhost:8001") {
-            $args += "--url", $OrchestratorUrl
+            $cliArgs += "--url", $OrchestratorUrl
         }
         
         # Add the query
-        $args += $query
+        $cliArgs += $query
 
-        Write-Verbose "Executing: python $aitherCliPath $($args -join ' ')"
+        Write-Verbose "Executing: python $aitherCliPath $($cliArgs -join ' ')"
 
         try {
             # Execute aither_cli.py
             $processInfo = New-Object System.Diagnostics.ProcessStartInfo
             $processInfo.FileName = "python"
-            $processInfo.Arguments = "`"$aitherCliPath`" $($args -join ' ')"
+            $processInfo.Arguments = "`"$aitherCliPath`" $($cliArgs -join ' ')"
             $processInfo.RedirectStandardOutput = $true
             $processInfo.RedirectStandardError = $true
             $processInfo.UseShellExecute = $false

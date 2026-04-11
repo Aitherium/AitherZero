@@ -179,7 +179,7 @@ process { try {
         if ($hasWriteAitherLog) {
             Write-AitherLog -Message "Error generating cloud-init config: $($_.Exception.Message)" -Level Error -Source 'New-AitherLinuxCloudInit' -Exception $_
         } else {
-            Write-AitherLog -Level Error -Message "Error generating cloud-init config: $($_.Exception.Message)" -Source 'New-AitherLinuxCloudInit' -Exception $_
+            Write-Error "Error generating cloud-init config: $($_.Exception.Message)"
         }
         throw
     }

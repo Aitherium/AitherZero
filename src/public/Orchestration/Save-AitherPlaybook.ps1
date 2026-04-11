@@ -136,9 +136,9 @@ function Save-AitherPlaybook {
 
                 # Convert to PowerShell data file format
                 $content = "@{`n"
-                $content += "    Name = '$($Playbook.Name)'`n"
-                $content += "    Description = '$($Playbook.Description)'`n"
-                $content += "    Version = '$($Playbook.Version)'`n"
+                $content += "    Name = '$($Playbook.Name -replace "'", "''")'`n"
+                $content += "    Description = '$($Playbook.Description -replace "'", "''")'`n"
+                $content += "    Version = '$($Playbook.Version -replace "'", "''")'`n"
                 $content += "`n"
 
                 if ($Playbook.Sequence) {
@@ -166,7 +166,7 @@ function Save-AitherPlaybook {
                     foreach ($key in $Playbook.Variables.Keys) {
                         $value = $Playbook.Variables[$key]
                         if ($value -is [string]) {
-                            $content += "        $key = '$value'`n"
+                            $content += "        $key = '$($value -replace "'", "''")'`n"
                         }
                         elseif ($value -is [bool]) {
                             $content += "        $key = `$$value`n"
@@ -183,7 +183,7 @@ function Save-AitherPlaybook {
                     foreach ($key in $Playbook.Options.Keys) {
                         $value = $Playbook.Options[$key]
                         if ($value -is [string]) {
-                            $content += "        $key = '$value'`n"
+                            $content += "        $key = '$($value -replace "'", "''")'`n"
                         }
                         elseif ($value -is [bool]) {
                             $content += "        $key = `$$value`n"

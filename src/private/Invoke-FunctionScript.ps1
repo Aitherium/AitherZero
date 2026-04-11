@@ -40,8 +40,8 @@ function Invoke-FunctionScript {
         # Read the file content
         $content = Get-Content -Path $Path -Raw
         
-        # Check if it already has a function wrapper
-        if ($content -notmatch '^\s*function\s+') {
+        # Check if it already has a function wrapper ((?m) = multiline so ^ matches each line)
+        if ($content -notmatch '(?m)^\s*function\s+') {
             # No function wrapper - wrap it
             $functionName = (Get-Item $Path).BaseName
             $wrappedContent = "function $functionName {`n$content`n}"
@@ -51,7 +51,8 @@ function Invoke-FunctionScript {
         }
         else {
             # Has function wrapper - return scriptblock that sources the file
-            return [scriptblock]::Create(". '$Path'")
+            $escapedPath = $Path -replace "'", "''"
+            return [scriptblock]::Create(". '$escapedPath'")
         }
     }
     catch {

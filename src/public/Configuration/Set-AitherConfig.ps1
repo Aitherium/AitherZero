@@ -291,7 +291,7 @@ process { try {
                 elseif ($value -is [array]) {
                     $arrayStr = $value | ForEach-Object {
                         if ($_ -is [string]) {
-                            "'$_'"
+                            "'$($_ -replace "'", "''")'" 
                         }
                         elseif ($_ -is [bool]) {
                             "`$$_"
@@ -303,7 +303,7 @@ process { try {
                     $result += "$indent    $key = @($($arrayStr -join ', '))`n"
                 }
                 elseif ($value -is [string]) {
-                    $result += "$indent    $key = '$value'`n"
+                    $result += "$indent    $key = '$($value -replace "'", "''")'`n"
                 }
                 elseif ($value -is [bool]) {
                     $result += "$indent    $key = `$$value`n"

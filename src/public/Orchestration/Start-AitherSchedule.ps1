@@ -192,7 +192,7 @@ process {
             # Linux/macOS cron
             $cronFile = Join-Path $schedulesPath "$Name.cron"
             $cronLine = switch ($Schedule) {
-                'Daily' { "0 $($Time.Split(':')[1]) $($Time.Split(':')[0]) * * * pwsh -NoProfile -Command `"$command`"" }
+                'Daily' { "$($Time.Split(':')[1]) $($Time.Split(':')[0]) * * * pwsh -NoProfile -Command `"$command`"" }
                 'Hourly' { "0 * * * * pwsh -NoProfile -Command `"$command`"" }
                 default { "0 0 * * * pwsh -NoProfile -Command `"$command`"" }
             }

@@ -80,7 +80,17 @@ function Get-AitherSecret {
                     $cred = Get-AitherCredential -Name $Name -ErrorAction Stop
 
                     if ($AsPlainText) {
-                        return $cred.GetNetworkCredential().Password
+                        if ($cred -is [PSCredential]) {
+                            return $cred.GetNetworkCredential().Password
+                        }
+                        elseif ($cred -is [System.Security.SecureString]) {
+                            $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($cred)
+                            try { return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) }
+                            finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
+                        }
+                        else {
+                            return [string]$cred
+                        }
                     }
                     return $cred
                 }

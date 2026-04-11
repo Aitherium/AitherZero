@@ -26,7 +26,7 @@ if (-not (Get-Variable -Name 'Script:AitherLogPath' -Scope Script -ErrorAction S
         Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
     }
 
-    $script:AitherLogPath = Join-Path $projectRoot "AitherZero/library/logs"
+    $script:AitherLogPath = Join-Path $projectRoot "library/logs"
     $script:AitherLogLevel = "Information"
     $script:AitherLogTargets = @("File")
     $script:AitherLogBuffer = @()

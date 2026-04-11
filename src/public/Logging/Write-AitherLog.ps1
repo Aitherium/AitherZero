@@ -151,7 +151,7 @@ param(
     [hashtable]$Data = @{},
 
     [Parameter()]
-    [System.Exception]$Exception,
+    [object]$Exception,
 
     [Parameter()]
     [string[]]$Targets

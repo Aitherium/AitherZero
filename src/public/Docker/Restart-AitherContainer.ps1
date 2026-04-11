@@ -91,7 +91,7 @@ function Restart-AitherContainer {
 
     process {
         foreach ($svc in $Name) {
-            $svcClean = $svc.ToLower().TrimStart('aither-').TrimStart('aitheros-')
+            $svcClean = $svc.ToLower() -replace '^aitheros-', '' -replace '^aither-', ''
             $containerName = "aitheros-$svcClean"
             $composeSvc = "aither-$svcClean"
 
@@ -143,8 +143,8 @@ function Restart-AitherContainer {
 
             # Fallback: Docker compose restart (profile-safe)
             Write-Host "Restarting $containerName via Docker..." -ForegroundColor Cyan
-            $args = @('compose') + $cfg.BaseArgs + @('restart', $composeSvc)
-            & docker @args
+            $dockerArgs = @('compose') + $cfg.BaseArgs + @('restart', $composeSvc)
+            & docker @dockerArgs
 
             if ($LASTEXITCODE -eq 0) {
                 Write-Host "Restarted $containerName" -ForegroundColor Green

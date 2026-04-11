@@ -112,7 +112,7 @@ function Stop-AitherService {
         }
         catch {
             Write-AitherLog -Level Error -Message "Failed to stop $svcName`: $_" -Source 'Stop-AitherService' -Exception $_
-            $result = [PSCustomObject]@{ Name = $svcName; Status = 'Error'; Port = $port; PID = $pid }
+            $result = [PSCustomObject]@{ Name = $svcName; Status = 'Error'; Port = $port; PID = $processId }
             if ($PassThru) { return $result }
         }
     }

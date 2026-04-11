@@ -98,7 +98,7 @@ function Invoke-IDIDriftWatch {
     # ── Resolve IntentGraph ───────────────────────────────────────────
     if (-not $IntentGraph -and $IntentStatement) {
         try {
-            $IntentGraph = ConvertTo-IntentGraph -Statement $IntentStatement
+            $IntentGraph = ConvertTo-IntentGraph -Intent $IntentStatement
         } catch {
             Write-Host "  ⚠️  IntentGraph extraction failed, drift scan may be incomplete" -ForegroundColor DarkYellow
         }
@@ -169,7 +169,7 @@ function Invoke-SingleScan {
             severity_score  = $SeverityOrder[$severity] ?? 2
             drift_details   = $change.drift_details ?? @()
             risk_level      = $change.risk_level ?? 'medium'
-            cost_delta      = $change.cost_delta_monthly ?? 0
+            cost_delta      = $change.cost_delta ?? 0
         }
     }
 
@@ -209,7 +209,7 @@ function Invoke-SingleScan {
                     watch_id       = $WatchId
                     drift_count    = $alertDrifts.Count
                     max_severity   = $maxSeverity
-                    environment    = $IntentGraph.metadata.environment ?? 'unknown'
+                    environment    = $IntentGraph.environment ?? 'unknown'
                 }
             } | ConvertTo-Json -Depth 5
 
