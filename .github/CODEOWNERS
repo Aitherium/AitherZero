@@ -1,0 +1,42 @@
+# Core module — maintainers only
+/AitherZero.psm1       @aitherium/core
+/AitherZero.psd1       @aitherium/core
+/src/private/           @aitherium/core
+/build.ps1             @aitherium/core
+/bootstrap.ps1         @aitherium/core
+
+# Public API surface — maintainer review required
+/src/public/Configuration/  @aitherium/core
+/src/public/Orchestration/  @aitherium/core
+/src/public/Execution/      @aitherium/core
+/src/public/Logging/        @aitherium/core
+/src/public/Plugins/        @aitherium/core
+/src/public/Security/       @aitherium/core
+
+# Other public functions — trusted contributors
+/src/public/                @aitherium/contributors
+
+# Automation scripts — trusted contributors
+/library/automation-scripts/  @aitherium/contributors
+
+# Infrastructure modules — infrastructure team
+/library/infrastructure/    @aitherium/infra
+
+# MCP server — maintainers
+/library/integrations/mcp-server/  @aitherium/core
+
+# Plugins — plugin maintainers
+/plugins/                   @aitherium/plugins
+
+# Documentation — open to all
+/library/docs/              @aitherium/docs
+/README.md                  @aitherium/docs
+
+# CI/CD — maintainers only
+/.github/workflows/         @aitherium/core
+
+# Config — maintainers
+/config/config.psd1         @aitherium/core
+
+# Tests — contributors welcome
+/tests/                     @aitherium/contributors

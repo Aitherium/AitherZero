@@ -1,0 +1,239 @@
+name: ci
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'library/automation-scripts/**'
+      - 'config/**'
+      - 'plugins/**'
+      - 'build.ps1'
+      - 'AitherZero.psd1'
+      - 'AitherZero.psm1'
+      - 'metadata.json'
+      - '.github/workflows/ci.yml'
+      - '.github/scripts/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'library/automation-scripts/**'
+      - 'config/**'
+      - 'plugins/**'
+      - 'build.ps1'
+      - 'AitherZero.psd1'
+      - 'AitherZero.psm1'
+      - 'metadata.json'
+      - '.github/workflows/ci.yml'
+      - '.github/scripts/**'
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      any_validation_needed: ${{ steps.scopes.outputs.any_validation_needed }}
+      module_changed: ${{ steps.scopes.outputs.module_changed }}
+      script_changed: ${{ steps.scopes.outputs.script_changed }}
+      tests_changed: ${{ steps.scopes.outputs.tests_changed }}
+      pester_test_files: ${{ steps.scopes.outputs.pester_test_files }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed scopes
+        id: scopes
+        shell: bash
+        run: ./.github/scripts/detect-changed-scopes.sh
+
+  lint:
+    name: PSScriptAnalyzer
+    needs: changes
+    if: needs.changes.outputs.module_changed == 'true' || needs.changes.outputs.script_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          # Fail on errors only; report warnings without blocking
+          $targets = @()
+          if ("${{ needs.changes.outputs.module_changed }}" -eq 'true') {
+            $targets += './src/'
+            if (Test-Path './AitherZero.psd1') { $targets += './AitherZero.psd1' }
+            if (Test-Path './build.ps1') { $targets += './build.ps1' }
+          }
+          if ("${{ needs.changes.outputs.script_changed }}" -eq 'true' -and (Test-Path './library/automation-scripts')) {
+            $targets += './library/automation-scripts/'
+          }
+
+          $errors = Invoke-ScriptAnalyzer -Path $targets -Recurse -Settings PSGallery -Severity Error
+          $warnings = Invoke-ScriptAnalyzer -Path $targets -Recurse -Settings PSGallery -Severity Warning
+          if ($warnings.Count -gt 0) {
+            Write-Host "::warning::PSScriptAnalyzer found $($warnings.Count) warning(s):"
+            $warnings | Format-Table -AutoSize
+          }
+          if ($errors.Count -gt 0) {
+            $errors | Format-Table -AutoSize
+            Write-Error "PSScriptAnalyzer found $($errors.Count) error(s)"
+            exit 1
+          }
+
+  test-windows:
+    name: Tests (Windows)
+    needs: changes
+    if: needs.changes.outputs.module_changed == 'true' || needs.changes.outputs.script_changed == 'true' || needs.changes.outputs.tests_changed == 'true'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module -Name Pester -MinimumVersion 5.5 -Force -Scope CurrentUser
+
+      - name: Build module
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          $changedTests = @'
+${{ needs.changes.outputs.pester_test_files }}
+'@ -split "`n" | Where-Object { $_ -and $_.Trim() }
+          $config = New-PesterConfiguration
+          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputFormat = 'JUnitXml'
+          $config.TestResult.OutputPath = './test-results/pester-windows.xml'
+          $config.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $config
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-windows
+          path: ./test-results/
+
+  test-linux:
+    name: Tests (Linux)
+    needs: changes
+    if: needs.changes.outputs.module_changed == 'true' || needs.changes.outputs.script_changed == 'true' || needs.changes.outputs.tests_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module -Name Pester -MinimumVersion 5.5 -Force -Scope CurrentUser
+
+      - name: Build module
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          $changedTests = @'
+${{ needs.changes.outputs.pester_test_files }}
+'@ -split "`n" | Where-Object { $_ -and $_.Trim() }
+          $config = New-PesterConfiguration
+          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputFormat = 'JUnitXml'
+          $config.TestResult.OutputPath = './test-results/pester-linux.xml'
+          $config.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $config
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-linux
+          path: ./test-results/
+
+  test-macos:
+    name: Tests (macOS)
+    needs: changes
+    if: needs.changes.outputs.module_changed == 'true' || needs.changes.outputs.script_changed == 'true' || needs.changes.outputs.tests_changed == 'true'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module -Name Pester -MinimumVersion 5.5 -Force -Scope CurrentUser
+
+      - name: Build module
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          $changedTests = @'
+${{ needs.changes.outputs.pester_test_files }}
+'@ -split "`n" | Where-Object { $_ -and $_.Trim() }
+          $config = New-PesterConfiguration
+          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputFormat = 'JUnitXml'
+          $config.TestResult.OutputPath = './test-results/pester-macos.xml'
+          $config.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $config
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-macos
+          path: ./test-results/
+
+  validate-scripts:
+    name: Validate Scripts
+    needs: changes
+    if: needs.changes.outputs.script_changed == 'true'
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Advisory — track violations without blocking PRs
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check script headers
+        shell: pwsh
+        run: |
+          $scripts = Get-ChildItem -Path ./library/automation-scripts/ -Recurse -Filter '*.ps1' |
+            Where-Object { $_.Name -ne '_init.ps1' }
+
+          $issues = @()
+          foreach ($script in $scripts) {
+            $content = Get-Content $script.FullName -Raw
+            if ($content -notmatch '#Requires -Version 7\.0') {
+              $issues += "$($script.Name): Missing #Requires -Version 7.0"
+            }
+            if ($content -notmatch '\[CmdletBinding\(\)\]') {
+              $issues += "$($script.Name): Missing [CmdletBinding()]"
+            }
+          }
+
+          if ($issues.Count -gt 0) {
+            $issues | ForEach-Object { Write-Warning $_ }
+            Write-Error "Found $($issues.Count) script standard violations"
+            exit 1
+          }
+          Write-Host "All $($scripts.Count) scripts pass validation" -ForegroundColor Green

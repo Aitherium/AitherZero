@@ -1,0 +1,16 @@
+# Grafana Dashboard Auto-Provisioning
+apiVersion: 1
+
+providers:
+  - name: 'AitherOS Dashboards'
+    orgId: 1
+    folder: 'AitherOS'
+    folderUid: 'aitheros'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false
+

@@ -1,0 +1,104 @@
+# AitherOS Alertmanager Configuration
+#
+# Routes alerts from Prometheus to appropriate notification channels.
+
+global:
+  resolve_timeout: 5m
+  # SMTP via Proton Mail Bridge (local relay)
+  smtp_smarthost: 'host.docker.internal:1025'
+  smtp_from: 'alertmanager@aitherium.com'
+  smtp_require_tls: false
+
+# Alert routing tree
+route:
+  # Default receiver
+  receiver: 'aitheros-default'
+  
+  # Group alerts by these labels
+  group_by: ['alertname', 'severity', 'layer']
+  
+  # Wait before sending notification for new group
+  group_wait: 30s
+  
+  # Wait before sending notification about new alerts in existing group
+  group_interval: 5m
+  
+  # Wait before re-sending notification
+  repeat_interval: 4h
+  
+  # Child routes for specific alert types
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'aitheros-critical'
+      group_wait: 10s
+      repeat_interval: 1h
+      
+    # Security alerts - high priority
+    - match:
+        layer: security
+      receiver: 'aitheros-security'
+      group_wait: 10s
+      repeat_interval: 30m
+      
+    # Agent alerts
+    - match:
+        layer: agents
+      receiver: 'aitheros-agents'
+      group_wait: 30s
+
+# Notification receivers
+receivers:
+  # Default receiver - sends to AitherPulse
+  - name: 'aitheros-default'
+    webhook_configs:
+      - url: 'http://host.docker.internal:8081/alerts/webhook'
+        send_resolved: true
+        http_config:
+          follow_redirects: true
+
+  # Critical alerts - multiple channels
+  - name: 'aitheros-critical'
+    webhook_configs:
+      - url: 'http://host.docker.internal:8081/alerts/webhook'
+        send_resolved: true
+        http_config:
+          follow_redirects: true
+    email_configs:
+      - to: 'david@aitherium.com'
+        send_resolved: true
+        headers:
+          Subject: '{{ if eq .Status "firing" }}🚨 CRITICAL{{ else }}✅ RESOLVED{{ end }}: {{ .CommonLabels.alertname }}'
+
+  # Security alerts - high priority
+  - name: 'aitheros-security'
+    webhook_configs:
+      - url: 'http://host.docker.internal:8081/alerts/webhook'
+        send_resolved: true
+    email_configs:
+      - to: 'david@aitherium.com'
+        send_resolved: true
+
+  # Agent-specific alerts
+  - name: 'aitheros-agents'
+    webhook_configs:
+      - url: 'http://host.docker.internal:8081/alerts/webhook'
+        send_resolved: true
+
+# Inhibition rules - suppress some alerts when others are firing
+inhibit_rules:
+  # If the whole system is critical, suppress individual service alerts
+  - source_match:
+      alertname: 'CriticalServicesDown'
+    target_match_re:
+      alertname: 'Service.*'
+    equal: ['layer']
+    
+  # If agent is unhealthy, suppress heartbeat stale alerts
+  - source_match:
+      alertname: 'AgentDown'
+    target_match:
+      alertname: 'AgentHeartbeatStale'
+    equal: ['agent']
+

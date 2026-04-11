@@ -1,0 +1,4 @@
+README.md
+src/public/Get-Thing.ps1
+tests/unit/Get-Thing.Tests.ps1
+library/automation-scripts/0402_Run-UnitTests.ps1

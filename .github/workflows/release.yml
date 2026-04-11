@@ -1,0 +1,380 @@
+name: release
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      any_validation_needed: ${{ steps.scopes.outputs.any_validation_needed }}
+      module_changed: ${{ steps.scopes.outputs.module_changed }}
+      script_changed: ${{ steps.scopes.outputs.script_changed }}
+      tests_changed: ${{ steps.scopes.outputs.tests_changed }}
+      pester_test_files: ${{ steps.scopes.outputs.pester_test_files }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed scopes
+        id: scopes
+        shell: bash
+        run: ./.github/scripts/detect-changed-scopes.sh
+
+  build-and-test:
+    name: Build & Test
+    needs: changes
+    if: needs.changes.outputs.any_validation_needed == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install test dependencies
+        shell: pwsh
+        run: |
+          Install-Module -Name Pester -MinimumVersion 5.5 -Force -Scope CurrentUser
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Lint
+        shell: pwsh
+        run: |
+          $targets = @()
+          if ("${{ needs.changes.outputs.module_changed }}" -eq 'true') {
+            $targets += './src/'
+            if (Test-Path './AitherZero.psd1') { $targets += './AitherZero.psd1' }
+            if (Test-Path './build.ps1') { $targets += './build.ps1' }
+          }
+          if ("${{ needs.changes.outputs.script_changed }}" -eq 'true' -and (Test-Path './library/automation-scripts')) {
+            $targets += './library/automation-scripts/'
+          }
+
+          $lint = Invoke-ScriptAnalyzer -Path $targets -Recurse -Settings PSGallery -Severity Error
+          if ($lint.Count -gt 0) {
+            $lint | Format-Table -AutoSize
+            throw "PSScriptAnalyzer found $($lint.Count) error(s)"
+          }
+
+      - name: Build module
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: Test
+        shell: pwsh
+        run: |
+          $changedTests = @'
+${{ needs.changes.outputs.pester_test_files }}
+'@ -split "`n" | Where-Object { $_ -and $_.Trim() }
+          $config = New-PesterConfiguration
+          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
+          $config.Output.Verbosity = 'Detailed'
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputFormat = 'JUnitXml'
+          $config.TestResult.OutputPath = "./test-results/pester-${{ matrix.os }}.xml"
+          Invoke-Pester -Configuration $config
+
+      - name: Verify module loads
+        shell: pwsh
+        run: |
+          Import-Module ./AitherZero.psd1 -Force -ErrorAction Stop
+          $mod = Get-Module AitherZero
+          Write-Host "Module version: $($mod.Version)"
+          Write-Host "Exported functions: $($mod.ExportedFunctions.Count)"
+          if ($mod.ExportedFunctions.Count -lt 100) {
+            throw "Expected 100+ exported functions, got $($mod.ExportedFunctions.Count)"
+          }
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.os }}
+          path: ./test-results/
+
+  package:
+    name: Package Release
+    needs: [changes, build-and-test]
+    if: always() && (needs.build-and-test.result == 'success' || needs.build-and-test.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Build module
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: Update manifest version
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          # Update metadata.json
+          $meta = Get-Content metadata.json -Raw | ConvertFrom-Json
+          $meta.ModuleVersion = $version
+          $meta | ConvertTo-Json -Depth 5 | Set-Content metadata.json
+
+          # Rebuild with correct version
+          ./build.ps1
+
+      - name: Create installable package
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $packageDir = "AitherZero-$version"
+          $packagePath = "$packageDir.zip"
+
+          # Create clean package directory
+          New-Item -ItemType Directory -Path $packageDir -Force | Out-Null
+
+          # Copy module files
+          Copy-Item -Path AitherZero.psm1 -Destination $packageDir/
+          Copy-Item -Path AitherZero.psd1 -Destination $packageDir/
+
+          # Copy essential dirs
+          @('config', 'plugins', 'library', 'src') | ForEach-Object {
+            if (Test-Path $_) {
+              Copy-Item -Path $_ -Destination "$packageDir/$_" -Recurse
+            }
+          }
+
+          # Copy docs
+          @('README.md', 'LICENSE', 'CONTRIBUTING.md', 'SECURITY.md',
+            'CODE_OF_CONDUCT.md', 'ARCHITECTURE.md', 'build.ps1',
+            'metadata.json') | ForEach-Object {
+            if (Test-Path $_) { Copy-Item -Path $_ -Destination "$packageDir/" }
+          }
+
+          # Create install script
+          @'
+          #Requires -Version 7.0
+          <#
+          .SYNOPSIS
+              Installs AitherZero to your PowerShell modules directory.
+          .PARAMETER Scope
+              CurrentUser (default) or AllUsers (requires admin).
+          #>
+          param(
+              [ValidateSet('CurrentUser', 'AllUsers')]
+              [string]$Scope = 'CurrentUser'
+          )
+          $ErrorActionPreference = 'Stop'
+
+          $modulesPath = if ($Scope -eq 'AllUsers') {
+              $env:PSModulePath -split [IO.Path]::PathSeparator | Where-Object { $_ -like '*Program*' } | Select-Object -First 1
+          } else {
+              Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'PowerShell/Modules'
+          }
+
+          $installPath = Join-Path $modulesPath 'AitherZero'
+
+          Write-Host "Installing AitherZero to $installPath..." -ForegroundColor Cyan
+
+          if (Test-Path $installPath) {
+              Write-Host "Removing existing installation..." -ForegroundColor Yellow
+              Remove-Item $installPath -Recurse -Force
+          }
+
+          New-Item -ItemType Directory -Path $installPath -Force | Out-Null
+          Copy-Item -Path "$PSScriptRoot/*" -Destination $installPath -Recurse -Exclude 'install.ps1'
+
+          Write-Host "AitherZero installed successfully!" -ForegroundColor Green
+          Write-Host ""
+          Write-Host "Quick start:" -ForegroundColor Cyan
+          Write-Host "  Import-Module AitherZero"
+          Write-Host "  Get-AitherVersion"
+          Write-Host "  Get-Command -Module AitherZero"
+          '@ | Set-Content "$packageDir/install.ps1"
+
+          # Create the zip
+          Compress-Archive -Path "$packageDir/*" -DestinationPath $packagePath -Force
+
+          Write-Host "Package created: $packagePath ($('{0:N1} MB' -f ((Get-Item $packagePath).Length / 1MB)))"
+
+      - name: Create PSGallery-ready package
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $nupkgDir = "nupkg-staging"
+
+          New-Item -ItemType Directory -Path $nupkgDir -Force | Out-Null
+
+          # Copy only what PSGallery needs
+          Copy-Item -Path AitherZero.psm1 -Destination $nupkgDir/
+          Copy-Item -Path AitherZero.psd1 -Destination $nupkgDir/
+          Copy-Item -Path LICENSE -Destination $nupkgDir/
+          Copy-Item -Path README.md -Destination $nupkgDir/
+
+          # Copy plugin template and config
+          if (Test-Path plugins/_template) {
+            New-Item -ItemType Directory -Path "$nupkgDir/plugins/_template" -Force | Out-Null
+            Copy-Item -Path plugins/_template/* -Destination "$nupkgDir/plugins/_template/" -Recurse
+          }
+          if (Test-Path config) {
+            Copy-Item -Path config -Destination "$nupkgDir/config" -Recurse
+          }
+          if (Test-Path src) {
+            Copy-Item -Path src -Destination "$nupkgDir/src" -Recurse
+          }
+
+          # Add PrivateData for PSGallery
+          $manifestContent = Get-Content "$nupkgDir/AitherZero.psd1" -Raw
+          if ($manifestContent -notmatch 'PrivateData') {
+            $manifestContent = $manifestContent -replace '\}$', @"
+
+              PrivateData = @{
+                  PSData = @{
+                      Tags         = @('automation', 'cicd', 'infrastructure', 'devops', 'docker', 'opentofu', 'terraform', 'ai', 'mcp')
+                      LicenseUri   = 'https://github.com/Aitherium/AitherZero/blob/main/LICENSE'
+                      ProjectUri   = 'https://github.com/Aitherium/AitherZero'
+                      ReleaseNotes = 'https://github.com/Aitherium/AitherZero/releases/tag/v$version'
+                  }
+              }
+          }
+          "@
+            Set-Content "$nupkgDir/AitherZero.psd1" -Value $manifestContent
+          }
+
+      - name: Generate release notes
+        id: notes
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $version = "${{ steps.version.outputs.version }}"
+          $prevTag = git describe --tags --abbrev=0 "$tag^" 2>$null
+
+          if ($prevTag) {
+            $log = git log --pretty=format:"- %s (%h)" "$prevTag..$tag"
+          } else {
+            $log = git log --pretty=format:"- %s (%h)" "$tag"
+          }
+
+          $notes = @"
+          ## AitherZero v$version
+
+          ### Installation
+
+          **PowerShell Gallery** (recommended):
+          ``````powershell
+          Install-Module -Name AitherZero -Scope CurrentUser
+          Import-Module AitherZero
+          ``````
+
+          **Download & Install**:
+          ``````powershell
+          # Download the zip from Assets below, then:
+          Expand-Archive AitherZero-$version.zip -DestinationPath ./AitherZero
+          cd AitherZero
+          ./install.ps1
+          ``````
+
+          **From source**:
+          ``````powershell
+          git clone https://github.com/Aitherium/AitherZero.git
+          cd AitherZero
+          ./build.ps1
+          Import-Module ./AitherZero.psd1
+          ``````
+
+          ### Changes
+          $($log -join "`n")
+
+          ### Requirements
+          - PowerShell 7.0+
+          - Windows, Linux, or macOS
+          "@
+
+          $notes | Set-Content -Path release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-notes.md
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          files: |
+            AitherZero-${{ steps.version.outputs.version }}.zip
+
+  publish-gallery:
+    name: Publish to PSGallery
+    needs: package
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Build module with release version
+        shell: pwsh
+        run: |
+          $meta = Get-Content metadata.json -Raw | ConvertFrom-Json
+          $meta.ModuleVersion = "${{ steps.version.outputs.version }}"
+          $meta | ConvertTo-Json -Depth 5 | Set-Content metadata.json
+          ./build.ps1
+
+      - name: Prepare PSGallery package
+        shell: pwsh
+        run: |
+          $publishDir = "publish-staging/AitherZero"
+          New-Item -ItemType Directory -Path $publishDir -Force | Out-Null
+
+          # Copy module essentials
+          Copy-Item -Path AitherZero.psm1 -Destination $publishDir/
+          Copy-Item -Path AitherZero.psd1 -Destination $publishDir/
+          Copy-Item -Path LICENSE -Destination $publishDir/
+          Copy-Item -Path README.md -Destination $publishDir/
+
+          if (Test-Path src) { Copy-Item -Path src -Destination "$publishDir/src" -Recurse }
+          if (Test-Path config) { Copy-Item -Path config -Destination "$publishDir/config" -Recurse }
+          if (Test-Path plugins/_template) {
+            New-Item -ItemType Directory -Path "$publishDir/plugins/_template" -Force | Out-Null
+            Copy-Item -Path plugins/_template/* -Destination "$publishDir/plugins/_template/" -Recurse -ErrorAction SilentlyContinue
+          }
+          if (Test-Path build.ps1) { Copy-Item -Path build.ps1 -Destination $publishDir/ }
+          if (Test-Path metadata.json) { Copy-Item -Path metadata.json -Destination $publishDir/ }
+
+          # Add PSData to manifest
+          $version = "${{ steps.version.outputs.version }}"
+          $psd1 = Get-Content "$publishDir/AitherZero.psd1" -Raw
+          if ($psd1 -notmatch 'PrivateData') {
+            $psd1 = $psd1.TrimEnd() -replace '\}\s*$', ''
+            $psd1 += @"
+
+              PrivateData = @{
+                  PSData = @{
+                      Tags         = @('automation', 'cicd', 'infrastructure', 'devops', 'docker', 'opentofu', 'terraform', 'ai', 'mcp')
+                      LicenseUri   = 'https://github.com/Aitherium/AitherZero/blob/main/LICENSE'
+                      ProjectUri   = 'https://github.com/Aitherium/AitherZero'
+                      ReleaseNotes = 'https://github.com/Aitherium/AitherZero/releases/tag/v$version'
+                  }
+              }
+          }
+          "@
+            Set-Content "$publishDir/AitherZero.psd1" -Value $psd1
+          }
+
+      - name: Publish to PowerShell Gallery
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          if (-not $env:NUGET_API_KEY) {
+            Write-Warning "PSGALLERY_API_KEY secret not set. Skipping PSGallery publish."
+            exit 0
+          }
+          Publish-Module -Path ./publish-staging/AitherZero -NuGetApiKey $env:NUGET_API_KEY -Repository PSGallery -Verbose
