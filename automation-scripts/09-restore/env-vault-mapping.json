@@ -1,0 +1,236 @@
+{
+  "env_vault_version": "1.0",
+  "synced_at": "2026-04-05T13:43:09-07:00",
+  "source_file": "D:\\AitherOS-Fresh\\.env",
+  "vault_prefix": "env_",
+  "total_mapped": 56,
+  "never_sync": [
+    "JWT_SECRET_KEY"
+  ],
+  "mappings": {
+    "VLLM_URL": {
+      "vault_key": "env_VLLM_URL",
+      "category": "vllm"
+    },
+    "AITHER_VLLM_URL": {
+      "vault_key": "env_AITHER_VLLM_URL",
+      "category": "aither"
+    },
+    "AITHER_HOST_GPU_NAME": {
+      "vault_key": "env_AITHER_HOST_GPU_NAME",
+      "category": "aither"
+    },
+    "AITHER_HOST_GPU_VRAM_GB": {
+      "vault_key": "env_AITHER_HOST_GPU_VRAM_GB",
+      "category": "aither"
+    },
+    "AITHER_HOST_CPU_NAME": {
+      "vault_key": "env_AITHER_HOST_CPU_NAME",
+      "category": "aither"
+    },
+    "AITHER_HOST_CPU_CORES": {
+      "vault_key": "env_AITHER_HOST_CPU_CORES",
+      "category": "aither"
+    },
+    "AITHER_HOST_CPU_THREADS": {
+      "vault_key": "env_AITHER_HOST_CPU_THREADS",
+      "category": "aither"
+    },
+    "AITHER_HOST_RAM_GB": {
+      "vault_key": "env_AITHER_HOST_RAM_GB",
+      "category": "aither"
+    },
+    "AITHER_TIMEZONE": {
+      "vault_key": "env_AITHER_TIMEZONE",
+      "category": "aither"
+    },
+    "COMFYUI_PATH": {
+      "vault_key": "env_COMFYUI_PATH",
+      "category": "comfyui"
+    },
+    "CLOUDFLARE_TUNNEL_TOKEN": {
+      "vault_key": "env_CLOUDFLARE_TUNNEL_TOKEN",
+      "category": "cloudflare"
+    },
+    "CF_ACCESS_TEAM_DOMAIN": {
+      "vault_key": "env_CF_ACCESS_TEAM_DOMAIN",
+      "category": "cloudflare"
+    },
+    "CF_ACCESS_AUD": {
+      "vault_key": "env_CF_ACCESS_AUD",
+      "category": "cloudflare"
+    },
+    "CF_ACCESS_AUD_MCP": {
+      "vault_key": "env_CF_ACCESS_AUD_MCP",
+      "category": "cloudflare"
+    },
+    "CLOUDFLARE_API_TOKEN": {
+      "vault_key": "env_CLOUDFLARE_API_TOKEN",
+      "category": "cloudflare"
+    },
+    "AITHER_IDP_BASE_URL": {
+      "vault_key": "env_AITHER_IDP_BASE_URL",
+      "category": "aither"
+    },
+    "NEWSDATA_API_KEY": {
+      "vault_key": "env_NEWSDATA_API_KEY",
+      "category": "newsdata"
+    },
+    "GNEWS_API_KEY": {
+      "vault_key": "env_GNEWS_API_KEY",
+      "category": "gnews"
+    },
+    "POSTGRES_PASSWORD": {
+      "vault_key": "env_POSTGRES_PASSWORD",
+      "category": "postgres"
+    },
+    "REDIS_PASSWORD": {
+      "vault_key": "env_REDIS_PASSWORD",
+      "category": "redis"
+    },
+    "AITHER_INTERNAL_SECRET": {
+      "vault_key": "env_AITHER_INTERNAL_SECRET",
+      "category": "aither"
+    },
+    "AITHER_MASTER_KEY": {
+      "vault_key": "env_AITHER_MASTER_KEY",
+      "category": "aither"
+    },
+    "MOLTBOOK_JWT_SECRET": {
+      "vault_key": "env_MOLTBOOK_JWT_SECRET",
+      "category": "moltbook"
+    },
+    "GITHUB_CLIENT_ID": {
+      "vault_key": "env_GITHUB_CLIENT_ID",
+      "category": "github"
+    },
+    "GITHUB_CLIENT_SECRET": {
+      "vault_key": "env_GITHUB_CLIENT_SECRET",
+      "category": "github"
+    },
+    "GOOGLE_CLIENT_ID": {
+      "vault_key": "env_GOOGLE_CLIENT_ID",
+      "category": "google"
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "vault_key": "env_GOOGLE_CLIENT_SECRET",
+      "category": "google"
+    },
+    "LINKEDIN_CLIENT_ID": {
+      "vault_key": "env_LINKEDIN_CLIENT_ID",
+      "category": "linkedin"
+    },
+    "LINKEDIN_CLIENT_SECRET": {
+      "vault_key": "env_LINKEDIN_CLIENT_SECRET",
+      "category": "linkedin"
+    },
+    "CLOUDFLARE_ACCOUNT_ID": {
+      "vault_key": "env_CLOUDFLARE_ACCOUNT_ID",
+      "category": "cloudflare"
+    },
+    "CLOUDFLARE_TUNNEL_ID": {
+      "vault_key": "env_CLOUDFLARE_TUNNEL_ID",
+      "category": "cloudflare"
+    },
+    "CF_ZONE_SETTINGS_TOKEN": {
+      "vault_key": "env_CF_ZONE_SETTINGS_TOKEN",
+      "category": "cloudflare"
+    },
+    "AITHER_WG_ENDPOINT": {
+      "vault_key": "env_AITHER_WG_ENDPOINT",
+      "category": "aither"
+    },
+    "CF_ACCESS_AUD_TUNNEL": {
+      "vault_key": "env_CF_ACCESS_AUD_TUNNEL",
+      "category": "cloudflare"
+    },
+    "AITHER_SMTP_HOST": {
+      "vault_key": "env_AITHER_SMTP_HOST",
+      "category": "smtp"
+    },
+    "AITHER_SMTP_PORT": {
+      "vault_key": "env_AITHER_SMTP_PORT",
+      "category": "smtp"
+    },
+    "AITHER_SMTP_USER": {
+      "vault_key": "env_AITHER_SMTP_USER",
+      "category": "smtp"
+    },
+    "AITHER_SMTP_PASS": {
+      "vault_key": "env_AITHER_SMTP_PASS",
+      "category": "smtp"
+    },
+    "AITHER_SMTP_FROM": {
+      "vault_key": "env_AITHER_SMTP_FROM",
+      "category": "smtp"
+    },
+    "AITHER_ADMIN_EMAIL": {
+      "vault_key": "env_AITHER_ADMIN_EMAIL",
+      "category": "aither"
+    },
+    "AITHER_ROUTE_ALL_EMAILS": {
+      "vault_key": "env_AITHER_ROUTE_ALL_EMAILS",
+      "category": "aither"
+    },
+    "NEXT_PUBLIC_APP_URL": {
+      "vault_key": "env_NEXT_PUBLIC_APP_URL",
+      "category": "next_public"
+    },
+    "DEMO_KEY": {
+      "vault_key": "env_DEMO_KEY",
+      "category": "demo"
+    },
+    "STRIPE_SECRET_KEY": {
+      "vault_key": "env_STRIPE_SECRET_KEY",
+      "category": "stripe"
+    },
+    "STRIPE_PUBLISHABLE_KEY": {
+      "vault_key": "env_STRIPE_PUBLISHABLE_KEY",
+      "category": "stripe"
+    },
+    "STRIPE_WEBHOOK_SECRET": {
+      "vault_key": "env_STRIPE_WEBHOOK_SECRET",
+      "category": "stripe"
+    },
+    "SSH_AUTHORIZED_KEYS": {
+      "vault_key": "env_SSH_AUTHORIZED_KEYS",
+      "category": "ssh"
+    },
+    "VLLM_GPU_UTIL": {
+      "vault_key": "env_VLLM_GPU_UTIL",
+      "category": "vllm"
+    },
+    "VASTAI_API_KEY": {
+      "vault_key": "env_VASTAI_API_KEY",
+      "category": "vastai"
+    },
+    "VAST_REFERRAL_ID": {
+      "vault_key": "env_VAST_REFERRAL_ID",
+      "category": "vastai"
+    },
+    "AITHER_TQ_MODE": {
+      "vault_key": "env_AITHER_TQ_MODE",
+      "category": "aither"
+    },
+    "AITHER_TQ_FORCE_TRITON": {
+      "vault_key": "env_AITHER_TQ_FORCE_TRITON",
+      "category": "aither"
+    },
+    "AITHER_TQ_EAGER": {
+      "vault_key": "env_AITHER_TQ_EAGER",
+      "category": "aither"
+    },
+    "OLLAMA_KEEP_ALIVE": {
+      "vault_key": "env_OLLAMA_KEEP_ALIVE",
+      "category": "ollama"
+    },
+    "OLLAMA_MAX_LOADED_MODELS": {
+      "vault_key": "env_OLLAMA_MAX_LOADED_MODELS",
+      "category": "ollama"
+    },
+    "OLLAMA_FLASH_ATTENTION": {
+      "vault_key": "env_OLLAMA_FLASH_ATTENTION",
+      "category": "ollama"
+    }
+  }
+}

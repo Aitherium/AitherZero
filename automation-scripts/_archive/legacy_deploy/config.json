@@ -1,0 +1,25 @@
+{
+  "$schema": "./config.schema.json",
+  "version": "2.0.0",
+  "description": "AitherOS Deployment - Reads services from services.yaml",
+  
+  "paths": {
+    "root": "D:/AitherOS-Fresh",
+    "aitheros": "D:/AitherOS-Fresh/AitherOS",
+    "servicesYaml": "D:/AitherOS-Fresh/AitherOS/config/services.yaml",
+    "venv": "D:/AitherOS-Fresh/AitherOS/.venv",
+    "logs": "D:/AitherOS-Fresh/logs/aither"
+  },
+  
+  "python": {
+    "executable": "D:/AitherOS-Fresh/AitherOS/.venv/Scripts/python.exe"
+  },
+  
+  "supervisor": {
+    "maxRestartAttempts": 3,
+    "restartDelaySeconds": 5,
+    "healthCheckIntervalSeconds": 30,
+    "startupTimeoutSeconds": 60,
+    "gracefulShutdownSeconds": 10
+  }
+}

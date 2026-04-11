@@ -1,0 +1,201 @@
+# =============================================================================
+# AitherOS Baseline Security Policy for Checkov/OpenTofu
+# =============================================================================
+# Run with: checkov -d . --external-checks-dir policies/
+# Or via:   Invoke-AitherInfraPipeline -PolicyDir policies/
+# =============================================================================
+
+metadata:
+  name: aitheros-baseline
+  version: "1.0.0"
+  description: "Baseline security policies for AitherOS infrastructure deployments"
+  author: Aitherium
+  severity: HIGH
+
+# =============================================================================
+# AWS Policies
+# =============================================================================
+aws:
+  # Networking
+  - id: AITHER_AWS_001
+    name: "No public ingress on 0.0.0.0/0 for non-HTTP ports"
+    resource_types: [aws_security_group]
+    check: |
+      ingress rules must not allow 0.0.0.0/0 except on ports 80, 443, 8001
+    severity: HIGH
+
+  - id: AITHER_AWS_002
+    name: "VPC must have DNS support enabled"
+    resource_types: [aws_vpc]
+    check: |
+      enable_dns_support must be true
+      enable_dns_hostnames must be true
+    severity: MEDIUM
+
+  - id: AITHER_AWS_003
+    name: "ECS tasks must use Fargate (no EC2 launch type in non-GPU profiles)"
+    resource_types: [aws_ecs_service]
+    check: |
+      launch_type must be FARGATE when profile is not 'full'
+    severity: LOW
+
+  - id: AITHER_AWS_004
+    name: "S3 buckets must have versioning enabled"
+    resource_types: [aws_s3_bucket]
+    check: |
+      versioning.enabled must be true
+    severity: HIGH
+
+  - id: AITHER_AWS_005
+    name: "RDS instances must not be publicly accessible"
+    resource_types: [aws_db_instance]
+    check: |
+      publicly_accessible must be false
+    severity: CRITICAL
+
+  - id: AITHER_AWS_006
+    name: "CloudWatch log groups must have retention set"
+    resource_types: [aws_cloudwatch_log_group]
+    check: |
+      retention_in_days must be set and > 0
+    severity: MEDIUM
+
+# =============================================================================
+# Azure Policies
+# =============================================================================
+azure:
+  - id: AITHER_AZ_001
+    name: "VMs must not have public IP unless explicitly external"
+    resource_types: [azurerm_linux_virtual_machine, azurerm_windows_virtual_machine]
+    check: |
+      public_ip_address must be null unless tags.external is true
+    severity: HIGH
+
+  - id: AITHER_AZ_002
+    name: "SQL databases must have threat detection enabled"
+    resource_types: [azurerm_mssql_database]
+    check: |
+      threat_detection_policy.state must be Enabled
+    severity: HIGH
+
+  - id: AITHER_AZ_003
+    name: "Container instances must have resource limits"
+    resource_types: [azurerm_container_group]
+    check: |
+      container.cpu and container.memory must be set
+    severity: MEDIUM
+
+# =============================================================================
+# GCP Policies
+# =============================================================================
+gcp:
+  - id: AITHER_GCP_001
+    name: "Cloud Run services must not allow unauthenticated access"
+    resource_types: [google_cloud_run_service]
+    check: |
+      IAM binding must not include allUsers or allAuthenticatedUsers
+    severity: HIGH
+
+  - id: AITHER_GCP_002
+    name: "GKE clusters must have private nodes"
+    resource_types: [google_container_cluster]
+    check: |
+      private_cluster_config.enable_private_nodes must be true
+    severity: HIGH
+
+  - id: AITHER_GCP_003
+    name: "Budget alerts must be configured for all environments"
+    resource_types: [google_billing_budget]
+    check: |
+      threshold_rules must include at least 50%, 80%, 100% thresholds
+    severity: MEDIUM
+
+# =============================================================================
+# Docker Policies
+# =============================================================================
+docker:
+  - id: AITHER_DOCKER_001
+    name: "Containers must have restart policy"
+    resource_types: [docker_container]
+    check: |
+      restart must be 'unless-stopped' or 'always'
+    severity: MEDIUM
+
+  - id: AITHER_DOCKER_002
+    name: "Containers must have resource limits"
+    resource_types: [docker_container]
+    check: |
+      memory must be set for production containers
+    severity: LOW
+
+  - id: AITHER_DOCKER_003
+    name: "Containers must have managed_by label"
+    resource_types: [docker_container]
+    check: |
+      labels must include managed_by = 'opentofu'
+    severity: LOW
+
+# =============================================================================
+# Kubernetes Policies
+# =============================================================================
+kubernetes:
+  - id: AITHER_K8S_001
+    name: "Deployments must have resource requests and limits"
+    resource_types: [kubernetes_deployment]
+    check: |
+      spec.template.spec.containers[*].resources.requests must be set
+      spec.template.spec.containers[*].resources.limits must be set
+    severity: HIGH
+
+  - id: AITHER_K8S_002
+    name: "Deployments must have liveness and readiness probes"
+    resource_types: [kubernetes_deployment]
+    check: |
+      containers must have liveness_probe or readiness_probe configured
+    severity: MEDIUM
+
+  - id: AITHER_K8S_003
+    name: "Pods must not run as root"
+    resource_types: [kubernetes_deployment]
+    check: |
+      spec.template.spec.security_context.run_as_non_root should be true
+    severity: HIGH
+
+  - id: AITHER_K8S_004
+    name: "NetworkPolicy must exist in namespace"
+    resource_types: [kubernetes_namespace]
+    check: |
+      namespace must have at least one NetworkPolicy resource
+    severity: MEDIUM
+
+  - id: AITHER_K8S_005
+    name: "ServiceAccounts must not use default"
+    resource_types: [kubernetes_deployment]
+    check: |
+      spec.template.spec.service_account_name must not be 'default'
+    severity: HIGH
+
+# =============================================================================
+# Cross-Provider Policies
+# =============================================================================
+general:
+  - id: AITHER_GEN_001
+    name: "All resources must have managed_by tag/label"
+    resource_types: ["*"]
+    check: |
+      tags or labels must include managed_by = 'opentofu'
+    severity: LOW
+
+  - id: AITHER_GEN_002
+    name: "All resources must have environment tag/label"
+    resource_types: ["*"]
+    check: |
+      tags or labels must include environment
+    severity: LOW
+
+  - id: AITHER_GEN_003
+    name: "No hardcoded credentials in resource definitions"
+    resource_types: ["*"]
+    check: |
+      No field values matching patterns: AKIA*, password=*, secret_key=*
+    severity: CRITICAL

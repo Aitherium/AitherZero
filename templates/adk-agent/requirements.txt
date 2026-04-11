@@ -1,0 +1,6 @@
+httpx>=0.27
+python-dotenv
+rich
+prompt_toolkit
+mcp
+pyyaml

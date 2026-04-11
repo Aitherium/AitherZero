@@ -1,0 +1,355 @@
+# automation-scripts
+
+**Navigation**: [[HOME] Root](../../index.md) → [library](../index.md) → **automation-scripts**
+
+[^] **Parent**: [library](../index.md)
+
+## Overview
+
+See [README.md](./README.md) for detailed information about this directory.
+
+### [STATS] Contents
+
+- **Subdirectories**: 0
+- **Files**: 183
+- **PowerShell Scripts**: 177
+
+## Files
+
+### .json Files
+
+- [CONFIG] [config-template.json](./config-template.json)
+
+### .md Files
+
+- [NOTE] [DEPRECATED-SCRIPTS.md](./DEPRECATED-SCRIPTS.md)
+- [NOTE] [EXECUTION-ORDER.md](./EXECUTION-ORDER.md)
+- [NOTE] [index.md](./index.md)
+- [NOTE] [migration-status.md](./migration-status.md)
+- [NOTE] [README.md](./README.md)
+
+### .ps1 Files
+
+- [CONFIG] [0000_Cleanup-Environment.ps1](./0000_Cleanup-Environment.ps1)
+- [CONFIG] [0001_Configure-Environment.ps1](./0001_Configure-Environment.ps1)
+ - *Configure system environment based on AitherZero configuration files*
+- [CONFIG] [0002_Setup-Directories.ps1](./0002_Setup-Directories.ps1)
+- [CONFIG] [0003_Sync-ConfigManifest.ps1](./0003_Sync-ConfigManifest.ps1)
+ - *Comprehensive synchronization of config.psd1 with repository state*
+- [CONFIG] [0004_Setup-GitHooks.ps1](./0004_Setup-GitHooks.ps1)
+ - *Setup Git hooks for AitherZero development*
+- [CONFIG] [0006_Install-ValidationTools.ps1](./0006_Install-ValidationTools.ps1)
+- [CONFIG] [0007_Install-Go.ps1](./0007_Install-Go.ps1)
+- [CONFIG] [0008_Install-OpenTofu.ps1](./0008_Install-OpenTofu.ps1)
+- [CONFIG] [0009_Initialize-OpenTofu.ps1](./0009_Initialize-OpenTofu.ps1)
+- [CONFIG] [0010_Setup-MCPServers.ps1](./0010_Setup-MCPServers.ps1)
+ - *Idempotent setup and validation of MCP servers for GitHub Copilot.*
+- [CONFIG] [0100_Configure-System.ps1](./0100_Configure-System.ps1)
+- [CONFIG] [0104_Install-CertificateAuthority.ps1](./0104_Install-CertificateAuthority.ps1)
+- [CONFIG] [0105_Install-HyperV.ps1](./0105_Install-HyperV.ps1)
+- [CONFIG] [0106_Install-WSL2.ps1](./0106_Install-WSL2.ps1)
+- [CONFIG] [0107_Install-WindowsAdminCenter.ps1](./0107_Install-WindowsAdminCenter.ps1)
+- [CONFIG] [0109_Initialize-InfrastructureSubmodules.ps1](./0109_Initialize-InfrastructureSubmodules.ps1)
+ - *Initialize Infrastructure Git Submodules*
+- [CONFIG] [0112_Enable-PXE.ps1](./0112_Enable-PXE.ps1)
+- [CONFIG] [0195_Inject-ISO-Artifacts.ps1](./0195_Inject-ISO-Artifacts.ps1)
+ - *Inject deployment artifacts into ISO images for automated OS installation.*
+- [CONFIG] [0201_Install-Node.ps1](./0201_Install-Node.ps1)
+- [CONFIG] [0204_Install-Poetry.ps1](./0204_Install-Poetry.ps1)
+- [CONFIG] [0205_Install-Sysinternals.ps1](./0205_Install-Sysinternals.ps1)
+- [CONFIG] [0206_Install-Python.ps1](./0206_Install-Python.ps1)
+- [CONFIG] [0207_Install-Git.ps1](./0207_Install-Git.ps1)
+- [CONFIG] [0208_Install-Docker.ps1](./0208_Install-Docker.ps1)
+- [CONFIG] [0209_Install-7Zip.ps1](./0209_Install-7Zip.ps1)
+- [CONFIG] [0210_Install-VSCode.ps1](./0210_Install-VSCode.ps1)
+- [CONFIG] [0211_Install-GitHubCLI.ps1](./0211_Install-GitHubCLI.ps1)
+ - *Install GitHub CLI (gh)*
+- [CONFIG] [0212_Install-AzureCLI.ps1](./0212_Install-AzureCLI.ps1)
+- [CONFIG] [0213_Install-AWSCLI.ps1](./0213_Install-AWSCLI.ps1)
+- [CONFIG] [0214_Install-Packer.ps1](./0214_Install-Packer.ps1)
+- [CONFIG] [0215_Configure-MCPServers.ps1](./0215_Configure-MCPServers.ps1)
+ - *Configure Model Context Protocol (MCP) servers for GitHub Copilot*
+- [CONFIG] [0216_Set-PowerShellProfile.ps1](./0216_Set-PowerShellProfile.ps1)
+- [CONFIG] [0217_Install-ClaudeCode.ps1](./0217_Install-ClaudeCode.ps1)
+- [CONFIG] [0218_Install-GeminiCLI.ps1](./0218_Install-GeminiCLI.ps1)
+- [CONFIG] [0219_Install-Chocolatey.ps1](./0219_Install-Chocolatey.ps1)
+- [CONFIG] [0220_Install-AI-CLIs.ps1](./0220_Install-AI-CLIs.ps1)
+ - *Install AI CLI tools (Claude, Gemini, Codex)*
+- [CONFIG] [0221_Install-VSBuildTools.ps1](./0221_Install-VSBuildTools.ps1)
+- [CONFIG] [0300_Deploy-Infrastructure.ps1](./0300_Deploy-Infrastructure.ps1)
+- [CONFIG] [0400_Install-TestingTools.ps1](./0400_Install-TestingTools.ps1)
+ - *Install testing and validation tools for AitherZero*
+- [CONFIG] [0402_Run-UnitTests.ps1](./0402_Run-UnitTests.ps1)
+ - *Execute unit tests for AitherZero*
+- [CONFIG] [0403_Run-IntegrationTests.ps1](./0403_Run-IntegrationTests.ps1)
+ - *Execute integration tests for AitherZero*
+- [CONFIG] [0404_Run-PSScriptAnalyzer.ps1](./0404_Run-PSScriptAnalyzer.ps1)
+ - *Run PSScriptAnalyzer on AitherZero codebase*
+- [CONFIG] [0405_Validate-ModuleManifests.ps1](./0405_Validate-ModuleManifests.ps1)
+ - *Validates all PowerShell module manifest files in the project for Unicode and parsing issues*
+- [CONFIG] [0406_Generate-Coverage.ps1](./0406_Generate-Coverage.ps1)
+ - *Generate code coverage reports for AitherZero*
+- [CONFIG] [0407_Validate-Syntax.ps1](./0407_Validate-Syntax.ps1)
+ - *Validates PowerShell script syntax using AST parser*
+- [CONFIG] [0408_Generate-TestCoverage.ps1](./0408_Generate-TestCoverage.ps1)
+- [CONFIG] [0409_Run-AllTests.ps1](./0409_Run-AllTests.ps1)
+ - *Execute all tests for AitherZero (unit, integration, E2E)*
+- [CONFIG] [0411_Test-Smart.ps1](./0411_Test-Smart.ps1)
+ - *Intelligent test runner with caching and incremental testing*
+- [CONFIG] [0412_Validate-AST.ps1](./0412_Validate-AST.ps1)
+ - *Validate PowerShell Abstract Syntax Tree (AST) for AitherZero*
+- [CONFIG] [0413_Validate-ConfigManifest.ps1](./0413_Validate-ConfigManifest.ps1)
+ - *Validates the config.psd1 manifest for accuracy and completeness*
+- [CONFIG] [0414_Test-Optimized.ps1](./0414_Test-Optimized.ps1)
+ - *High-performance parallel test execution optimized for AitherZero*
+- [CONFIG] [0415_Manage-PSScriptAnalyzerCache.ps1](./0415_Manage-PSScriptAnalyzerCache.ps1)
+ - *Manage PSScriptAnalyzer cache for performance optimization*
+- [CONFIG] [0416_Validate-ModuleManifest.ps1](./0416_Validate-ModuleManifest.ps1)
+ - *Validates PowerShell module manifest files for common issues including Unicode characters*
+- [CONFIG] [0420_Validate-ComponentQuality.ps1](./0420_Validate-ComponentQuality.ps1)
+ - *Validate component quality for new features and components*
+- [CONFIG] [0425_Validate-DocumentationStructure.ps1](./0425_Validate-DocumentationStructure.ps1)
+ - *Validates and maintains documentation structure and organization*
+- [CONFIG] [0426_Validate-TestScriptSync.ps1](./0426_Validate-TestScriptSync.ps1)
+ - *Validate synchronization between test files and automation scripts*
+- [CONFIG] [0428_Get-AutomationTestCoverage.ps1](./0428_Get-AutomationTestCoverage.ps1)
+ - *Analyzes test coverage for automation scripts by comparing existing scripts to available test files.*
+- [CONFIG] [0440_Validate-Workflows.ps1](./0440_Validate-Workflows.ps1)
+ - *Validates GitHub Actions workflow files for syntax, schema compliance, and best practices*
+- [CONFIG] [0441_Test-WorkflowsLocally.ps1](./0441_Test-WorkflowsLocally.ps1)
+ - *Test GitHub Actions workflows locally using act or similar tools*
+- [CONFIG] [0442_Install-Act.ps1](./0442_Install-Act.ps1)
+ - *Install act for local GitHub Actions testing*
+- [CONFIG] [0443_Install-PowerShellYaml.ps1](./0443_Install-PowerShellYaml.ps1)
+ - *Installs the powershell-yaml module for YAML parsing capabilities*
+- [CONFIG] [0450_Publish-TestResults.ps1](./0450_Publish-TestResults.ps1)
+ - *Publishes test results to GitHub Pages for easy viewing*
+- [CONFIG] [0460_Orchestrate-Tests.ps1](./0460_Orchestrate-Tests.ps1)
+ - *Orchestrated test execution using AitherZero's own automation capabilities*
+- [CONFIG] [0470_Orchestrate-SimpleTesting.ps1](./0470_Orchestrate-SimpleTesting.ps1)
+ - *Simple testing orchestrator that eliminates configuration complexity*
+- [CONFIG] [0480_Test-Simple.ps1](./0480_Test-Simple.ps1)
+ - *Ultra-simple, high-performance test runner for AitherZero*
+- [CONFIG] [0490_AI-TestRunner.ps1](./0490_AI-TestRunner.ps1)
+ - *AI-friendly test runner with intelligent automation and self-optimization*
+- [CONFIG] [0500_Validate-Environment.ps1](./0500_Validate-Environment.ps1)
+- [CONFIG] [0501_Get-SystemInfo.ps1](./0501_Get-SystemInfo.ps1)
+- [CONFIG] [0510_Generate-ProjectReport.ps1](./0510_Generate-ProjectReport.ps1)
+ - *Generate comprehensive project status report including dependencies, tests, coverage, and documentation*
+- [CONFIG] [0511_Show-ProjectDashboard.ps1](./0511_Show-ProjectDashboard.ps1)
+ - *Display comprehensive project dashboard with logs, tests, and metrics*
+- [CONFIG] [0512_Generate-Dashboard.ps1](./0512_Generate-Dashboard.ps1)
+ - *Generate comprehensive CI/CD dashboard with real-time status monitoring*
+- [CONFIG] [0513_Generate-Changelog.ps1](./0513_Generate-Changelog.ps1)
+ - *Generate PR changelog from commits with categorization*
+- [CONFIG] [0514_Analyze-Diff.ps1](./0514_Analyze-Diff.ps1)
+ - *Analyze PR diff and calculate impact metrics*
+- [CONFIG] [0515_Generate-BuildMetadata.ps1](./0515_Generate-BuildMetadata.ps1)
+ - *Generate comprehensive build metadata for PR and releases*
+- [CONFIG] [0516_Schedule-ReportGeneration.ps1](./0516_Schedule-ReportGeneration.ps1)
+ - *Schedule automatic report generation for AitherZero project*
+- [CONFIG] [0517_Aggregate-AnalysisResults.ps1](./0517_Aggregate-AnalysisResults.ps1)
+ - *Aggregate analysis results and generate action able recommendations*
+- [CONFIG] [0518_Generate-Recommendations.ps1](./0518_Generate-Recommendations.ps1)
+ - *Generate actionable recommendations from analysis results*
+- [CONFIG] [0519_Generate-PRComment.ps1](./0519_Generate-PRComment.ps1)
+ - *Generate consolidated PR comment with all ecosystem information*
+- [CONFIG] [0520_Analyze-ConfigurationUsage.ps1](./0520_Analyze-ConfigurationUsage.ps1)
+ - *Analyzes configuration usage across the codebase*
+- [CONFIG] [0521_Analyze-DocumentationCoverage.ps1](./0521_Analyze-DocumentationCoverage.ps1)
+ - *Analyzes documentation coverage across the codebase*
+- [CONFIG] [0522_Analyze-CodeQuality.ps1](./0522_Analyze-CodeQuality.ps1)
+ - *Analyzes code quality issues across the codebase*
+- [CONFIG] [0523_Analyze-SecurityIssues.ps1](./0523_Analyze-SecurityIssues.ps1)
+ - *Analyzes security issues across the codebase*
+- [CONFIG] [0524_Generate-TechDebtReport.ps1](./0524_Generate-TechDebtReport.ps1)
+ - *Generates comprehensive tech debt report from analysis results*
+- [CONFIG] [0525_Deploy-Documentation.ps1](./0525_Deploy-Documentation.ps1)
+ - *Deploy documentation and reports to GitHub Pages*
+- [CONFIG] [0526_Enable-ContinuousReporting.ps1](./0526_Enable-ContinuousReporting.ps1)
+ - *Enable continuous reporting and monitoring for development workflow*
+- [CONFIG] [0527_Generate-CodeMap.ps1](./0527_Generate-CodeMap.ps1)
+ - *Generate comprehensive interactive code map visualizer*
+- [CONFIG] [0528_Generate-QualityMetrics.ps1](./0528_Generate-QualityMetrics.ps1)
+ - *Integrate three-tier validation metrics into dashboard*
+- [CONFIG] [0530_View-Logs.ps1](./0530_View-Logs.ps1)
+- [CONFIG] [0531_Get-WorkflowRunReport.ps1](./0531_Get-WorkflowRunReport.ps1)
+ - *Get detailed workflow run reports for CI debugging.*
+- [CONFIG] [0550_Health-Dashboard.ps1](./0550_Health-Dashboard.ps1)
+ - *Real-time operational health dashboard for local development and troubleshooting*
+- [CONFIG] [0599_CI-ProgressReporter.ps1](./0599_CI-ProgressReporter.ps1)
+ - *Enhanced CI progress reporting with real-time updates*
+- [CONFIG] [0700_Setup-GitEnvironment.ps1](./0700_Setup-GitEnvironment.ps1)
+ - *Set up Git environment with best practices*
+- [CONFIG] [0701_Create-FeatureBranch.ps1](./0701_Create-FeatureBranch.ps1)
+ - *Create a feature branch with conventional naming*
+- [CONFIG] [0702_Create-Commit.ps1](./0702_Create-Commit.ps1)
+ - *Create a conventional commit with validation*
+- [CONFIG] [0703_Create-PullRequest.ps1](./0703_Create-PullRequest.ps1)
+ - *Create a pull request with templates and automation*
+- [CONFIG] [0704_Stage-Files.ps1](./0704_Stage-Files.ps1)
+ - *Stage files for Git commit using patterns*
+- [CONFIG] [0705_Push-Branch.ps1](./0705_Push-Branch.ps1)
+ - *Push Git branch to remote repository*
+- [CONFIG] [0709_Post-PRComment.ps1](./0709_Post-PRComment.ps1)
+ - *Post or update PR comment with test results*
+- [CONFIG] [0720_Setup-GitHubRunners.ps1](./0720_Setup-GitHubRunners.ps1)
+ - *Setup GitHub Actions Self-Hosted Runners*
+- [CONFIG] [0721_Configure-RunnerEnvironment.ps1](./0721_Configure-RunnerEnvironment.ps1)
+ - *Configure GitHub Actions Runner Environment*
+- [CONFIG] [0722_Install-RunnerServices.ps1](./0722_Install-RunnerServices.ps1)
+ - *Install GitHub Actions Runner as System Services*
+- [CONFIG] [0723_Setup-MatrixRunners.ps1](./0723_Setup-MatrixRunners.ps1)
+ - *Setup Matrix of GitHub Actions Self-Hosted Runners*
+- [CONFIG] [0724_Install-GitHub-Runner.ps1](./0724_Install-GitHub-Runner.ps1)
+ - *Install and configure GitHub Actions self-hosted runner*
+- [CONFIG] [0730_Setup-AIAgents.ps1](./0730_Setup-AIAgents.ps1)
+ - *Configures and initializes all AI agent integrations for AitherZero.*
+- [CONFIG] [0731_Invoke-AICodeReview.ps1](./0731_Invoke-AICodeReview.ps1)
+ - *Multi-AI code analysis pipeline for comprehensive code review.*
+- [CONFIG] [0732_Generate-AITests.ps1](./0732_Generate-AITests.ps1)
+ - *AI-powered test generation using configured providers.*
+- [CONFIG] [0733_Create-AIDocs.ps1](./0733_Create-AIDocs.ps1)
+ - *Automated documentation generation using AI providers.*
+- [CONFIG] [0734_Optimize-AIPerformance.ps1](./0734_Optimize-AIPerformance.ps1)
+ - *AI-driven performance analysis and optimization.*
+- [CONFIG] [0735_Analyze-AISecurity.ps1](./0735_Analyze-AISecurity.ps1)
+ - *Comprehensive security scanning with AI analysis.*
+- [CONFIG] [0736_Generate-AIWorkflow.ps1](./0736_Generate-AIWorkflow.ps1)
+ - *Generate custom orchestration workflows using AI.*
+- [CONFIG] [0737_Monitor-AIUsage.ps1](./0737_Monitor-AIUsage.ps1)
+ - *Monitor and report AI API usage and costs.*
+- [CONFIG] [0738_Train-AIContext.ps1](./0738_Train-AIContext.ps1)
+ - *Build and train project-specific AI context.*
+- [CONFIG] [0739_Validate-AIOutput.ps1](./0739_Validate-AIOutput.ps1)
+ - *Validate AI-generated code and content.*
+- [CONFIG] [0740_Integrate-AITools.ps1](./0740_Integrate-AITools.ps1)
+ - *Integrate AI tools for code review and analysis*
+- [CONFIG] [0741_Generate-AICommitMessage.ps1](./0741_Generate-AICommitMessage.ps1)
+- [CONFIG] [0742_Create-AIPoweredPR.ps1](./0742_Create-AIPoweredPR.ps1)
+- [CONFIG] [0743_Enable-AutomatedCopilot.ps1](./0743_Enable-AutomatedCopilot.ps1)
+ - *Enable and configure the comprehensive automated copilot system*
+- [CONFIG] [0744_Generate-AutoDocumentation.ps1](./0744_Generate-AutoDocumentation.ps1)
+ - *Automated reactive documentation generation for AitherZero platform*
+- [CONFIG] [0745_Generate-ProjectIndexes.ps1](./0745_Generate-ProjectIndexes.ps1)
+ - *Generate navigable index.md files for entire project structure*
+- [CONFIG] [0746_Generate-AllDocumentation.ps1](./0746_Generate-AllDocumentation.ps1)
+ - *Automated documentation generation orchestrator - runs all documentation generators*
+- [CONFIG] [0750_Build-MCPServer.ps1](./0750_Build-MCPServer.ps1)
+ - *Build the AitherZero MCP Server*
+- [CONFIG] [0751_Start-MCPServer.ps1](./0751_Start-MCPServer.ps1)
+ - *Start the AitherZero MCP Server*
+- [CONFIG] [0752_Demo-MCPServer.ps1](./0752_Demo-MCPServer.ps1)
+ - *Demonstrate AitherZero MCP Server functionality*
+- [CONFIG] [0753_Use-MCPServer.ps1](./0753_Use-MCPServer.ps1)
+ - *Actually USE the MCP Server to execute AitherZero commands*
+- [CONFIG] [0754_Create-MCPServer.ps1](./0754_Create-MCPServer.ps1)
+ - *Create a new MCP server from the template*
+- [CONFIG] [0798_generate-changelog.ps1](./0798_generate-changelog.ps1)
+ - *Generate changelog from git history.*
+- [CONFIG] [0799_cleanup-old-tags.ps1](./0799_cleanup-old-tags.ps1)
+ - *Clean up old and development tags from the repository.*
+- [CONFIG] [0800_Create-TestIssues.ps1](./0800_Create-TestIssues.ps1)
+ - *Create GitHub issues from test failures*
+- [CONFIG] [0801_Parse-PesterResults.ps1](./0801_Parse-PesterResults.ps1)
+ - *Parse Pester test results for analysis*
+- [CONFIG] [0802_Load-ObfuscatedModule.ps1](./0802_Load-ObfuscatedModule.ps1)
+ - *Runtime loader for obfuscated source code*
+- [CONFIG] [0803_Setup-LicenseInfrastructure.ps1](./0803_Setup-LicenseInfrastructure.ps1)
+ - *Sets up license infrastructure including CA integration and key management*
+- [CONFIG] [0804_Deploy-LicenseToGitHub.ps1](./0804_Deploy-LicenseToGitHub.ps1)
+ - *Deploys licenses to GitHub using AitherZero's secure credential system*
+- [CONFIG] [0805_Analyze-OpenIssues.ps1](./0805_Analyze-OpenIssues.ps1)
+ - *Analyze open GitHub issues for PR linkage*
+- [CONFIG] [0810_Create-IssueFromTestFailure.ps1](./0810_Create-IssueFromTestFailure.ps1)
+ - *Creates GitHub issues automatically from test failures*
+- [CONFIG] [0815_Setup-IssueManagement.ps1](./0815_Setup-IssueManagement.ps1)
+ - *Sets up automated issue management based on analysis findings*
+- [CONFIG] [0816_Monitor-AutomationHealth.ps1](./0816_Monitor-AutomationHealth.ps1)
+ - *Monitors the health and effectiveness of the automated copilot agent system*
+- [CONFIG] [0820_Save-WorkContext.ps1](./0820_Save-WorkContext.ps1)
+ - *Saves current work context for session continuation*
+- [CONFIG] [0821_Generate-ContinuationPrompt.ps1](./0821_Generate-ContinuationPrompt.ps1)
+ - *Generates AI-ready continuation prompts from saved context*
+- [CONFIG] [0822_Test-IssueCreation.ps1](./0822_Test-IssueCreation.ps1)
+ - *Test script to validate the complete issue creation pipeline*
+- [CONFIG] [0825_Create-Issues-Manual.ps1](./0825_Create-Issues-Manual.ps1)
+ - *Manually create GitHub issues from analysis findings*
+- [CONFIG] [0830_Search-AllLogs.ps1](./0830_Search-AllLogs.ps1)
+ - *Advanced log search utility for comprehensive log analysis*
+- [CONFIG] [0831_Prompt-Templates.ps1](./0831_Prompt-Templates.ps1)
+ - *Library of prompt templates for various scenarios*
+- [CONFIG] [0832_Generate-PromptFromData.ps1](./0832_Generate-PromptFromData.ps1)
+ - *Generates AI prompts from structured data*
+- [CONFIG] [0840_Validate-WorkflowAutomation.ps1](./0840_Validate-WorkflowAutomation.ps1)
+ - *Validate automated workflow configuration and health*
+- [CONFIG] [0841_Validate-WorkflowIntegration.ps1](./0841_Validate-WorkflowIntegration.ps1)
+ - *Validate AitherCore workflow integration with existing GitHub Actions workflows*
+- [CONFIG] [0850_Deploy-PREnvironment.ps1](./0850_Deploy-PREnvironment.ps1)
+ - *Deploy PR environment for testing*
+- [CONFIG] [0851_Cleanup-PREnvironment.ps1](./0851_Cleanup-PREnvironment.ps1)
+ - *Cleanup PR environment after testing*
+- [CONFIG] [0852_Validate-PRDockerDeployment.ps1](./0852_Validate-PRDockerDeployment.ps1)
+ - *Validate PR Docker deployment functionality*
+- [CONFIG] [0853_Quick-Docker-Validation.ps1](./0853_Quick-Docker-Validation.ps1)
+ - *Quick validation of PR Docker deployment configuration*
+- [CONFIG] [0854_Manage-PRContainer.ps1](./0854_Manage-PRContainer.ps1)
+ - *Manage PR container environments with automated operations*
+- [CONFIG] [0860_Validate-Deployments.ps1](./0860_Validate-Deployments.ps1)
+ - *Validates deployment configuration and status for GitHub Pages and containers.*
+- [CONFIG] [0870_Create-LicenseStorage.ps1](./0870_Create-LicenseStorage.ps1)
+ - *Creates license storage directory structure*
+- [CONFIG] [0875_Verify-LicenseBackup.ps1](./0875_Verify-LicenseBackup.ps1)
+ - *Verifies license is safely backed up before allowing encryption*
+- [CONFIG] [0876_Rotate-LicenseKeys.ps1](./0876_Rotate-LicenseKeys.ps1)
+ - *Rotates license keys and re-encrypts files safely*
+- [CONFIG] [0877_Rotate-GitHubCredentials.ps1](./0877_Rotate-GitHubCredentials.ps1)
+ - *Rotates GitHub credentials safely*
+- [CONFIG] [0878_Manage-License.ps1](./0878_Manage-License.ps1)
+ - *Manages AitherZero licenses for source code protection*
+- [CONFIG] [0879_Obfuscate-PreCommit.ps1](./0879_Obfuscate-PreCommit.ps1)
+ - *Pre-commit hook for source code obfuscation*
+- [CONFIG] [0900_Test-SelfDeployment.ps1](./0900_Test-SelfDeployment.ps1)
+ - *COMPREHENSIVE AitherZero self-deployment validation test*
+- [CONFIG] [0901_Test-LocalDeployment.ps1](./0901_Test-LocalDeployment.ps1)
+ - *Test AitherZero local deployment capabilities (offline mode)*
+- [CONFIG] [0902_Create-ReleasePackage.ps1](./0902_Create-ReleasePackage.ps1)
+ - *Create AitherZero release packages (ZIP/TAR.GZ)*
+- [CONFIG] [0930_Analyze-Workflows.ps1](./0930_Analyze-Workflows.ps1)
+ - *Analyze GitHub Actions workflows for triggers, usage, and status*
+- [CONFIG] [0950_Generate-AllTests.ps1](./0950_Generate-AllTests.ps1)
+ - *Automatic Test Generation Orchestrator - "The 100% Solution"*
+- [CONFIG] [0960_Track-DocumentationFreshness.ps1](./0960_Track-DocumentationFreshness.ps1)
+ - *Track documentation freshness relative to code changes.*
+- [CONFIG] [0961_Validate-DirectoryDocumentation.ps1](./0961_Validate-DirectoryDocumentation.ps1)
+ - *Validate that directories have proper documentation (README.md).*
+- [CONFIG] [0962_Run-Playbook.ps1](./0962_Run-Playbook.ps1)
+ - *Run orchestration playbooks - wrapper for easy local CI/CD workflow execution*
+- [CONFIG] [0963_Demo-OrchestrationFeatures.ps1](./0963_Demo-OrchestrationFeatures.ps1)
+ - *Demonstration of new orchestration engine features (Matrix, Caching, Summaries)*
+- [CONFIG] [0964_Run-GitHubWorkflow.ps1](./0964_Run-GitHubWorkflow.ps1)
+ - *Convert and execute GitHub Actions workflows locally*
+- [CONFIG] [0965_Test-PlaybookCompatibility.ps1](./0965_Test-PlaybookCompatibility.ps1)
+ - *Test orchestration playbook backward compatibility*
+- [CONFIG] [0966_Run-LocalValidation.ps1](./0966_Run-LocalValidation.ps1)
+ - *Run local PR validation checks without requiring GitHub Actions.*
+- [CONFIG] [0967_Test-OrchestrationEngine.ps1](./0967_Test-OrchestrationEngine.ps1)
+ - *Test OrchestrationEngine functionality*
+- [CONFIG] [0968_Migrate-PlaybooksV2.ps1](./0968_Migrate-PlaybooksV2.ps1)
+ - *Migrate legacy v1 playbooks to new v2.0 format*
+- [CONFIG] [0969_Validate-BranchDeployments.ps1](./0969_Validate-BranchDeployments.ps1)
+ - *Validate branch-specific GitHub Pages deployment configuration*
+- [CONFIG] [0969_Validate-PREcosystem.ps1](./0969_Validate-PREcosystem.ps1)
+ - *Validate PR Ecosystem end-to-end functionality*
+- [CONFIG] [0970_Validate-AllPlaybooks.ps1](./0970_Validate-AllPlaybooks.ps1)
+ - *Comprehensive validation of all playbooks in the repository*
+- [CONFIG] [9999_Reset-Machine.ps1](./9999_Reset-Machine.ps1)
+
+### .psm1 Files
+
+- [CONFIG] [RingStatusDashboard.psm1](./RingStatusDashboard.psm1)
+
+---
+
+*Generated by AitherZero Project Indexer* • Last updated: 2025-11-10 04:12:16 UTC
+

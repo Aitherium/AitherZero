@@ -1,0 +1,29 @@
+{
+  "Tests": {
+    "SkippedTests": 0,
+    "FailedTests": 5,
+    "PassedTests": 247,
+    "Duration": 0,
+    "TotalTests": 252,
+    "ResultFiles": [
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\PythonTests-20260207-001812.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\PythonTests-20260207-001845.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\PythonTests-20260207-002045.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\PythonTests-20260207-002113.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20251119-015541.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20251119-015620.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20251119-020234.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20251120-054819.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20251120-054934.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20251121-230837.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20251127-024124.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20251128-131548.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20251201-161920.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20260131-000234.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20260223-111552.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20260227-204900.xml",
+      "D:\\AitherOS-Fresh\\AitherZero\\library\\tests\\results\\UnitTests-20260301-121712.xml"
+    ],
+    "Coverage": 0
+  }
+}

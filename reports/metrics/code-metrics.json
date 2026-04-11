@@ -1,0 +1,119 @@
+{
+  "Timestamp": "2025-11-16T17:23:06Z",
+  "CodebaseStats": {
+    "TotalFiles": 19,
+    "CodeLines": 14362,
+    "TotalLines": 18793,
+    "BlankLines": 3077,
+    "CommentLines": 1354
+  },
+  "Functions": {
+    "MaxLength": 0,
+    "Total": 263,
+    "AverageLength": 0
+  },
+  "FileTypes": {
+    ".psm1": 19
+  },
+  "Modules": [
+    {
+      "Path": "aithercore\\automation\\DeploymentAutomation.psm1",
+      "Lines": 633,
+      "Name": "DeploymentAutomation"
+    },
+    {
+      "Path": "aithercore\\automation\\OrchestrationEngine.psm1",
+      "Lines": 3397,
+      "Name": "OrchestrationEngine"
+    },
+    {
+      "Path": "aithercore\\automation\\PlaybookHelpers.psm1",
+      "Lines": 704,
+      "Name": "PlaybookHelpers"
+    },
+    {
+      "Path": "aithercore\\automation\\ScriptUtilities.psm1",
+      "Lines": 575,
+      "Name": "ScriptUtilities"
+    },
+    {
+      "Path": "aithercore\\configuration\\ConfigManager.psm1",
+      "Lines": 667,
+      "Name": "ConfigManager"
+    },
+    {
+      "Path": "aithercore\\configuration\\Configuration.psm1",
+      "Lines": 1544,
+      "Name": "Configuration"
+    },
+    {
+      "Path": "aithercore\\documentation\\ProjectIndexer.psm1",
+      "Lines": 843,
+      "Name": "ProjectIndexer"
+    },
+    {
+      "Path": "aithercore\\infrastructure\\DeploymentArtifacts.psm1",
+      "Lines": 889,
+      "Name": "DeploymentArtifacts"
+    },
+    {
+      "Path": "aithercore\\infrastructure\\Infrastructure.psm1",
+      "Lines": 965,
+      "Name": "Infrastructure"
+    },
+    {
+      "Path": "aithercore\\reporting\\DashboardGeneration.psm1",
+      "Lines": 272,
+      "Name": "DashboardGeneration"
+    },
+    {
+      "Path": "aithercore\\reporting\\ReportingEngine.psm1",
+      "Lines": 1517,
+      "Name": "ReportingEngine"
+    },
+    {
+      "Path": "aithercore\\security\\Encryption.psm1",
+      "Lines": 520,
+      "Name": "Encryption"
+    },
+    {
+      "Path": "aithercore\\security\\LicenseManager.psm1",
+      "Lines": 581,
+      "Name": "LicenseManager"
+    },
+    {
+      "Path": "aithercore\\security\\Security.psm1",
+      "Lines": 2097,
+      "Name": "Security"
+    },
+    {
+      "Path": "aithercore\\utilities\\EnvironmentConfig.psm1",
+      "Lines": 864,
+      "Name": "EnvironmentConfig"
+    },
+    {
+      "Path": "aithercore\\utilities\\Logging.psm1",
+      "Lines": 967,
+      "Name": "Logging"
+    },
+    {
+      "Path": "aithercore\\utilities\\LogViewer.psm1",
+      "Lines": 566,
+      "Name": "LogViewer"
+    },
+    {
+      "Path": "aithercore\\utilities\\PackageManager.psm1",
+      "Lines": 490,
+      "Name": "PackageManager"
+    },
+    {
+      "Path": "aithercore\\utilities\\Performance.psm1",
+      "Lines": 702,
+      "Name": "Performance"
+    }
+  ],
+  "Complexity": {
+    "AverageComplexity": 0,
+    "HighComplexityFunctions": []
+  }
+}

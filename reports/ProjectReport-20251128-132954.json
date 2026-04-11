@@ -1,0 +1,75 @@
+{
+  "Tests": {
+    "Suites": [],
+    "Total": 0,
+    "Failed": 0,
+    "Skipped": 0,
+    "Passed": 0
+  },
+  "Version": "1.0.0.0\r\n",
+  "Metrics": {
+    "CodeLines": 52302,
+    "CommentLines": 6439,
+    "PSFiles": 300,
+    "TotalFiles": 23672,
+    "TestFiles": 1
+  },
+  "ProjectName": "AitherZero",
+  "Modules": {
+    "Configuration": {
+      "HasReadme": false,
+      "Functions": 6
+    },
+    "Logging": {
+      "HasReadme": false,
+      "Functions": 11
+    },
+    "Security": {
+      "HasReadme": false,
+      "Functions": 8
+    },
+    "Execution": {
+      "HasReadme": false,
+      "Functions": 6
+    },
+    "Orchestration": {
+      "HasReadme": false,
+      "Functions": 9
+    },
+    "System": {
+      "HasReadme": false,
+      "Functions": 25
+    },
+    "Remote": {
+      "HasReadme": false,
+      "Functions": 5
+    },
+    "Deployment": {
+      "HasReadme": false,
+      "Functions": 5
+    },
+    "Dashboard": {
+      "HasReadme": false,
+      "Functions": 4
+    },
+    "Testing": {
+      "HasReadme": false,
+      "Functions": 2
+    },
+    "Integrations": {
+      "HasReadme": false,
+      "Functions": 2
+    }
+  },
+  "Analysis": {
+    "Errors": 4,
+    "Issues": [],
+    "Count": 203,
+    "Warnings": 199
+  },
+  "System": {
+    "Platform": "Win32NT",
+    "PSVersion": "7.5.4"
+  },
+  "Timestamp": "2025-11-28 13:29:51"
+}

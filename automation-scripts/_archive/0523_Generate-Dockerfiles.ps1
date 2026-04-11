@@ -1,0 +1,522 @@
+﻿<#
+.SYNOPSIS
+    Generates optimized Dockerfiles for AitherOS services and agents.
+
+.DESCRIPTION
+    Creates production-ready Dockerfiles with:
+    - Multi-stage builds for smaller images
+    - Proper layer caching
+    - Security best practices (non-root user)
+    - Health checks
+    - GPU support (optional)
+
+.PARAMETER Service
+    Name of a specific service to generate Dockerfile for.
+    If not provided, generates Dockerfiles for all services.
+
+.PARAMETER OutputDir
+    Directory to write generated Dockerfiles (default: AitherOS/docker/services).
+
+.PARAMETER BaseImage
+    Base Python image (default: python:3.11-slim).
+
+.PARAMETER GPUSupport
+    Include NVIDIA GPU support.
+
+.PARAMETER SingleFile
+    Generate a single multi-service Dockerfile instead of individual ones.
+
+.PARAMETER ShowOutput
+    Show detailed output.
+
+.EXAMPLE
+    .\0523_Generate-Dockerfiles.ps1
+    Generates Dockerfiles for all services
+
+.EXAMPLE
+    .\0523_Generate-Dockerfiles.ps1 -Service Pulse -GPUSupport
+    Generates GPU-enabled Dockerfile for AitherPulse
+
+.NOTES
+    Script ID: 0523
+    Category: Reporting/Documentation
+    Exit Codes: 0 = Success, 1 = Failure
+#>
+
+[CmdletBinding()]
+param(
+    [Parameter()]
+    [string]$Service,
+
+    [Parameter()]
+    [string]$OutputDir,
+
+    [Parameter()]
+    [string]$BaseImage = "python:3.11-slim",
+
+    [Parameter()]
+    [switch]$GPUSupport,
+
+    [Parameter()]
+    [switch]$SingleFile,
+
+    [Parameter()]
+    [switch]$ShowOutput
+)
+
+# Initialize script
+. "$PSScriptRoot/_init.ps1"
+
+$ErrorActionPreference = 'Stop'
+$repoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+
+if (-not $OutputDir) {
+    $OutputDir = Join-Path $repoRoot "AitherOS/docker/services"
+}
+
+function Write-Status {
+    param([string]$Message, [string]$Type = 'Info')
+    if ($ShowOutput) {
+        $color = switch ($Type) {
+            'Success' { 'Green' }
+            'Warning' { 'Yellow' }
+            'Error' { 'Red' }
+            default { 'Cyan' }
+        }
+        Write-Host "[$Type] $Message" -ForegroundColor $color
+    }
+}
+
+function Get-ServiceDefinitions {
+    <#
+    .SYNOPSIS
+        Gets service definitions from services.yaml
+    #>
+    $servicesYaml = Join-Path $repoRoot "AitherOS/config/services.yaml"
+    
+    $services = @{}
+    
+    if (-not (Test-Path $servicesYaml)) {
+        Write-Status "services.yaml not found" -Type Warning
+        return $services
+    }
+    
+    # Parse YAML - get service name, port, module, dependencies
+    $content = Get-Content $servicesYaml -Raw
+    $lines = $content -split "`n"
+    
+    $currentService = $null
+    $inServices = $false
+    
+    foreach ($line in $lines) {
+        # Detect service section start (2-space indent)
+        if ($line -match '^\s{2}(\w+):\s*$') {
+            $name = $Matches[1]
+            # Skip non-service keys like 'minimal', 'headless', 'core'
+            if ($name -notin @('minimal', 'headless', 'core', 'full', 'production', 'development', 'testing')) {
+                $currentService = $name
+                $services[$name] = @{
+                    Name = $name
+                    Port = $null
+                    Module = $null
+                    Group = $null
+                    Description = $null
+                    DependsOn = @()
+                }
+            }
+        }
+        elseif ($currentService -and $line -match '^\s{4}port:\s*(\d+)') {
+            $services[$currentService].Port = [int]$Matches[1]
+        }
+        elseif ($currentService -and $line -match '^\s{4}modulD:\s*(.+)$') {
+            $services[$currentService].Module = $Matches[1].Trim()
+        }
+        elseif ($currentService -and $line -match '^\s{4}group:\s*(.+)$') {
+            $services[$currentService].Group = $Matches[1].Trim()
+        }
+        elseif ($currentService -and $line -match '^\s{4}description:\s*"?(.+)"?$') {
+            $services[$currentService].Description = $Matches[1].Trim('"')
+        }
+        elseif ($currentService -and $line -match '^\s{4}depends_on:\s*\[(.+)\]') {
+            $deps = $Matches[1] -split ',' | ForEach-Object { $_.Trim() }
+            $services[$currentService].DependsOn = $deps
+        }
+    }
+    
+    return $services
+}
+
+function New-ServiceDockerfile {
+    param(
+        [hashtable]$ServiceDef,
+        [string]$BaseImage,
+        [bool]$WithGPU
+    )
+    
+    $serviceName = $ServiceDef.Name
+    $port = $ServiceDef.Port
+    $module = $ServiceDef.Module
+    $description = $ServiceDef.Description ?? "Aither$serviceName Service"
+    
+    # Determine if it's a service or agent based on module path
+    $isAgent = $module -match '^agents\.'
+    
+    # GPU base image
+    $actualBase = if ($WithGPU) {
+        "nvidia/cuda:12.1-runtime-ubuntu22.04"
+    } else {
+        $BaseImage
+    }
+    
+    # Build the Dockerfile content
+    $dockerfile = @"
+# ============================================================================
+# Aither$serviceName Dockerfile
+# Auto-generated by 0523_Generate-Dockerfiles.ps1
+# ============================================================================
+# $description
+# Port: $port
+# ============================================================================
+
+# =============================================================================
+# Stage 1: Builder
+# =============================================================================
+FROM $actualBase AS builder
+
+"@
+
+    if ($WithGPU) {
+        $dockerfile += @"
+# Install Python for CUDA base
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf /usr/bin/python3.11 /usr/bin/python && \
+    ln -sf /usr/bin/pip3 /usr/bin/pip
+
+"@
+    }
+
+    $dockerfile += @"
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:`$PATH"
+
+# Install dependencies first (better caching)
+WORKDIR /build
+COPY AitherOS/requirements.txt ./requirements.txt
+COPY AitherOS/requirements-*.txt ./
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt || \
+    pip install --no-cache-dir fastapi uvicorn httpx pydantic
+
+# =============================================================================
+# Stage 2: Runtime
+# =============================================================================
+FROM $actualBase AS runtime
+
+LABEL maintainer="Aitherium"
+LABEL service="Aither$serviceName"
+LABEL description="$description"
+LABEL port="$port"
+
+"@
+
+    if ($WithGPU) {
+        $dockerfile += @"
+# Install Python runtime for CUDA
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf /usr/bin/python3.11 /usr/bin/python
+
+"@
+    }
+
+    $dockerfile += @"
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:`$PATH"
+
+# Create non-root user for security
+RUN groupadd -r aither && useradd -r -g aither aither
+
+# Set working directory
+WORKDIR /app
+
+# Copy application code
+COPY AitherOS/AitherNode /app/AitherNode
+COPY AitherOS/config /app/config
+
+# Set ownership
+RUN chown -R aither:aither /app
+
+# Switch to non-root user
+USER aither
+
+# Set environment variables
+ENV PYTHONPATH="/app/AitherNode:/app/AitherNode/lib"
+ENV AITHERZERO_ROOT="/app"
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Expose port
+EXPOSE $port
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:$port/health || exit 1
+
+# Default command
+"@
+
+    if ($module -eq "server") {
+        $dockerfile += @"
+CMD ["python", "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "$port"]
+"@
+    }
+    elseif ($module -match '^services\.') {
+        $dockerfile += @"
+CMD ["python", "-m", "uvicorn", "$module`:app", "--host", "0.0.0.0", "--port", "$port"]
+"@
+    }
+    else {
+        $dockerfile += @"
+CMD ["python", "-m", "uvicorn", "$module`:app", "--host", "0.0.0.0", "--port", "$port"]
+"@
+    }
+
+    return $dockerfile
+}
+
+function New-DockerCompose {
+    param(
+        [hashtable]$Services,
+        [bool]$WithGPU
+    )
+    
+    $yaml = @"
+# ============================================================================
+# AitherOS Docker Compose
+# Auto-generated by 0523_Generate-Dockerfiles.ps1
+# ============================================================================
+# Start with: docker-compose -f docker-compose.generated.yml up -d
+# ============================================================================
+
+version: '3.8'
+
+networks:
+  aithernet:
+    driver: bridge
+
+volumes:
+  aither-data:
+  aither-logs:
+  aither-models:
+
+services:
+"@
+
+    foreach ($serviceName in $Services.Keys | Sort-Object { $Services[$_].Port }) {
+        $svc = $Services[$serviceName]
+        if (-not $svc.Port) { continue }
+        
+        $deps = if ($svc.DependsOn.Count -gt 0) {
+            "`n    depends_on:`n" + ($svc.DependsOn | ForEach-Object { "      - $($_.ToLower())" } | Out-String)
+        } else { "" }
+        
+        $gpuSection = if ($WithGPU -and $svc.Group -in @('gpu', 'training')) {
+            @"
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+"@
+        } else { "" }
+        
+        $yaml += @"
+
+  $($serviceName.ToLower()):
+    build:
+      context: ../..
+      dockerfile: AitherOS/docker/services/Dockerfile.$($serviceName.ToLower())
+    container_name: aither-$($serviceName.ToLower())
+    ports:
+      - "$($svc.Port):$($svc.Port)"
+    environment:
+      - AITHERZERO_ROOT=/app
+      - PYTHONPATH=/app/AitherNode:/app/AitherNode/lib
+    volumes:
+      - aither-data:/app/data
+      - aither-logs:/app/logs
+    networks:
+      - aithernet
+    restart: unless-stopped$deps$gpuSection
+"@
+    }
+
+    return $yaml
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MAIN
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Write-Status "ðŸ³ AitherOS Dockerfile Generator" -Type Info
+Write-Status "Output directory: $OutputDir" -Type Info
+
+# Create output directory
+if (-not (Test-Path $OutputDir)) {
+    New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+    Write-Status "Created output directory" -Type Info
+}
+
+# Get service definitions
+$allServices = Get-ServiceDefinitions
+
+if ($allServices.Count -eq 0) {
+    Write-Status "No services found in services.yaml" -Type Error
+    exit 1
+}
+
+Write-Status "Found $($allServices.Count) service definitions" -Type Info
+
+# Filter to specific service if requested
+if ($Service) {
+    if ($allServices.ContainsKey($Service)) {
+        $services = @{ $Service = $allServices[$Service] }
+    }
+    else {
+        Write-Status "Service '$Service' not found in services.yaml" -Type Error
+        exit 1
+    }
+}
+else {
+    $services = $allServices
+}
+
+# Generate Dockerfiles
+$generated = 0
+
+foreach ($serviceName in $services.Keys) {
+    $svc = $services[$serviceName]
+    
+    if (-not $svc.Port -or -not $svc.Module) {
+        Write-Status "Skipping $serviceName (missing port or module)" -Type Warning
+        continue
+    }
+    
+    Write-Status "Generating Dockerfile for $serviceName (port $($svc.Port))" -Type Info
+    
+    $dockerfile = New-ServiceDockerfile -ServiceDef $svc -BaseImage $BaseImage -WithGPU $GPUSupport
+    
+    $outputPath = Join-Path $OutputDir "Dockerfile.$($serviceName.ToLower())"
+    $dockerfile | Set-Content -Path $outputPath -Encoding UTF8
+    
+    Write-Status "  Saved: $outputPath" -Type Success
+    $generated++
+}
+
+# Generate docker-compose.yml
+Write-Status "Generating docker-compose.yml" -Type Info
+$compose = New-DockerCompose -Services $services -WithGPU $GPUSupport
+$composePath = Join-Path $OutputDir "docker-compose.generated.yml"
+$compose | Set-Content -Path $composePath -Encoding UTF8
+Write-Status "  Saved: $composePath" -Type Success
+
+# Generate .dockerignore
+$dockerignore = @"
+# AitherOS Dockerignore
+# Auto-generated
+
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+.eggs
+*.egg
+
+# Virtual environments
+.venv
+venv
+ENV
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+.tox
+
+# Build
+dist/
+build/
+*.spec
+
+# Data (mount as volumes instead)
+AitherOS/Library/Data/*
+AitherOS/Library/Training/*
+training-data/
+
+# Development
+*.md
+!README.md
+tests/
+docs/
+"@
+
+$dockerignorePath = Join-Path (Split-Path $OutputDir) ".dockerignore"
+$dockerignore | Set-Content -Path $dockerignorePath -Encoding UTF8
+Write-Status "  Saved: $dockerignorePath" -Type Success
+
+Write-Status "" -Type Info
+Write-Status "✅ Dockerfile generation complete!" -Type Success
+Write-Status "   Generated: $generated Dockerfiles" -Type Info
+Write-Status "   Location: $OutputDir" -Type Info
+Write-Status "" -Type Info
+Write-Status "To build all services:" -Type Info
+Write-Status "  cd $OutputDir && docker-compose -f docker-compose.generated.yml build" -Type Info
+Write-Status "" -Type Info
+Write-Status "To run all services:" -Type Info
+Write-Status "  docker-compose -f docker-compose.generated.yml up -d" -Type Info
+
+exit 0
+
