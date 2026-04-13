@@ -146,8 +146,6 @@ function Invoke-AitherDeploy {
                     Completed   = $result.Completed
                     Failed      = $result.Failed
                     Total       = $result.Total
-                    DashboardUrl = 'http://localhost:3000'
-                    GenesisUrl  = 'http://localhost:8001'
                     Results     = $result.Results
                 }
             }
@@ -185,8 +183,6 @@ function Invoke-AitherDeploy {
                     Environment = $Environment
                     Duration    = (Get-Date) - $startTime
                     ExitCode    = $LASTEXITCODE
-                    DashboardUrl = 'http://localhost:3000'
-                    GenesisUrl  = 'http://localhost:8001'
                 }
             }
         }

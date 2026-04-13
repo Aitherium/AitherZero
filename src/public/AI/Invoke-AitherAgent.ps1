@@ -110,16 +110,29 @@ function Invoke-AitherAgent {
         $contextData = @()
         
         # Check if orchestrator is available
+        $genesisAvailable = $false
         try {
             $response = Invoke-WebRequest -Uri "$OrchestratorUrl/status" -Method GET -TimeoutSec 5 -ErrorAction Stop
-            if ($response.StatusCode -ne 200) {
-                Write-Warning "Genesis is not responding. Start it with: Start-AitherOS -Group core"
-                return
+            if ($response.StatusCode -eq 200) {
+                $genesisAvailable = $true
             }
         } catch {
-            Write-Warning "Cannot connect to Genesis at $OrchestratorUrl. Start it with: Start-AitherOS -Group core"
-            Write-Warning "Error: $_"
-            return
+            Write-Verbose "Genesis unavailable at $OrchestratorUrl — standalone LLM fallback available"
+        }
+
+        if (-not $genesisAvailable) {
+            # Fall back to standalone LLM if available
+            if (Get-Command -Name Invoke-AitherLLM -ErrorAction SilentlyContinue) {
+                Write-Host "`n  Genesis offline — routing through standalone LLM" -ForegroundColor Yellow
+                $llmParams = @{ Prompt = $Prompt }
+                if ($Effort -gt 0) { $llmParams.Effort = $Effort }
+                if ($Model) { $llmParams.Model = $Model }
+                return Invoke-AitherLLM @llmParams
+            } else {
+                Write-Warning "Genesis is not responding and standalone LLM not available."
+                Write-Warning "Start services with: Start-AitherOS -Group core"
+                return
+            }
         }
     }
 

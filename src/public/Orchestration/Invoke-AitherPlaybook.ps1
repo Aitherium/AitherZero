@@ -221,7 +221,10 @@ function Invoke-AitherPlaybook {
             }
 
             # Merge playbook variables with provided variables
-            $playbookVariables = if ($Playbook.Variables) { $Playbook.Variables } else { @{} }
+            # G9 fix: Also read from Playbook.Parameters if Variables is empty
+            $playbookVariables = if ($Playbook.Variables) { $Playbook.Variables }
+                                 elseif ($Playbook.Parameters) { $Playbook.Parameters }
+                                 else { @{} }
             $mergedVariables = $playbookVariables.Clone()
             foreach ($key in $Variables.Keys) {
                 $mergedVariables[$key] = $Variables[$key]
@@ -319,9 +322,23 @@ function Invoke-AitherPlaybook {
                     while ($runningJobs.Count -lt $maxConcurrency -and $index -lt $sequence.Count) {
                         $item = $sequence[$index]
                         $scriptId = if ($item.Script) { $item.Script } else { $item }
-                        $scriptParams = if ($item.Parameters) { $item.Parameters } elseif ($item.Params) { $item.Params } else { @{} }
+                        $scriptParams = if ($item.Parameters) { $item.Parameters.Clone() } elseif ($item.Params) { $item.Params.Clone() } else { @{} }
 
-                        # Merge variables into parameters
+                        # G8 fix: Interpolate '$VarName' placeholder strings with actual merged variable values
+                        $keysToUpdate = @($scriptParams.Keys)
+                        foreach ($key in $keysToUpdate) {
+                            $val = $scriptParams[$key]
+                            if ($val -is [string] -and $val -match '^\$(.+)$') {
+                                $varName = $Matches[1]
+                                if ($mergedVariables.ContainsKey($varName)) {
+                                    $scriptParams[$key] = $mergedVariables[$varName]
+                                } elseif ($val -eq "`$$key") {
+                                    $scriptParams.Remove($key)
+                                }
+                            }
+                        }
+
+                        # Merge variables into parameters (only add keys not already present)
                         foreach ($key in $mergedVariables.Keys) {
                             if (-not $scriptParams.ContainsKey($key)) {
                                 $scriptParams[$key] = $mergedVariables[$key]
@@ -401,9 +418,24 @@ function Invoke-AitherPlaybook {
                 # Sequential execution
                 foreach ($item in $sequence) {
                     $scriptId = if ($item.Script) { $item.Script } else { $item }
-                    $scriptParams = if ($item.Parameters) { $item.Parameters } elseif ($item.Params) { $item.Params } else { @{} }
+                    $scriptParams = if ($item.Parameters) { $item.Parameters.Clone() } elseif ($item.Params) { $item.Params.Clone() } else { @{} }
 
-                    # Merge variables into parameters
+                    # G8 fix: Interpolate '$VarName' placeholder strings with actual merged variable values
+                    $keysToUpdate = @($scriptParams.Keys)
+                    foreach ($key in $keysToUpdate) {
+                        $val = $scriptParams[$key]
+                        if ($val -is [string] -and $val -match '^\$(.+)$') {
+                            $varName = $Matches[1]
+                            if ($mergedVariables.ContainsKey($varName)) {
+                                $scriptParams[$key] = $mergedVariables[$varName]
+                            } elseif ($val -eq "`$$key") {
+                                # Self-referencing placeholder with no merged value — remove so script default applies
+                                $scriptParams.Remove($key)
+                            }
+                        }
+                    }
+
+                    # Merge variables into parameters (only add keys not already present)
                     foreach ($key in $mergedVariables.Keys) {
                         if (-not $scriptParams.ContainsKey($key)) {
                             $scriptParams[$key] = $mergedVariables[$key]

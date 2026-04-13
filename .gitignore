@@ -34,6 +34,13 @@ library/automation-scripts/30-deploy/*
 !library/automation-scripts/30-deploy/3061_Deploy-LightweightNode.ps1
 library/automation-scripts/40-lifecycle/
 
+# AitherOS-specific infrastructure (Hyper-V, Rocky Linux)
+library/automation-scripts/01-infrastructure/0300_Deploy-Infrastructure.ps1
+library/automation-scripts/01-infrastructure/0310_Deploy-HypervVM.ps1
+library/automation-scripts/01-infrastructure/0311_Prepare-RockyLinuxImage.ps1
+library/infrastructure/environments/
+library/infrastructure/modules/rocky-linux/
+
 # Internal planning docs
 OPEN_SOURCE_PLAN.md
 # AitherZero Full Deployment*.md
@@ -45,3 +52,9 @@ Thumbs.db
 .idea/
 *.swp
 *~
+
+# Terraform/OpenTofu state
+.terraform/
+*.tfstate*
+*.tfvars
+!*.tfvars.example

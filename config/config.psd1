@@ -600,6 +600,129 @@
             MultiModel        = @{ Enabled = $true }
             ComfyUI           = @{ Enabled = $true }
             GPUAcceleration   = @{ Enabled = $true }
+            StandaloneLLM     = @{ Enabled = $true }
+        }
+    }
+
+    # ===================================================================
+    # INFRASTRUCTURE - VM / IaC Deployment Settings
+    # ===================================================================
+    # Drives the deploy-infrastructure and deploy-rocky-vm playbooks.
+    # Invoked automatically via: bootstrap.ps1 -InstallProfile Infrastructure
+    # Or manually: Invoke-AitherPlaybook deploy-infrastructure
+    # Or: Invoke-AitherInfra -Action Apply -Provider rocky-linux
+    Infrastructure           = @{
+        Enabled            = $false       # Master toggle — set $true to activate
+        Provider           = 'opentofu'   # opentofu | terraform
+        Hypervisor         = 'hyperv'     # hyperv (future: libvirt, vmware)
+
+        # OpenTofu settings
+        WorkingDirectory   = 'AitherZero/library/infrastructure'
+        TofuAutoApprove    = $false       # Auto-approve applies (true for CI)
+
+        # Target OS for VM deployment
+        TargetOS           = 'rocky-linux' # rocky-linux | windows-server
+
+        # Rocky Linux VM settings
+        RockyLinux         = @{
+            CloudImagePath    = ''           # Path to Rocky-9-GenericCloud .qcow2 or .vhdx
+                                             # Auto-populated by 0311_Prepare-RockyLinuxImage.ps1 -UpdateConfig
+            ImageVersion      = '9.5'        # Rocky minor version to download (9.4, 9.5, etc.)
+            ImageArch         = 'x86_64'     # Architecture (x86_64 | aarch64)
+            AutoDownload      = $true        # Auto-download cloud image if CloudImagePath is empty
+            SSHPublicKey      = ''           # SSH public key for 'aither' user
+            BootstrapMode     = 'pull'       # pull | build | hybrid
+            Profile           = 'standard'  # minimal | core | standard | full | gpu
+            Registry          = 'ghcr.io/aitherium'
+            Tag               = 'latest'
+            EnableCockpit     = $true
+        }
+
+        # VM defaults
+        VM                 = @{
+            DefaultCPUs       = 4
+            DefaultMemoryGB   = 8
+            DefaultDiskGB     = 100
+            DataDiskGB        = 500
+            SwitchName        = 'AitherSwitch'
+            SwitchType        = 'Internal'   # Internal | External
+            VHDPath           = 'C:/VMs/AitherOS'
+            EnableGPU         = $false
+            AutoStart         = $true
+        }
+
+        # Hyper-V provider (for OpenTofu)
+        HyperV             = @{
+            Host              = '127.0.0.1'
+            Port              = 5986
+            UseHTTPS          = $true
+            Insecure          = $true
+            UseNTLM           = $true
+        }
+
+        # Fleet definition — nodes to deploy
+        # Override in config.local.psd1 with your actual node specs
+        Nodes              = @(
+            @{
+                Name              = 'aither-rocky-01'
+                Profile           = 'standard'
+                CPUs              = 4
+                MemoryGB          = 8
+                DiskGB            = 100
+                MeshRole          = 'primary'
+                FailoverPriority  = 1
+            }
+        )
+    }
+
+    # ===================================================================
+    # LLM - Standalone Language Model Configuration
+    # ===================================================================
+    # Provider cascade for Invoke-AitherLLM when Genesis is unavailable.
+    # Providers are tried in order until one succeeds.
+    # API keys: set via env vars or AitherSecrets vault.
+    LLM                      = @{
+        # Provider priority (first available wins)
+        ProviderCascade    = @('microscheduler', 'ollama', 'openai', 'anthropic')
+
+        # MicroScheduler (AitherOS in-process LLM queue)
+        MicroScheduler     = @{
+            Url            = 'http://localhost:8150'
+        }
+
+        # Ollama (local, always-on)
+        Ollama             = @{
+            Url            = 'http://localhost:11434'
+            DefaultModel   = 'llama3.2'
+        }
+
+        # OpenAI (cloud, requires OPENAI_API_KEY)
+        OpenAI             = @{
+            DefaultModel   = 'gpt-4o-mini'
+        }
+
+        # Anthropic (cloud, requires ANTHROPIC_API_KEY)
+        Anthropic          = @{
+            DefaultModel   = 'claude-sonnet-4-6'
+        }
+
+        # Azure OpenAI (cloud, requires AZURE_OPENAI_ENDPOINT + AZURE_OPENAI_KEY)
+        Azure              = @{
+            Deployment     = ''    # e.g., 'gpt-4o-mini'
+            ApiVersion     = '2024-02-15-preview'
+        }
+
+        # Effort-to-model mapping
+        EffortModels       = @{
+            Small          = 'llama3.2'        # Effort 1-2
+            Medium         = 'aither-orchestrator'  # Effort 3-6
+            Reasoning      = 'deepseek-r1:14b'     # Effort 7-10
+        }
+
+        # Conversation threading
+        Threads            = @{
+            StorePath      = ''    # Default: library/logs/threads/
+            MaxHistory     = 20   # Max messages sent as context
         }
     }
 

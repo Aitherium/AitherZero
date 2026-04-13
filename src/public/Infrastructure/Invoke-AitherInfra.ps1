@@ -75,7 +75,7 @@ function Invoke-AitherInfra {
         [ValidateSet('Plan', 'Apply', 'Destroy', 'Status', 'List', 'Init', 'Validate')]
         [string]$Action,
 
-        [ValidateSet('docker', 'aws', 'azure', 'gcp', 'hyperv', 'kubernetes')]
+        [ValidateSet('docker', 'aws', 'azure', 'gcp', 'hyperv', 'rocky-linux', 'kubernetes')]
         [string]$Provider,
 
         [ValidateSet('dev', 'staging', 'prod')]
@@ -102,11 +102,30 @@ function Invoke-AitherInfra {
     $InfraBase = if ($env:AITHER_INFRA_PATH) {
         $env:AITHER_INFRA_PATH
     } else {
-        Join-Path $PSScriptRoot '..\..\..\..\library\infrastructure' | Resolve-Path -ErrorAction SilentlyContinue
+        # G16 fix: Use Get-AitherModuleRoot if available, otherwise walk up to find library/infrastructure
+        $moduleRoot = if (Get-Command Get-AitherModuleRoot -ErrorAction SilentlyContinue) {
+            Get-AitherModuleRoot
+        } else { $null }
+
+        if ($moduleRoot) {
+            Join-Path $moduleRoot 'library' 'infrastructure'
+        } else {
+            # Fallback: walk up from PSScriptRoot to find library/infrastructure
+            $searchDir = $PSScriptRoot
+            $found = $null
+            for ($i = 0; $i -lt 8; $i++) {
+                $candidate = Join-Path $searchDir 'library' 'infrastructure'
+                if (Test-Path $candidate) { $found = $candidate; break }
+                $searchDir = Split-Path $searchDir -Parent
+                if (-not $searchDir) { break }
+            }
+            $found
+        }
     }
 
     if (-not $InfraBase -or -not (Test-Path $InfraBase)) {
-        $InfraBase = Join-Path (Split-Path $PSScriptRoot -Parent) 'library\infrastructure'
+        # Last resort: try relative to current directory
+        $InfraBase = Join-Path $PWD 'AitherZero' 'library' 'infrastructure'
     }
 
     # ── Find tofu binary ─────────────────────────────────────────────────
@@ -122,12 +141,13 @@ function Invoke-AitherInfra {
 
     # ── Provider module mapping ──────────────────────────────────────────
     $ProviderModuleMap = @{
-        'docker'     = 'docker-host'
-        'aws'        = 'aws'
-        'azure'      = 'azure'
-        'gcp'        = 'gcp'
-        'hyperv'     = 'aitheros-node'
-        'kubernetes' = 'kubernetes'
+        'docker'      = 'docker-host'
+        'aws'         = 'aws'
+        'azure'       = 'azure'
+        'gcp'         = 'gcp'
+        'hyperv'      = 'aitheros-node'
+        'rocky-linux' = 'rocky-linux'
+        'kubernetes'  = 'kubernetes'
     }
 
     # ── Resolve workspace ────────────────────────────────────────────────
@@ -137,7 +157,13 @@ function Invoke-AitherInfra {
         $Workspace = Join-Path $InfraBase '.workspaces' $RequestId
     } elseif ($Provider) {
         $ModuleName = $ProviderModuleMap[$Provider]
-        $Workspace = Join-Path $InfraBase 'modules' $ModuleName
+        # Providers with full environments use environments/ instead of modules/
+        $envPath = Join-Path $InfraBase 'environments' $ModuleName
+        if (Test-Path $envPath) {
+            $Workspace = $envPath
+        } else {
+            $Workspace = Join-Path $InfraBase 'modules' $ModuleName
+        }
     } else {
         $Workspace = $InfraBase
     }

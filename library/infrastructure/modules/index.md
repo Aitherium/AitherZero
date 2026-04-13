@@ -10,13 +10,17 @@
 
 ### [STATS] Contents
 
-- **Subdirectories**: 2
+- **Subdirectories**: 4
 - **Files**: 1
 
 ## [FILES] Subdirectories
 
+- [[FOLDER] **aitheros-node**](./aitheros-node/index.md)
+ - *Provision a Windows Server 2025 Core VM pre-configured for AitherOS via Hyper-V.*
 - [[FOLDER] **network_switch**](./network_switch/index.md)
  - *Use this module to create a reusable Hyper‑V virtual switch via the*
+- [[FOLDER] **rocky-linux**](./rocky-linux/index.md)
+ - *Provision a Rocky Linux 9 VM on Hyper-V with cloud-init for AitherOS Podman deployment.*
 - [[FOLDER] **vm**](./vm/index.md)
  - *Provision one or more Hyper-V virtual machines and their accompanying VHD files.*
 
