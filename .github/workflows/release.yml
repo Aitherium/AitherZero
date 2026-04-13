@@ -71,9 +71,7 @@ jobs:
       - name: Test
         shell: pwsh
         run: |
-          $changedTests = @'
-${{ needs.changes.outputs.pester_test_files }}
-'@ -split "`n" | Where-Object { $_ -and $_.Trim() }
+          $changedTests = "${{ needs.changes.outputs.pester_test_files }}" -split "`n" | Where-Object { $_ -and $_.Trim() }
           $config = New-PesterConfiguration
           $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
           $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
