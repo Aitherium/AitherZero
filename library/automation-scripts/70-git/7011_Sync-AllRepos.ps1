@@ -35,6 +35,12 @@
 .PARAMETER Branch
     Branch to push. Default: current branch.
 
+.PARAMETER PublicBundle
+    Optional public bundle manifest name to package before the aither sync.
+
+.PARAMETER PublicTag
+    Optional tag value passed to sync-alpha.yml and bundle packaging.
+
 .EXAMPLE
     .\7011_Sync-AllRepos.ps1 -Message "feat: new deployment tools"
     # Commit, push to origin, sync AitherZero + Alpha public repos
@@ -65,7 +71,9 @@ param(
     [switch]$Force,
     [switch]$SkipCommit,
 
-    [string]$Branch
+    [string]$Branch,
+    [string]$PublicBundle,
+    [string]$PublicTag
 )
 
 $ErrorActionPreference = 'Stop'
@@ -307,6 +315,32 @@ try {
             Write-Host ""
             Write-Host "  ━━━ Step 4: aither sync ━━━" -ForegroundColor Yellow
 
+            if ($PublicBundle) {
+                $bundleScript = Join-Path $PSScriptRoot '7012_Package-PublicRelease.ps1'
+                if (Test-Path $bundleScript) {
+                    try {
+                        $bundleArgs = @{
+                            BundleName = $PublicBundle
+                            Branch     = $Branch
+                            DryRun     = $DryRun
+                        }
+                        if ($PublicTag) {
+                            $bundleArgs.Version = $PublicTag
+                            $bundleArgs.Tag = $PublicTag
+                        }
+
+                        & $bundleScript @bundleArgs
+                        $results['Bundle'] = if ($DryRun) { 'DRY RUN' } else { "✓ $PublicBundle" }
+                    } catch {
+                        Write-Host "  ✗ Public bundle packaging failed: $_" -ForegroundColor Red
+                        $results['Bundle'] = "✗ $($_.Exception.Message)"
+                    }
+                } else {
+                    Write-Host "  ⚠ Bundle script not found at $bundleScript" -ForegroundColor Yellow
+                    $results['Bundle'] = 'skipped (script missing)'
+                }
+            }
+
             # Alpha sync is done via GitHub Actions workflow (sync-alpha.yml)
             # We trigger it here if gh CLI is available
             if (Get-Command gh -ErrorAction SilentlyContinue) {
@@ -315,9 +349,14 @@ try {
                     $results['Alpha'] = 'DRY RUN'
                 } else {
                     try {
-                        gh workflow run sync-alpha.yml --ref $Branch 2>&1
+                        if ($PublicTag) {
+                            gh workflow run sync-alpha.yml --ref $Branch -f "tag=$PublicTag" 2>&1
+                        } else {
+                            gh workflow run sync-alpha.yml --ref $Branch 2>&1
+                        }
                         Write-Host "  ✓ Alpha sync workflow triggered" -ForegroundColor Green
-                        Write-SyncLog -Repo 'alpha-public' -Action 'workflow-trigger' -Status 'success' -Detail "Triggered sync-alpha.yml"
+                        $detail = if ($PublicTag) { "Triggered sync-alpha.yml ($PublicTag)" } else { 'Triggered sync-alpha.yml' }
+                        Write-SyncLog -Repo 'alpha-public' -Action 'workflow-trigger' -Status 'success' -Detail $detail
                         $results['Alpha'] = '✓ workflow triggered'
                     } catch {
                         Write-Host "  ⚠ Could not trigger Alpha sync: $_" -ForegroundColor Yellow
