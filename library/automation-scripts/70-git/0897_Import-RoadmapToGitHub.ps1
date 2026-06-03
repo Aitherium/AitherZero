@@ -132,7 +132,7 @@ Write-Status "Atlas URL: $AtlasUrl" -Level Info
 # Health check
 if (-not (Test-AtlasHealth)) {
     Write-Status "Atlas (port $AtlasPort) is not running. Start it first:" -Level Error
-    Write-Status "  docker compose -f docker-compose.aitheros.yml up -d aither-atlas" -Level Error
+    Write-Status "  .DEPLOYMENT/scripts/compose.sh aitheros up -d aither-atlas" -Level Error
     exit 1
 }
 

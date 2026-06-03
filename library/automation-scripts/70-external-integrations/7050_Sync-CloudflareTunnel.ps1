@@ -23,9 +23,22 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$ConfigPath = (Join-Path $PSScriptRoot '../../../../AitherOS/config/cloudflare/tunnel-ingress.yaml'),
+    [string]$ConfigPath,
     [switch]$DryRun
 )
+
+# Calculate ProjectRoot (module is at .PRODUCTS/.AITHERZERO/)
+$ProjectRoot = $PSScriptRoot
+for ($i = 0; $i -lt 5; $i++) {
+    $ProjectRoot = Split-Path $ProjectRoot -Parent
+    if (Test-Path (Join-Path $ProjectRoot ".PRODUCTS/.AITHERZERO/AitherZero.psd1")) {
+        break
+    }
+}
+
+if (-not $ConfigPath) {
+    $ConfigPath = Join-Path $ProjectRoot 'AitherOS/config/cloudflare/tunnel-ingress.yaml'
+}
 
 $ErrorActionPreference = 'Stop'
 

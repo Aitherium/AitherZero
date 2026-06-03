@@ -84,7 +84,7 @@ $ProgressPreference = 'SilentlyContinue'
 # ═══════════════════════════════════════════════════════════════
 
 $MonoRoot = Split-Path $PSScriptRoot -Parent | Split-Path -Parent | Split-Path -Parent | Split-Path -Parent
-$LogFile = Join-Path $MonoRoot "AitherZero/library/logs/repo-sync.jsonl"
+$LogFile = Join-Path $MonoRoot ".PRODUCTS/.AITHERZERO/library/logs/repo-sync.jsonl"
 
 $Repos = @{
     Origin = @{

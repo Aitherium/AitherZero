@@ -48,9 +48,9 @@ Import-Module (Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 # Determine output path based on mode
 if (-not $OutputPath) {
     if ($Fast) {
-        $OutputPath = "./AitherZero/library/reports/psscriptanalyzer-fast"
+        $OutputPath = "./.PRODUCTS/.AITHERZERO/library/reports/psscriptanalyzer-fast"
     } else {
-        $OutputPath = "./AitherZero/library/reports/psscriptanalyzer-results"
+        $OutputPath = "./.PRODUCTS/.AITHERZERO/library/reports/psscriptanalyzer-results"
     }
 }
 
@@ -222,7 +222,7 @@ try {
         # Key automation scripts (most important)
         $keyPattern = '^(0[0-4]\d{2}_|0815_|0820_|0830_|0835_|0400_|0402_|0404_)'
         $keyAutomationScripts = @()
-        $automationPath = Join-Path $Path 'AitherZero/library/automation-scripts'
+        $automationPath = Join-Path $Path '.PRODUCTS/.AITHERZERO/library/automation-scripts'
         if (Test-Path $automationPath) {
             $keyAutomationScripts = Get-ChildItem $automationPath -Filter '*.ps1' |
                                    Where-Object { $_.Name -match $keyPattern } |
@@ -578,7 +578,7 @@ try {
     # Save results
     if ($totalIssues -gt 0) {
         if (-not $OutputPath) {
-            $OutputPath = Join-Path $projectRoot "AitherZero/library/tests/analysis"
+            $OutputPath = Join-Path $projectRoot ".PRODUCTS/.AITHERZERO/library/tests/analysis"
         }
 
         if (-not (Test-Path $OutputPath)) {

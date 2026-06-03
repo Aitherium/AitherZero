@@ -188,7 +188,7 @@ if (Test-Path $skillFile) {
 Write-Host ""
 Write-Host "[4/5] Verifying Docker configuration..." -ForegroundColor Cyan
 
-$composeFile = Join-Path $projectRoot "docker-compose.aitheros.yml"
+$composeFile = Join-Path $projectRoot ".DEPLOYMENT" "compose" "docker-compose.aitheros.yml"
 if (Test-Path $composeFile) {
     $composeContent = Get-Content $composeFile -Raw
     if ($composeContent -match 'aither-skills:') {
@@ -205,10 +205,10 @@ if (Test-Path $composeFile) {
 if ($StartService) {
     Write-Host ""
     Write-Host "[5/5] Starting AitherSkills service..." -ForegroundColor Cyan
-    
+
     Push-Location $projectRoot
     try {
-        docker compose -f docker-compose.aitheros.yml up -d aither-skills
+        docker compose -f .DEPLOYMENT/compose/docker-compose.aitheros.yml up -d aither-skills
         
         Write-Host "  ✓ Service started" -ForegroundColor Green
         Write-Host ""

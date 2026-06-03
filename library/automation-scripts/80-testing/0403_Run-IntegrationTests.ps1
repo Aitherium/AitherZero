@@ -322,7 +322,7 @@ try {
 
     # Output configuration
     if (-not $OutputPath) {
-        $OutputPath = Join-Path $projectRoot "AitherZero/library/tests/results"
+        $OutputPath = Join-Path $projectRoot ".PRODUCTS/.AITHERZERO/library/tests/results"
     }
 
     if (-not (Test-Path $OutputPath)) {
@@ -557,7 +557,7 @@ catch {
     $scriptProjectRoot = Split-Path $PSScriptRoot -Parent
 
     if (-not $OutputPath) {
-        $OutputPath = Join-Path $scriptProjectRoot "AitherZero/library/tests/results"
+        $OutputPath = Join-Path $scriptProjectRoot ".PRODUCTS/.AITHERZERO/library/tests/results"
     }
 
     if (-not (Test-Path $OutputPath)) {

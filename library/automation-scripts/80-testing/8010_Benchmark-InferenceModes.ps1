@@ -255,7 +255,7 @@ foreach ($mode in $modeList) {
 if ($feasibleModes.Count -eq 0) {
     Write-Host "  ❌ No feasible modes to benchmark!" -ForegroundColor Red
     Write-Host "     Start backends: ollama serve" -ForegroundColor Gray
-    Write-Host "     For vLLM:       docker compose -f docker-compose.aitheros.yml --profile vllm up -d" -ForegroundColor Gray
+    Write-Host "     For vLLM:       .DEPLOYMENT/scripts/compose.sh aitheros --profile vllm up -d" -ForegroundColor Gray
     exit 1
 }
 

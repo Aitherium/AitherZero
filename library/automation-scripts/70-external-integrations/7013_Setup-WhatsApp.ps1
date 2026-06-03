@@ -52,13 +52,13 @@ $ProgressPreference = 'SilentlyContinue'
 
 # ── Resolve workspace root ────────────────────────────────────────────────
 $WorkspaceRoot = $PSScriptRoot
-while ($WorkspaceRoot -and -not (Test-Path (Join-Path $WorkspaceRoot 'docker-compose.aitheros.yml'))) {
+while ($WorkspaceRoot -and -not (Test-Path (Join-Path $WorkspaceRoot '.DEPLOYMENT' 'compose' 'docker-compose.aitheros.yml'))) {
     $parent = Split-Path $WorkspaceRoot -Parent
     if ($parent -eq $WorkspaceRoot) { $WorkspaceRoot = $null; break }
     $WorkspaceRoot = $parent
 }
 if (-not $WorkspaceRoot) {
-    throw "Could not locate workspace root (docker-compose.aitheros.yml not found)."
+    throw "Could not locate workspace root (.DEPLOYMENT/compose/docker-compose.aitheros.yml not found)."
 }
 
 $EnvFile       = Join-Path $WorkspaceRoot '.env.whatsapp'
@@ -305,14 +305,14 @@ if (-not $SkipDocker) {
     Write-Step "Starting AitherWhatsApp Docker service..."
 
     try {
-        $composeFile = Join-Path $WorkspaceRoot 'docker-compose.aitheros.yml'
+        $composeFile = Join-Path $WorkspaceRoot '.DEPLOYMENT' 'compose' 'docker-compose.aitheros.yml'
         if (-not (Test-Path $composeFile)) {
-            Write-Err "docker-compose.aitheros.yml not found at $composeFile"
+            Write-Err ".DEPLOYMENT/compose/docker-compose.aitheros.yml not found at $composeFile"
             exit 1
         }
 
         Push-Location $WorkspaceRoot
-        docker compose -f docker-compose.aitheros.yml --profile communication up -d aither-whatsapp 2>&1 |
+        docker compose -f .DEPLOYMENT/compose/docker-compose.aitheros.yml --profile communication up -d aither-whatsapp 2>&1 |
             ForEach-Object { Write-Host "    $_" -ForegroundColor Gray }
         Pop-Location
 

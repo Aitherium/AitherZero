@@ -136,7 +136,7 @@ Write-Host "-" * 40
 
 $configFiles = @(
     @{ Path = "AitherOS/config/services.yaml"; Required = $true }
-    @{ Path = "docker-compose.aitheros.yml"; Required = $true }
+    @{ Path = ".DEPLOYMENT/compose/docker-compose.aitheros.yml"; Required = $true }
     @{ Path = "docker/genesis/Dockerfile"; Required = $true }
     @{ Path = "docker/genesis/genesis.py"; Required = $true }
     @{ Path = "docker/.env"; Required = $false }
