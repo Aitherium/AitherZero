@@ -33,6 +33,11 @@ param(
     [Parameter(Mandatory)][string]$ProtonPass,
     [string]$TotpCode,
     [int]$SmtpPort = 1025,
+    # FROM address for automated system mail. Decoupled from the Proton login so
+    # alerts don't go out "as" the human admin account. MUST be an address the
+    # Proton account OWNS (alias/additional address) or Proton rewrites it to the
+    # account default. Defaults to the shared system identity.
+    [string]$FromAddress = 'aither@aitherium.com',
     [switch]$SkipDownload,
     [switch]$SkipInstall,
     [switch]$ResendVerification
@@ -553,7 +558,7 @@ $secrets = @{
     'AITHER_SMTP_PORT'    = "$SmtpPort"
     'AITHER_SMTP_USER'    = $smtpUser
     'AITHER_SMTP_PASS'    = $smtpPass
-    'AITHER_SMTP_FROM'    = $smtpUser
+    'AITHER_SMTP_FROM'    = $FromAddress
     'AITHER_IMAP_HOST'    = $ContainerBridgeHost
     'AITHER_IMAP_PORT'    = '1143'
     'AITHER_IMAP_USER'    = $smtpUser
@@ -595,7 +600,7 @@ if (Test-Path $EnvFile) {
         'AITHER_SMTP_PORT=.*'  = "AITHER_SMTP_PORT=$SmtpPort"
         'AITHER_SMTP_USER=.*'  = "AITHER_SMTP_USER=$smtpUser"
         'AITHER_SMTP_PASS=.*'  = "AITHER_SMTP_PASS=$smtpPass"
-        'AITHER_SMTP_FROM=.*'  = "AITHER_SMTP_FROM=$smtpUser"
+        'AITHER_SMTP_FROM=.*'  = "AITHER_SMTP_FROM=$FromAddress"
         'AITHER_IMAP_HOST=.*'  = "AITHER_IMAP_HOST=$ContainerBridgeHost"
         'AITHER_IMAP_PORT=.*'  = 'AITHER_IMAP_PORT=1143'
         'AITHER_IMAP_USER=.*'  = "AITHER_IMAP_USER=$smtpUser"
@@ -619,7 +624,7 @@ if (Test-Path $EnvFile) {
         "AITHER_SMTP_PORT=$SmtpPort",
         "AITHER_SMTP_USER=$smtpUser",
         "AITHER_SMTP_PASS=$smtpPass",
-        "AITHER_SMTP_FROM=$smtpUser",
+        "AITHER_SMTP_FROM=$FromAddress",
         "AITHER_IMAP_HOST=$ContainerBridgeHost",
         'AITHER_IMAP_PORT=1143',
         "AITHER_IMAP_USER=$smtpUser",
