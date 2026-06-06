@@ -34,15 +34,15 @@
     Valid: gpu,llm,comfyui,meshgen,genesis,agents,scheduler,gateway,mcp,pulse,watch
 
 .EXAMPLE
-    .\6010_Get-FlightDeck.ps1
+    .\6051_Get-FlightDeck.ps1
     Single pass, full flight deck.
 
 .EXAMPLE
-    .\6010_Get-FlightDeck.ps1 -Watch 10 -Compact
+    .\6051_Get-FlightDeck.ps1 -Watch 10 -Compact
     Refresh every 10s, only show active items.
 
 .EXAMPLE
-    .\6010_Get-FlightDeck.ps1 -Sections gpu,llm,comfyui -Watch 5
+    .\6051_Get-FlightDeck.ps1 -Sections gpu,llm,comfyui -Watch 5
     Monitor only GPU + LLM + ComfyUI.
 
 .NOTES

@@ -26,10 +26,10 @@
     Custom commit message for push operations.
 
 .EXAMPLE
-    .\7010_Sync-OpenSource.ps1 -Direction push -Message "feat: add new playbook engine"
+    .\0705_Sync-OpenSource.ps1 -Direction push -Message "feat: add new playbook engine"
 
 .EXAMPLE
-    .\7010_Sync-OpenSource.ps1 -Direction pull
+    .\0705_Sync-OpenSource.ps1 -Direction pull
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param(
@@ -77,6 +77,9 @@ $ExcludePatterns = @(
     'library/automation-scripts/40-lifecycle/'
     'library/automation-scripts/50-ai-setup/'
     'library/automation-scripts/60-security/'
+    'library/automation-scripts/26-roboflow/'
+    'library/automation-scripts/27-aither-integrations/'
+    'library/automation-scripts/70-github/'
     'library/automation-scripts/_archive/'
     '0908_Switch-GpuProfile.ps1'
     '0806_AitherOS-Lifecycle.ps1'

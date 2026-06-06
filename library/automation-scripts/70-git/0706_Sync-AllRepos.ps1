@@ -42,15 +42,15 @@
     Optional tag value passed to sync-alpha.yml and bundle packaging.
 
 .EXAMPLE
-    .\7011_Sync-AllRepos.ps1 -Message "feat: new deployment tools"
+    .\0706_Sync-AllRepos.ps1 -Message "feat: new deployment tools"
     # Commit, push to origin, sync AitherZero + Alpha public repos
 
 .EXAMPLE
-    .\7011_Sync-AllRepos.ps1 -SkipCommit -AitherZeroOnly
+    .\0706_Sync-AllRepos.ps1 -SkipCommit -AitherZeroOnly
     # Just sync AitherZero subtree to public (no new commit)
 
 .EXAMPLE
-    .\7011_Sync-AllRepos.ps1 -DryRun
+    .\0706_Sync-AllRepos.ps1 -DryRun
     # Show what would be pushed everywhere
 
 .NOTES
@@ -266,7 +266,7 @@ try {
         Write-Host ""
         Write-Host "  ━━━ Step 3: Sync AitherZero public ━━━" -ForegroundColor Yellow
 
-        $syncScript = Join-Path $PSScriptRoot "7010_Sync-OpenSource.ps1"
+        $syncScript = Join-Path $PSScriptRoot "0705_Sync-OpenSource.ps1"
 
         if (Test-Path $syncScript) {
             if ($DryRun) {
@@ -316,7 +316,7 @@ try {
             Write-Host "  ━━━ Step 4: aither sync ━━━" -ForegroundColor Yellow
 
             if ($PublicBundle) {
-                $bundleScript = Join-Path $PSScriptRoot '7012_Package-PublicRelease.ps1'
+                $bundleScript = Join-Path $PSScriptRoot '0707_Package-PublicRelease.ps1'
                 if (Test-Path $bundleScript) {
                     try {
                         $bundleArgs = @{

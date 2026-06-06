@@ -24,15 +24,15 @@
     Default: "genesis"
 
 .EXAMPLE
-    .\5001_Get-ServiceStatus.ps1
+    .\6050_Get-ServiceStatus.ps1
     Shows status of all services via Genesis API.
 
 .EXAMPLE
-    .\5001_Get-ServiceStatus.ps1 -Watch 5 -Detailed
+    .\6050_Get-ServiceStatus.ps1 -Watch 5 -Detailed
     Continuously monitors services with details, refreshing every 5 seconds.
 
 .EXAMPLE
-    .\5001_Get-ServiceStatus.ps1 -Source docker -Json
+    .\6050_Get-ServiceStatus.ps1 -Source docker -Json
     Gets status directly from Docker and outputs as JSON.
 
 .NOTES

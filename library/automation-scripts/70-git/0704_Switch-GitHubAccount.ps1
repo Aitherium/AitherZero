@@ -17,16 +17,16 @@
     Show current identity without changing anything.
 
 .EXAMPLE
-    ./0898_Switch-GitHubAccount.ps1 personal
-    ./0898_Switch-GitHubAccount.ps1 work
-    ./0898_Switch-GitHubAccount.ps1 -Status
+    ./0704_Switch-GitHubAccount.ps1 personal
+    ./0704_Switch-GitHubAccount.ps1 work
+    ./0704_Switch-GitHubAccount.ps1 -Status
 
 .NOTES
     Git identity and gh active account persist to disk and work across shells.
     If GH_TOKEN is set in your current shell (Copilot/VS Code inject it),
     dot-source the script to clear it in your session too:
 
-        . ./0898_Switch-GitHubAccount.ps1 work
+        . ./0704_Switch-GitHubAccount.ps1 work
 
     Without dot-sourcing, git identity still switches correctly but `gh` CLI
     may still auth as the GH_TOKEN user in that specific shell.
@@ -133,6 +133,6 @@ if ($savedToken) {
     Write-Host "`n  ⚠ GH_TOKEN was set (Copilot/VS Code inject it)." -ForegroundColor Yellow
     Write-Host "    Git identity is switched. For gh CLI too, run:" -ForegroundColor Yellow
     Write-Host "      `$env:GH_TOKEN = `$null" -ForegroundColor White
-    Write-Host "    Or dot-source next time:  . ./0898_Switch-GitHubAccount.ps1 $resolved" -ForegroundColor DarkGray
+    Write-Host "    Or dot-source next time:  . ./0704_Switch-GitHubAccount.ps1 $resolved" -ForegroundColor DarkGray
 }
 Write-Host ""

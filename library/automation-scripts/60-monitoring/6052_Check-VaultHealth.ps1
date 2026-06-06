@@ -55,7 +55,7 @@ if ($rc -ne 0 -and -not $NoEmitPulse) {
         domain        = 'security'
         title         = "AitherSecrets vault health check FAILED"
         message       = "secrets-doctor exit code $rc — vault unreachable OR critical keys missing"
-        source        = 'automation:7050_Check-VaultHealth'
+        source        = 'automation:6052_Check-VaultHealth'
         dedup_key     = 'vault_health_check'
         recommended   = 'pwsh ./scripts/secrets-doctor.ps1   (then ./scripts/vault-put.ps1 for missing keys)'
     } | ConvertTo-Json -Compress

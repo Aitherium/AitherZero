@@ -1,109 +1,60 @@
 # AitherZero Automation Scripts
 
-This directory contains all automated installation, configuration, and lifecycle management scripts for the AitherOS platform.
+This directory contains the automated installation, configuration, deployment, and
+lifecycle-management scripts for the AitherOS platform. Scripts are grouped into
+**category directories**; each script is a single, idempotent, cross-platform unit
+of work named `NNNN_Verb-Noun.ps1`.
 
-## New Architecture (January 2026)
+> **Public vs. gated:** AitherZero is curated when synced to the public repo
+> (`github.com/Aitherium/AitherZero`). Only the categories marked **public** below
+> ship publicly; **gated** categories (enterprise/infra-sensitive and
+> project-specific tooling) stay in the private monorepo. The curation policy lives
+> in [`SYNC-MANIFEST.yaml`](../../SYNC-MANIFEST.yaml) and is enforced by
+> `.github/workflows/sync-aitherzero.yml`. If a category is missing from your
+> checkout, see `GATED.md`.
 
-Scripts are now organized into **category-based directories** for better maintainability and clearer purpose.
+## Numbering convention
 
-### Directory Structure
+- Filenames begin with a **4-digit number** (`NNNN_`). The runtime resolves a script
+  by that number (`Invoke-AitherScript 0402`) or by `category/number`
+  (`80-testing/0402`).
+- The directory's 2-digit prefix groups scripts by **category**. Numbers are
+  **unique repo-wide** — there are no duplicate numbers across categories.
+- Some categories still contain legacy numbers that predate the current grouping
+  (e.g. `01-infrastructure` holds `9011_Cleanup-DiskSpace`). These are valid and
+  unique; they are simply not yet re-sequenced into their category's range.
 
-```
-automation-scripts/
- _archive/ # Archived legacy scripts (212+ scripts)
- _init.ps1 # Shared utilities and functions
- README.md # This file
+## Categories
 
- 00-bootstrap/ # System bootstrap and prerequisites (9 scripts)
-  0000_Bootstrap-AitherOS.ps1
-  0001_Validate-Prerequisites.ps1
-  0002_Install-PowerShell7.ps1
-  0003_Install-Docker.ps1
-  0005_Configure-Environment.ps1
-  0006_Setup-GPUDependencies.ps1
+| Category | Scripts | Visibility | Purpose |
+|----------|:------:|:----------:|---------|
+| `00-bootstrap` | 14 | gated | System prerequisites, PowerShell 7, Docker, K8s, environment |
+| `01-infrastructure` | 11 | gated | Infra provisioning: OpenTofu, Hyper-V, WSL2, ADK, self-hosted runner |
+| `08-aitheros` | 11 | gated | AitherOS-specific config, snapshots, internal-product integrations |
+| `09-restore` | 10 | gated | Backup/restore pipeline (secrets, filesystem, Postgres, volumes) |
+| `10-devtools` | 23 | **public** | Dev tool installation (git, node, python, CLIs, build tools) |
+| `20-ai-tools` | 13 | **public** | AI desktop tools (ComfyUI, Stable Diffusion, Ollama, local LLM) |
+| `20-build` | 9 | gated | Container image builds and publishing |
+| `26-roboflow` | 11 | gated | Roboflow 3D asset pipeline (project-specific) |
+| `30-deploy` | 29 | gated | Deployment targets: compose, K8s/K3s, cloud, rings, partners |
+| `31-remote` | 18 | gated | Remote/edge node deployment, DGX Spark, quantization |
+| `32-onboarding` | 8 | gated | Node onboarding, mesh join, laptop/ADK setup |
+| `40-lifecycle` | 10 | gated | Service start/stop/restart/scale, autoscale, watchdogs |
+| `50-ai-setup` | 15 | gated | vLLM, model provisioning, voice, workbench, orchestrator |
+| `60-chaos` | 1 | gated | Chaos-engineering scenarios |
+| `60-monitoring` | 5 | **public** | Observability, service status, flight deck, SLO reports |
+| `60-security` | 9 | gated | Secrets, security mesh, TLS certificates |
+| `70-external-integrations` | 5 | **public** | Generic 3rd-party integrations (Proton Bridge, Slack, WhatsApp, Obsidian, Cloudflare) |
+| `70-git` | 10 | **public** | Git/GitHub workflow, account switching, open-source sync |
+| `70-github` | 3 | gated | GitHub org/runner/Copilot bootstrap (org-specific) |
+| `70-maintenance` | 4 | **public** | Docker cleanup, disk usage, GPU memory |
+| `80-testing` | 8 | **public** | Unit/integration tests, PSScriptAnalyzer, benchmarks |
+| `90-competition` | 1 | gated | Competition / training runs |
 
- 08-aitheros/ # AitherOS-specific config (1 script)
-  0845_Setup-ScheduledBackups.ps1
+**Total: 228 scripts** (plus legacy scripts archived under `_archive/`).
 
- 10-devtools/ # Dev tool installation (19 scripts)
-  1001_Install-Chocolatey.ps1
-  1002_Install-Git.ps1
-  1003_Install-Node.ps1
-  1004_Install-Python.ps1
-  ...
-
- 20-build/ # Container image builds (7 scripts)
-  2001_Build-GenesisImage.ps1
-  2002_Build-ServicesBase.ps1
-  2003_Build-ServiceImages.ps1
-  2005_Push-Images.ps1
-
- 30-deploy/ # Deployment to various targets (11 scripts)
-  3001_Deploy-LocalCompose.ps1
-  3002_Deploy-K8sCluster.ps1
-  3020_Deploy-OneClick.ps1
-  3021_Install-Dependencies.ps1
-  3022_Provision-Models.ps1
-
- 40-lifecycle/ # Service lifecycle management (9 scripts)
-  4001_Start-Genesis.ps1
-  4002_Stop-Genesis.ps1
-  4003_Restart-Services.ps1
-
- 50-ai-setup/ # AI/ML setup: vLLM, ComfyUI, models (7 scripts)
-  5001_Setup-vLLM.ps1
-  5002_Provision-Models.ps1
-  0850_Validate-ComfyUISetup.ps1
-  0851_Setup-ComfyUIModels.ps1
-
- 60-monitoring/ # Monitoring and observability (2 scripts)
-  0650_Sync-Observability.ps1
-  6001_Get-ServiceStatus.ps1
-
- 60-security/ # Security configuration (5 scripts)
-  0820_Setup-SecurityMesh.ps1
-  6001_Add-Secret.ps1
-  6002_List-Secrets.ps1
-
- 70-external-integrations/ # External service integrations (2 scripts)
-
- 70-git/ # Git and GitHub automation (2 scripts)
-  0897_Import-RoadmapToGitHub.ps1
-  0898_Submit-SessionLog.ps1
-
- 70-maintenance/ # Maintenance and cleanup (4 scripts)
-  7001_Cleanup-Docker.ps1
-  7002_Validate-Environment.ps1
-  9010_Scan-DiskUsage.ps1
-  9020_Optimize-GPUMemory.ps1
-
- 80-testing/ # Testing and validation (8 scripts)
-  0402_Run-UnitTests.ps1
-  0403_Run-IntegrationTests.ps1
-  0404_Run-PSScriptAnalyzer.ps1
-  8001_Test-ServiceHealth.ps1
-  8010_Benchmark-InferenceModes.ps1
-```
-
-## Category Overview
-
-| Category | Range | Purpose | Script Count |
-|----------|-------|---------|--------------|
-| 00-bootstrap | 0000-0011 | System prerequisites, Docker, K8s | 9 |
-| 08-aitheros | 0845 | AitherOS-specific config | 1 |
-| 10-devtools | 0769-1021 | Dev tool installation | 19 |
-| 20-build | 2001-2011 | Container image building and pushing | 7 |
-| 30-deploy | 3001-3022 | Deployment to various environments | 11 |
-| 40-lifecycle | 4001-4008 | Service start/stop/restart/scale | 9 |
-| 50-ai-setup | 0550-5002 | AI/ML tools: vLLM, ComfyUI, models | 7 |
-| 60-monitoring | 0650-6001 | Observability, service status | 2 |
-| 60-security | 0820-6003 | Secrets, security mesh | 5 |
-| 70-external | varies | External integrations | 2 |
-| 70-git | 0897-0898 | GitHub sync, session logging | 2 |
-| 70-maintenance | 7001-9020 | Docker cleanup, GPU memory | 4 |
-| 80-testing | 0402-8010 | Integration tests, benchmarks | 8 |
-
-**Total: ~86 focused scripts** (vs. 212+ legacy scripts)
+Public categories: `10-devtools`, `20-ai-tools`, `60-monitoring`,
+`70-external-integrations`, `70-git`, `70-maintenance`, `80-testing`.
 
 ## Script Standards
 
@@ -128,10 +79,13 @@ Every script must include:
 
 .NOTES
  Category: bootstrap
+ Order: 0001
  Dependencies: None
  Platform: Windows, Linux, macOS
 #>
 ```
+
+Keep the `Order:` header in sync with the filename number.
 
 ### Key Principles
 
@@ -139,7 +93,7 @@ Every script must include:
 2. **Cross-platform**: Support Windows, Linux, macOS where applicable
 3. **Container-first**: All services run in containers
 4. **Single responsibility**: Each script does one thing well
-5. **Configurable**: Read settings from services.yaml and environment
+5. **Configurable**: Read settings from `services.yaml` and environment
 
 ### Exit Codes
 
@@ -166,56 +120,35 @@ Invoke-AitherPlaybook -Name build
 
 # Deploy locally
 Invoke-AitherPlaybook -Name deploy-local
-
-# Deploy to production
-Invoke-AitherPlaybook -Name deploy-prod
 ```
 
 ### Direct Execution
 
 ```powershell
-# Run a single script
+# By number (resolved across categories)
+Invoke-AitherScript 0001 -Verbose
+
+# By category/number, or by path
 & ".\00-bootstrap\0001_Validate-Prerequisites.ps1" -Verbose
-
-# Run with configuration
 & ".\30-deploy\3001_Deploy-LocalCompose.ps1" -Environment "development"
-```
-
-## Container Architecture
-
-All AitherOS services run in containers:
-
-- **Local Development**: Docker Compose
-- **Production**: Kubernetes
-
-### Key Containers
-
-| Container | Purpose | Port |
-|-----------|---------|------|
-| genesis | Bootloader and orchestrator | 8001 |
-| veil | Dashboard UI | 3000 |
-| chronicle | Centralized logging | 8121 |
-| vllm-orchestrator | General LLM (vLLM) | 8200 |
-| vllm-reasoning | Deep reasoning LLM (vLLM) | 8201 |
-| vllm-vision | Multimodal LLM (vLLM) | 8202 |
-| vllm-coding | Code generation LLM (vLLM) | 8203 |
-| canvas | ComfyUI image generation | 8108 |
-
-## Legacy Scripts
-
-All 212+ legacy scripts have been archived to `_archive/` for reference. Key functionality has been consolidated into the new category-based structure.
-
-To reference old scripts:
-```powershell
-# View archived scripts
-Get-ChildItem .\_archive\*.ps1 | Select-Object Name
 ```
 
 ## Adding New Scripts
 
-1. Identify the appropriate category directory
-2. Use the next available number in that category's range
-3. Follow the naming convention: `NNNN_Verb-Noun.ps1`
-4. Include the required metadata header
-5. Make the script idempotent and cross-platform
-6. Add to the appropriate playbook if needed
+1. Pick the appropriate category directory (or propose a new one).
+2. Use the **next available number** — it must be **unique repo-wide**, not just
+   within the directory.
+3. Follow the naming convention: `NNNN_Verb-Noun.ps1`.
+4. Include the required metadata header (keep `Order:` = filename number).
+5. Make the script idempotent and cross-platform.
+6. If the script is enterprise/infra-sensitive or project-specific, place it in a
+   **gated** category and confirm it is excluded by `SYNC-MANIFEST.yaml`.
+7. Add it to the relevant playbook if part of a sequence.
+
+## Legacy Scripts
+
+Legacy scripts are archived under `_archive/` for reference:
+
+```powershell
+Get-ChildItem .\_archive\*.ps1 | Select-Object Name
+```
