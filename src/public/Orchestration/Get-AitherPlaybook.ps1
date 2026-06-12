@@ -156,8 +156,17 @@ begin {
         }
     }
 
-    # Use environment variable set by module initialization instead of calling private function
-    $moduleRoot = if ($env:AITHERZERO_ROOT) {
+    # Resolve from the MODULE root (where library/ lives), like every sibling
+    # (Get-AitherSchedule, Save-AitherPlaybook, ...). $env:AITHERZERO_ROOT is the
+    # OUTER repo root — when AitherZero is vendored at <repo>/.PRODUCTS/.AITHERZERO/
+    # that points at <repo>/library/playbooks (which doesn't exist), so no playbook
+    # is ever found. AITHERZERO_MODULE_ROOT / Get-AitherModuleRoot point at the
+    # module dir (.../.AITHERZERO) where library/playbooks actually lives.
+    $moduleRoot = if ($env:AITHERZERO_MODULE_ROOT) {
+        $env:AITHERZERO_MODULE_ROOT
+    } elseif (Get-Command Get-AitherModuleRoot -ErrorAction SilentlyContinue) {
+        Get-AitherModuleRoot
+    } elseif ($env:AITHERZERO_ROOT) {
         $env:AITHERZERO_ROOT
     } else {
         Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -178,8 +187,12 @@ process {
         # List all playbooks
         if ($List -or $PSCmdlet.ParameterSetName -eq 'List') {
             return $playbooks | ForEach-Object {
+                # Capture the pipeline FileInfo — inside the catch, $_ is the ERROR
+                # record (no .BaseName/.FullName), so referencing $_ there crashed the
+                # whole -List call whenever a single playbook failed to parse.
+                $pbFile = $_
                 try {
-                    $content = Get-Content $_.FullName -Raw
+                    $content = Get-Content $pbFile.FullName -Raw
                     $scriptBlock = [scriptblock]::Create($content)
                     $playbook = & $scriptBlock
 
@@ -187,17 +200,17 @@ process {
                         Name = $playbook.Name
                         Description = $playbook.Description
                         Version = $playbook.Version
-                        Path = $_.FullName
-                        FileName = $_.Name
+                        Path = $pbFile.FullName
+                        FileName = $pbFile.Name
                     }
                 }
                 catch {
                     [PSCustomObject]@{
-                        Name = $_.BaseName
+                        Name = $pbFile.BaseName
                         Description = "Error loading playbook"
                         Version = $null
-                        Path = $_.FullName
-                        FileName = $_.Name
+                        Path = $pbFile.FullName
+                        FileName = $pbFile.Name
                     }
                 }
             }

@@ -220,22 +220,38 @@ function Invoke-AitherPlaybook {
                 throw "Playbook must be provided via -Name or -Playbook parameter"
             }
 
-            # Merge playbook variables with provided variables
-            # G9 fix: Also read from Playbook.Parameters if Variables is empty
-            $playbookVariables = if ($Playbook.Variables) { $Playbook.Variables }
-                                 elseif ($Playbook.Parameters) { $Playbook.Parameters }
-                                 else { @{} }
+            # Merge playbook variables with provided variables.
+            # G9 fix: also read from Playbook.Parameters if Variables is empty.
+            # StrictMode-safe: a playbook hashtable that defines Parameters (not
+            # Variables) would make a bare `$Playbook.Variables` THROW under
+            # Set-StrictMode ("property 'Variables' cannot be found"), so probe
+            # with ContainsKey before dereferencing.
+            $playbookVariables = if ($Playbook -is [hashtable]) {
+                if ($Playbook.ContainsKey('Variables') -and $Playbook.Variables) { $Playbook.Variables }
+                elseif ($Playbook.ContainsKey('Parameters') -and $Playbook.Parameters) { $Playbook.Parameters }
+                else { @{} }
+            } else {
+                if ($Playbook.PSObject.Properties['Variables'] -and $Playbook.Variables) { $Playbook.Variables }
+                elseif ($Playbook.PSObject.Properties['Parameters'] -and $Playbook.Parameters) { $Playbook.Parameters }
+                else { @{} }
+            }
             $mergedVariables = $playbookVariables.Clone()
             foreach ($key in $Variables.Keys) {
                 $mergedVariables[$key] = $Variables[$key]
             }
 
+            # Optional 'Options' block — resolved StrictMode-safely (a playbook
+            # without an Options key would make bare `$Playbook.Options` THROW).
+            $pbOptions = if ($Playbook -is [hashtable]) {
+                if ($Playbook.ContainsKey('Options')) { $Playbook.Options } else { $null }
+            } elseif ($Playbook.PSObject.Properties['Options']) { $Playbook.Options } else { $null }
+
             # Determine execution mode
             $executeParallel = if ($PSBoundParameters.ContainsKey('Parallel')) {
                 $Parallel
             }
-            elseif ($Playbook.Options -and $Playbook.Options.ContainsKey('Parallel')) {
-                $Playbook.Options.Parallel
+            elseif ($pbOptions -and $pbOptions.ContainsKey('Parallel')) {
+                $pbOptions.Parallel
             }
             else {
                 $false  # Default to sequential for safety
@@ -244,8 +260,8 @@ function Invoke-AitherPlaybook {
             $maxConcurrency = if ($PSBoundParameters.ContainsKey('MaxConcurrency')) {
                 $MaxConcurrency
             }
-            elseif ($Playbook.Options -and $Playbook.Options.ContainsKey('MaxConcurrency')) {
-                $Playbook.Options.MaxConcurrency
+            elseif ($pbOptions -and $pbOptions.ContainsKey('MaxConcurrency')) {
+                $pbOptions.MaxConcurrency
             }
             else {
                 $config = Get-AitherConfigs -ErrorAction SilentlyContinue
@@ -260,15 +276,17 @@ function Invoke-AitherPlaybook {
             $continueOnError = if ($PSBoundParameters.ContainsKey('ContinueOnError')) {
                 $ContinueOnError
             }
-            elseif ($Playbook.Options -and $Playbook.Options.ContainsKey('StopOnError')) {
-                -not $Playbook.Options.StopOnError
+            elseif ($pbOptions -and $pbOptions.ContainsKey('StopOnError')) {
+                -not $pbOptions.StopOnError
             }
             else {
                 $false
             }
 
-            # Get sequence from playbook
-            $sequence = if ($Playbook.Sequence) {
+            # Get sequence from playbook (StrictMode-safe key probe).
+            $pbHasSequence = if ($Playbook -is [hashtable]) { $Playbook.ContainsKey('Sequence') }
+                             else { [bool]$Playbook.PSObject.Properties['Sequence'] }
+            $sequence = if ($pbHasSequence -and $Playbook.Sequence) {
                 $Playbook.Sequence
             }
             else {
