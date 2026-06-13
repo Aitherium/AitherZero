@@ -76,7 +76,7 @@ function Get-SecretsApiKey {
         }
     }
 
-    return 'dev-internal-secret-687579a3'
+    throw "AITHER_INTERNAL_SECRET (or AITHER_MASTER_KEY) must be set — no hardcoded default"
 }
 
 # ── Bridge exe search paths ─────────────────────────────────────────────
