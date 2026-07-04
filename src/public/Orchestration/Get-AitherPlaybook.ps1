@@ -172,17 +172,38 @@ begin {
         Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
     }
     $playbooksPath = Join-Path $moduleRoot 'library' 'playbooks'
+
+    # Plugin playbooks: registered plugins add their playbook dirs to
+    # [AitherPluginState]::PlaybookPaths (see Register-AitherPlugin). Include them
+    # so plugin-provided playbooks (e.g. the aitheros deploy-tenant-app playbook)
+    # are discoverable, not just those in the core library/playbooks dir.
+    $playbookDirs = [System.Collections.Generic.List[string]]::new()
+    if (Test-Path $playbooksPath) { $playbookDirs.Add($playbooksPath) }
+    try {
+        $pluginPbPaths = [AitherPluginState]::PlaybookPaths
+        if ($pluginPbPaths) {
+            foreach ($pp in $pluginPbPaths) {
+                if ($pp -and (Test-Path $pp) -and -not $playbookDirs.Contains($pp)) {
+                    $playbookDirs.Add($pp)
+                }
+            }
+        }
+    } catch {
+        # AitherPluginState may be unavailable in minimal contexts — core dir still works.
+    }
 }
 
 process {
     try {
         try {
-        if (-not (Test-Path $playbooksPath)) {
+        if ($playbookDirs.Count -eq 0) {
             Write-AitherLog -Level Warning -Message "Playbooks directory not found: $playbooksPath" -Source 'Get-AitherPlaybook'
             return @()
         }
 
-        $playbooks = Get-ChildItem -Path $playbooksPath -Filter '*.psd1' -ErrorAction SilentlyContinue
+        $playbooks = foreach ($dir in $playbookDirs) {
+            Get-ChildItem -Path $dir -Filter '*.psd1' -ErrorAction SilentlyContinue
+        }
 
         # List all playbooks
         if ($List -or $PSCmdlet.ParameterSetName -eq 'List') {

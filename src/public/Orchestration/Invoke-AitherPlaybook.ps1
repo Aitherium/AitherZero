@@ -265,12 +265,10 @@ function Invoke-AitherPlaybook {
             }
             else {
                 $config = Get-AitherConfigs -ErrorAction SilentlyContinue
-                if ($config -and $config.Automation -and $config.Automation.OrchestrationEngine) {
-                    $config.Automation.OrchestrationEngine.MaxConcurrency
-                }
-                else {
-                    4  # Default
-                }
+                # StrictMode-safe nested access (bare $config.Automation throws when absent).
+                $oe = Get-AitherMember (Get-AitherMember $config 'Automation') 'OrchestrationEngine'
+                $mc = Get-AitherMember $oe 'MaxConcurrency'
+                if ($null -ne $mc) { $mc } else { 4 }
             }
 
             $continueOnError = if ($PSBoundParameters.ContainsKey('ContinueOnError')) {
@@ -303,14 +301,17 @@ function Invoke-AitherPlaybook {
                 Write-AitherLog -Level Information -Message "[DRY RUN] Playbook: $($Playbook.Name)" -Source 'Invoke-AitherPlaybook'
                 Write-AitherLog -Level Information -Message ("=" * 60) -Source 'Invoke-AitherPlaybook'
                 foreach ($item in $sequence) {
-                    $scriptId = if ($item.Script) { $item.Script } else { $item }
-                    $desc = if ($item.Description) { $item.Description } else { "Script $scriptId" }
+                    # StrictMode-safe: sequence items are hashtables with optional
+                    # keys (Description/Params may be absent) — bare $item.X throws.
+                    $scriptId = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'Script' } else { $null }
+                    if (-not $scriptId) { $scriptId = $item }
+                    $descVal = Get-AitherMember $item 'Description'
+                    $desc = if ($descVal) { $descVal } else { "Script $scriptId" }
                     Write-AitherLog -Level Information -Message "  - $scriptId : $desc" -Source 'Invoke-AitherPlaybook'
-                    if ($item.Parameters) {
-                        Write-AitherLog -Level Information -Message "    Parameters: $($item.Parameters | ConvertTo-Json -Compress)" -Source 'Invoke-AitherPlaybook'
-                    }
-                    elseif ($item.Params) {
-                        Write-AitherLog -Level Information -Message "    Parameters: $($item.Params | ConvertTo-Json -Compress)" -Source 'Invoke-AitherPlaybook'
+                    $itemParams = Get-AitherMember $item 'Parameters'
+                    if (-not $itemParams) { $itemParams = Get-AitherMember $item 'Params' }
+                    if ($itemParams) {
+                        Write-AitherLog -Level Information -Message "    Parameters: $($itemParams | ConvertTo-Json -Compress)" -Source 'Invoke-AitherPlaybook'
                     }
                 }
                 return
@@ -339,14 +340,18 @@ function Invoke-AitherPlaybook {
                     # Start new jobs up to concurrency limit
                     while ($runningJobs.Count -lt $maxConcurrency -and $index -lt $sequence.Count) {
                         $item = $sequence[$index]
-                        $scriptId = if ($item.Script) { $item.Script } else { $item }
-                        $scriptParams = if ($item.Parameters) { $item.Parameters.Clone() } elseif ($item.Params) { $item.Params.Clone() } else { @{} }
+                        # StrictMode-safe optional-key access (see DryRun branch note).
+                        $scriptId = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'Script' } else { $null }
+                        if (-not $scriptId) { $scriptId = $item }
+                        $itemParams = Get-AitherMember $item 'Parameters'
+                        if (-not $itemParams) { $itemParams = Get-AitherMember $item 'Params' }
+                        $scriptParams = if ($itemParams) { $itemParams.Clone() } else { @{} }
 
                         # G8 fix: Interpolate '$VarName' placeholder strings with actual merged variable values
                         $keysToUpdate = @($scriptParams.Keys)
                         foreach ($key in $keysToUpdate) {
                             $val = $scriptParams[$key]
-                            if ($val -is [string] -and $val -match '^\$(.+)$') {
+                            if ($val -is [string] -and $val -match '^\$\{?([^}]+)\}?$') {
                                 $varName = $Matches[1]
                                 if ($mergedVariables.ContainsKey($varName)) {
                                     $scriptParams[$key] = $mergedVariables[$varName]
@@ -435,14 +440,18 @@ function Invoke-AitherPlaybook {
             else {
                 # Sequential execution
                 foreach ($item in $sequence) {
-                    $scriptId = if ($item.Script) { $item.Script } else { $item }
-                    $scriptParams = if ($item.Parameters) { $item.Parameters.Clone() } elseif ($item.Params) { $item.Params.Clone() } else { @{} }
+                    # StrictMode-safe optional-key access (see DryRun branch note).
+                    $scriptId = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'Script' } else { $null }
+                    if (-not $scriptId) { $scriptId = $item }
+                    $itemParams = Get-AitherMember $item 'Parameters'
+                    if (-not $itemParams) { $itemParams = Get-AitherMember $item 'Params' }
+                    $scriptParams = if ($itemParams) { $itemParams.Clone() } else { @{} }
 
                     # G8 fix: Interpolate '$VarName' placeholder strings with actual merged variable values
                     $keysToUpdate = @($scriptParams.Keys)
                     foreach ($key in $keysToUpdate) {
                         $val = $scriptParams[$key]
-                        if ($val -is [string] -and $val -match '^\$(.+)$') {
+                        if ($val -is [string] -and $val -match '^\$\{?([^}]+)\}?$') {
                             $varName = $Matches[1]
                             if ($mergedVariables.ContainsKey($varName)) {
                                 $scriptParams[$key] = $mergedVariables[$varName]
