@@ -447,6 +447,15 @@ function Invoke-AitherPlaybook {
                     if (-not $itemParams) { $itemParams = Get-AitherMember $item 'Params' }
                     $scriptParams = if ($itemParams) { $itemParams.Clone() } else { @{} }
 
+                    # Per-step ContinueOnError. Playbook Sequence items set this
+                    # individually (e.g. a validator phase continues on error while an
+                    # install phase must halt). The engine previously honored only the
+                    # playbook-level -ContinueOnError switch, so a phase marked
+                    # ContinueOnError=$true still aborted the whole run. Fall back to the
+                    # global switch when the step omits it.
+                    $stepCoE = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'ContinueOnError' } else { $null }
+                    $effectiveContinueOnError = if ($null -ne $stepCoE) { [bool]$stepCoE } else { $continueOnError }
+
                     # G8 fix: Interpolate '$VarName' placeholder strings with actual merged variable values
                     $keysToUpdate = @($scriptParams.Keys)
                     foreach ($key in $keysToUpdate) {
@@ -504,7 +513,7 @@ function Invoke-AitherPlaybook {
 
                         Write-AitherLog -Message "Script failed: $scriptId - $($_.Exception.Message)" -Level Error -Source 'Invoke-AitherPlaybook'
 
-                        if (-not $continueOnError) {
+                        if (-not $effectiveContinueOnError) {
                             break
                         }
                     }
