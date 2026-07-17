@@ -304,10 +304,14 @@ function Invoke-AitherPlaybook {
                     # StrictMode-safe: sequence items are hashtables with optional
                     # keys (Description/Params may be absent) — bare $item.X throws.
                     $scriptId = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'Script' } else { $null }
-                    if (-not $scriptId) { $scriptId = $item }
+                    $dryCmd = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'Command' } else { $null }
+                    if (-not $scriptId) { $scriptId = if ($dryCmd) { "(command step)" } else { $item } }
                     $descVal = Get-AitherMember $item 'Description'
                     $desc = if ($descVal) { $descVal } else { "Script $scriptId" }
                     Write-AitherLog -Level Information -Message "  - $scriptId : $desc" -Source 'Invoke-AitherPlaybook'
+                    if ($dryCmd) {
+                        Write-AitherLog -Level Information -Message "    Command: $dryCmd" -Source 'Invoke-AitherPlaybook'
+                    }
                     $itemParams = Get-AitherMember $item 'Parameters'
                     if (-not $itemParams) { $itemParams = Get-AitherMember $item 'Params' }
                     if ($itemParams) {
@@ -438,10 +442,156 @@ function Invoke-AitherPlaybook {
                 }
             }
             else {
+                # ── ForEach step-expansion ───────────────────────────────────
+                # A step may set `ForEach = '<VarName>'` where <VarName> is an array
+                # variable (e.g. Nodes). Expand it into ONE concrete step per item,
+                # resolving `$_.Field` placeholders in Parameters (kept TYPED) and in
+                # Command/Condition (stringified), and — because the Script path does
+                # not gate Condition — dropping items whose Condition is false HERE.
+                # Steps WITHOUT a ForEach key pass through unchanged, so existing
+                # playbooks are unaffected.
+                $expandedSequence = @()
+                foreach ($seqItem in $sequence) {
+                    $feVar = if ($seqItem -is [System.Collections.IDictionary]) { Get-AitherMember $seqItem 'ForEach' } else { $null }
+                    if (-not $feVar -or -not $mergedVariables.ContainsKey($feVar)) {
+                        $expandedSequence += , $seqItem
+                        continue
+                    }
+                    foreach ($feCur in @($mergedVariables[$feVar])) {
+                        $resolved = @{}
+                        foreach ($sk in @($seqItem.Keys)) {
+                            $sv = $seqItem[$sk]
+                            if (($sk -eq 'Parameters' -or $sk -eq 'Params') -and $sv -is [System.Collections.IDictionary]) {
+                                $rp = @{}
+                                foreach ($pk in @($sv.Keys)) {
+                                    $pv = $sv[$pk]
+                                    if ($pv -is [string] -and $pv -match '^\$_\.(\w+)$') {
+                                        $fld = $Matches[1]
+                                        $rp[$pk] = if ($feCur -is [System.Collections.IDictionary]) { $feCur[$fld] } else { $feCur.$fld }
+                                    } elseif ($pv -is [string] -and $pv -match '\$_\.\w+') {
+                                        $rp[$pk] = [regex]::Replace($pv, '\$_\.(\w+)', {
+                                            param($m) $f = $m.Groups[1].Value
+                                            [string]$(if ($feCur -is [System.Collections.IDictionary]) { $feCur[$f] } else { $feCur.$f }) })
+                                    } else { $rp[$pk] = $pv }
+                                }
+                                $resolved[$sk] = $rp
+                            }
+                            elseif (($sk -eq 'Command' -or $sk -eq 'Condition') -and $sv -is [string]) {
+                                $isCond = ($sk -eq 'Condition')
+                                $resolved[$sk] = [regex]::Replace($sv, '\$_\.(\w+)', {
+                                    param($m) $f = $m.Groups[1].Value
+                                    $val = if ($feCur -is [System.Collections.IDictionary]) { $feCur[$f] } else { $feCur.$f }
+                                    if ($isCond) { if ($val -is [string]) { "'" + ($val -replace "'", "''") + "'" } else { [string]$val } }
+                                    else { [string]$val } })
+                            }
+                            else { $resolved[$sk] = $sv }
+                        }
+                        $feCond = if ($resolved.ContainsKey('Condition')) { $resolved['Condition'] } else { $null }
+                        if ($feCond) {
+                            $condPass = $true
+                            try {
+                                foreach ($vk in $mergedVariables.Keys) { Set-Variable -Name $vk -Value $mergedVariables[$vk] -Scope Local -Force }
+                                $condPass = [bool](Invoke-Expression $feCond)
+                            } catch { $condPass = $false }
+                            if (-not $condPass) { continue }
+                        }
+                        $expandedSequence += , $resolved
+                    }
+                }
+
                 # Sequential execution
-                foreach ($item in $sequence) {
+                foreach ($item in $expandedSequence) {
                     # StrictMode-safe optional-key access (see DryRun branch note).
                     $scriptId = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'Script' } else { $null }
+
+                    # ── Command-step support ─────────────────────────────────
+                    # Playbooks authored in the deploy-bonsai-node shape use
+                    # Command/Environment/Condition steps (a shell command with
+                    # env-var injection), NOT numbered Script ids. Before this
+                    # branch existed the engine stringified the step hashtable
+                    # and failed with "Script not found: System.Collections.
+                    # Hashtable" — no Command playbook had ever actually run.
+                    # NOTE: Command paths are repo-relative; run from repo root.
+                    $stepCommand = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'Command' } else { $null }
+                    if (-not $scriptId -and $stepCommand) {
+                        $stepName = Get-AitherMember $item 'Name'
+                        if (-not $stepName) { $stepName = $stepCommand }
+                        $stepCoE2 = Get-AitherMember $item 'ContinueOnError'
+                        $effCoE = if ($null -ne $stepCoE2) { [bool]$stepCoE2 } else { $continueOnError }
+
+                        # Condition gate: expression over playbook variables
+                        # (e.g. '$WireRouter -eq $true'). Variables come from the
+                        # merged Parameters+(-Variables) set.
+                        $condExpr = Get-AitherMember $item 'Condition'
+                        $condOk = $true
+                        if ($condExpr) {
+                            try {
+                                foreach ($vk in $mergedVariables.Keys) {
+                                    Set-Variable -Name $vk -Value $mergedVariables[$vk] -Scope Local -Force
+                                }
+                                $condOk = [bool](Invoke-Expression $condExpr)
+                            } catch {
+                                Write-AitherLog -Message "Condition eval failed for '$stepName': $($_.Exception.Message) — skipping step" -Level Warning -Source 'Invoke-AitherPlaybook'
+                                $condOk = $false
+                            }
+                        }
+                        if (-not $condOk) {
+                            $skipped++
+                            $scriptResults += [PSCustomObject]@{
+                                Script = $stepName; Success = $true; Duration = [timespan]::Zero
+                                Output = '(skipped: condition false)'; Error = $null
+                            }
+                            continue
+                        }
+
+                        # Environment injection with '$VarName' interpolation
+                        # (same placeholder syntax the Script path supports).
+                        $envMap = Get-AitherMember $item 'Environment'
+                        $savedEnv = @{}
+                        if ($envMap) {
+                            foreach ($ek in @($envMap.Keys)) {
+                                $ev = $envMap[$ek]
+                                if ($ev -is [string] -and $ev -match '^\$\{?([^}]+)\}?$') {
+                                    $vn = $Matches[1]
+                                    $ev = if ($mergedVariables.ContainsKey($vn)) { [string]$mergedVariables[$vn] } else { '' }
+                                }
+                                $savedEnv[$ek] = [Environment]::GetEnvironmentVariable($ek)
+                                [Environment]::SetEnvironmentVariable($ek, [string]$ev)
+                            }
+                        }
+
+                        Write-AitherLog -Message "Executing command step: $stepName" -Level Information -Source 'Invoke-AitherPlaybook'
+                        $cmdStart = Get-Date
+                        try {
+                            $global:LASTEXITCODE = 0
+                            $cmdOutput = Invoke-Expression $stepCommand 2>&1
+                            if ($LASTEXITCODE -ne 0) {
+                                throw "command exited with code $LASTEXITCODE"
+                            }
+                            $scriptResults += [PSCustomObject]@{
+                                Script = $stepName; Success = $true
+                                Duration = (Get-Date) - $cmdStart
+                                Output = ($cmdOutput | Out-String); Error = $null
+                            }
+                            $completed++
+                        } catch {
+                            $scriptResults += [PSCustomObject]@{
+                                Script = $stepName; Success = $false
+                                Duration = (Get-Date) - $cmdStart
+                                Output = ($cmdOutput | Out-String); Error = $_.Exception.Message
+                            }
+                            $failed++
+                            Write-AitherLog -Message "Command step failed: $stepName - $($_.Exception.Message)" -Level Error -Source 'Invoke-AitherPlaybook'
+                            if (-not $effCoE) { break }
+                        } finally {
+                            foreach ($ek in $savedEnv.Keys) {
+                                [Environment]::SetEnvironmentVariable($ek, $savedEnv[$ek])
+                            }
+                        }
+                        continue
+                    }
+                    # ── end Command-step support ─────────────────────────────
+
                     if (-not $scriptId) { $scriptId = $item }
                     $itemParams = Get-AitherMember $item 'Parameters'
                     if (-not $itemParams) { $itemParams = Get-AitherMember $item 'Params' }
