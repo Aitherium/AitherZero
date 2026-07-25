@@ -28,11 +28,28 @@ function Get-AitherProjectRoot {
 param()
 
 process { try {
+        # Both supported layouts must validate here — monorepo
+        # (<root>/.PRODUCTS/.AITHERZERO/...) and standalone (<root>/AitherZero.psd1),
+        # the latter being what the public Aitherium/AitherZero repo ships.
+        # Accepting only the monorepo marker silently rejected a correct
+        # AITHERZERO_ROOT on a public checkout and fell through to "current
+        # directory", so resolution depended on where the user happened to cd.
+        $isProjectRoot = {
+            param($p)
+            $p -and (
+                (Test-Path (Join-Path $p ".PRODUCTS/.AITHERZERO/config/config.psd1")) -or
+                (Test-Path (Join-Path $p ".PRODUCTS/.AITHERZERO/AitherZero.psd1")) -or
+                # Standalone, excluding the monorepo's own .PRODUCTS/.AITHERZERO
+                # directory, which carries the identical marker pair.
+                ((Test-Path (Join-Path $p "config/config.psd1")) -and
+                 (Test-Path (Join-Path $p "AitherZero.psd1")) -and
+                 (Split-Path (Split-Path $p -Parent) -Leaf) -ne '.PRODUCTS')
+            )
+        }
+
         # 1. Check environment variable first
         if ($env:AITHERZERO_ROOT -and (Test-Path $env:AITHERZERO_ROOT)) {
-            # Validate it looks like a project root (has config.psd1 or .PRODUCTS/.AITHERZERO folder)
-            if ((Test-Path (Join-Path $env:AITHERZERO_ROOT ".PRODUCTS/.AITHERZERO/config/config.psd1")) -or
-                (Test-Path (Join-Path $env:AITHERZERO_ROOT ".PRODUCTS/.AITHERZERO/AitherZero.psd1"))) {
+            if (& $isProjectRoot $env:AITHERZERO_ROOT) {
                 return $env:AITHERZERO_ROOT
             }
         }
@@ -43,7 +60,7 @@ process { try {
         if ($PSScriptRoot) {
             $testPath = $PSScriptRoot
             for ($i = 0; $i -lt 5; $i++) {
-                if (Test-Path (Join-Path $testPath ".PRODUCTS/.AITHERZERO/config/config.psd1")) {
+                if (& $isProjectRoot $testPath) {
                     return $testPath
                 }
                 $testPath = Split-Path $testPath -Parent
@@ -55,7 +72,7 @@ process { try {
         $currentPath = Get-Location
         $testPath = $currentPath.Path
         while ($testPath) {
-            if (Test-Path (Join-Path $testPath ".PRODUCTS/.AITHERZERO/config/config.psd1")) {
+            if (& $isProjectRoot $testPath) {
                 return $testPath
             }
             $parent = Split-Path $testPath -Parent

@@ -169,7 +169,11 @@ if ($PlaybookRoot -and (Test-Path $PlaybookRoot)) {
 $catCounts = @($scripts | Group-Object { $_.category } |
   ForEach-Object { [ordered]@{ category = $_.Name; scripts = $_.Count } })
 $schema = [ordered]@{
-  generatedFrom = "$ScriptRoot"
+  # Record only the LEAF, never the absolute path. This field is committed into
+  # the published config-schema.json, and an absolute path leaks the generating
+  # machine's layout and username into a public artifact (the shipped copy read
+  # "C:\Users\<name>\AppData\Local\Temp\...").
+  generatedFrom = (Split-Path $ScriptRoot -Leaf)
   scriptCount = $scripts.Count
   categories = $catCounts
   scripts = $scripts

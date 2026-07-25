@@ -60,9 +60,30 @@ function Get-AitherModuleRoot {
     $currentPath = $PSScriptRoot
     if (-not $currentPath) { $currentPath = $PWD.Path }
 
-    # Walk up the directory tree to find the project root (identified by .PRODUCTS/.AITHERZERO/config/config.psd1)
+    # Walk up the directory tree looking for EITHER supported layout.
+    #
+    # TWO LAYOUTS EXIST and both must resolve (2026-07-25):
+    #   monorepo   <root>/.PRODUCTS/.AITHERZERO/config/config.psd1   (project root = <root>)
+    #   standalone <root>/config/config.psd1                          (project root = <root>)
+    # The standalone case is what the PUBLIC Aitherium/AitherZero repo ships —
+    # there is no .PRODUCTS/ there at all. Testing only the monorepo marker made
+    # every walk-up fall through to the depth-2 fallback below, which returned a
+    # directory OUTSIDE the repo. Get-AitherConfigs then reported
+    # "Base configuration file not found: <parent>/AitherZero/config/config.psd1"
+    # and Invoke-AitherScript could not run a single script for a public user.
+    # Monorepo is checked FIRST so a nested checkout still resolves to the outer
+    # root exactly as before.
     while ($currentPath) {
         if (Test-Path (Join-Path $currentPath ".PRODUCTS/.AITHERZERO/config/config.psd1")) {
+            return $currentPath
+        }
+        # Standalone marker, but NOT when this directory is itself the monorepo's
+        # <root>/.PRODUCTS/.AITHERZERO — that directory carries the same two files,
+        # so without this guard the walk-up stops there and reports the module dir
+        # as the project root instead of the outer repo.
+        if ((Test-Path (Join-Path $currentPath "config/config.psd1")) -and
+            (Test-Path (Join-Path $currentPath "AitherZero.psd1")) -and
+            (Split-Path (Split-Path $currentPath -Parent) -Leaf) -ne '.PRODUCTS') {
             return $currentPath
         }
 
@@ -79,7 +100,13 @@ function Get-AitherModuleRoot {
             $curr = Split-Path $curr -Parent
         }
         if ($curr) {
-            # Found module root (.PRODUCTS/.AITHERZERO folder). Project root is two levels up.
+            # $curr is the directory HOLDING the manifest. In the standalone
+            # layout that IS the project root — do not climb out of the repo.
+            if (Test-Path (Join-Path $curr 'config/config.psd1')) {
+                return $curr
+            }
+            # Monorepo: manifest sits at <root>/.PRODUCTS/.AITHERZERO, so the
+            # project root is two levels up.
             return Split-Path (Split-Path $curr -Parent) -Parent
         }
 

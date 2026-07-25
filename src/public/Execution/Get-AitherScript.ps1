@@ -321,7 +321,14 @@ function Get-AitherScript {
 
             # List all scripts
             if ($List -or ($PSCmdlet.ParameterSetName -eq 'List' -and -not $Script)) {
-                $scripts = Get-ChildItem -Path $scriptsPath -Filter '*.ps1' -ErrorAction SilentlyContinue |
+                # -Recurse is REQUIRED: numbered scripts live in category
+                # subdirectories (10-devtools/, 80-testing/, ...), not at the top
+                # level of automation-scripts/. Without it this listed only the
+                # handful of strays in the root and reported 0 on the public repo
+                # — while Find-AitherScriptFile (which DOES recurse) happily ran
+                # the same scripts, so `Invoke-AitherScript 1002` worked whilst
+                # `Get-AitherScript` claimed nothing existed.
+                $scripts = Get-ChildItem -Path $scriptsPath -Filter '*.ps1' -Recurse -ErrorAction SilentlyContinue |
                 Where-Object { $_.Name -match '^\d{4}_' } |
                 Sort-Object Name
 
@@ -340,7 +347,8 @@ function Get-AitherScript {
 
             # Search scripts
             if ($Search) {
-                $scripts = Get-ChildItem -Path $scriptsPath -Filter '*.ps1' -ErrorAction SilentlyContinue |
+                # -Recurse: see the note on the List branch above.
+                $scripts = Get-ChildItem -Path $scriptsPath -Filter '*.ps1' -Recurse -ErrorAction SilentlyContinue |
                 Where-Object { $_.Name -match '^\d{4}_' }
 
                 return $scripts | ForEach-Object {

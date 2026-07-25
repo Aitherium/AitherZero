@@ -313,7 +313,7 @@ function renderAutomation(){
   const root=$("#form");root.innerHTML="";$("#nav").innerHTML="";
   if(!SCHEMA){const card=el("section","sec"),inner=el("div","loadschema");
     inner.append(el("div",null,"Configure every automation script — including your private ones. Generate the inventory schema, then load it here:"));
-    inner.append(el("div","cmd","pwsh .PRODUCTS/.AITHERZERO/tools/config-editor/Export-AitherConfigSchema.ps1 -ScriptRoot <automation-scripts> -PlaybookRoot <playbooks>"));
+    inner.append(el("div","cmd","pwsh tools/config-editor/Export-AitherConfigSchema.ps1 -ScriptRoot library/automation-scripts -PlaybookRoot library/playbooks"));
     const b=el("button","btn primary","Load config-schema.json…");b.onclick=()=>$("#schemaFile").click();inner.append(b);
     inner.append(el("div","desc","Reads every script's param() block — enums, defaults, help — from whatever inventory you point it at. Add a new script, regenerate, and it appears here automatically."));
     card.append(inner);root.append(card);refreshAuto();return;}

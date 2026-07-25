@@ -1,12 +1,41 @@
 # Set module root
 $script:ModuleRoot = $PSScriptRoot
-# Adjust ProjectRoot calculation based on location
-if ((Split-Path $PSScriptRoot -Leaf) -eq 'bin') {
-    # If running from bin/, we need to go up three levels to get to repo root (.PRODUCTS/.AITHERZERO/bin)
-    $script:ProjectRoot = Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
+
+# Resolve the PROJECT root for either shipped layout (2026-07-25).
+#
+#   monorepo    <root>/.PRODUCTS/.AITHERZERO/[bin/]   -> project root is <root>
+#   standalone  <root>/[bin/]                          -> project root is <root>
+#
+# The standalone layout is what the public Aitherium/AitherZero repo ships (it has
+# no .PRODUCTS/ at all). This block previously assumed the monorepo depth
+# unconditionally and climbed 2-3 levels, landing OUTSIDE the repo — and because it
+# also exports $env:AITHERZERO_ROOT, that wrong value propagated into every
+# resolver that trusts the env var. Downstream symptoms: Get-AitherConfigs raised
+# "Base configuration file not found: <parent>/AitherZero/config/config.psd1", so
+# Invoke-AitherScript could not run a single published script, and logs were
+# written to a directory outside the checkout.
+#
+# Anchor on a marker instead of on a level count, so neither layout depends on how
+# deep the module happens to sit.
+$script:ModuleDir = if ((Split-Path $PSScriptRoot -Leaf) -eq 'bin') {
+    Split-Path $PSScriptRoot -Parent
 } else {
-    # If running from module root (.PRODUCTS/.AITHERZERO/), we need to go up two levels
-    $script:ProjectRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    $PSScriptRoot
+}
+
+# Discriminate on the module dir's OWN location, not on marker files. Both layouts
+# put config/config.psd1 + AitherZero.psd1 side by side inside the module directory,
+# so a marker test alone cannot tell them apart — it matched the monorepo's
+# .PRODUCTS/.AITHERZERO and reported THAT as the project root, breaking every
+# monorepo consumer that expects the outer repo. The parent directory name is the
+# one unambiguous signal.
+$_parentDir = Split-Path $script:ModuleDir -Parent
+if ($_parentDir -and (Split-Path $_parentDir -Leaf) -eq '.PRODUCTS') {
+    # monorepo: <root>/.PRODUCTS/.AITHERZERO -> project root is <root>
+    $script:ProjectRoot = Split-Path $_parentDir -Parent
+} else {
+    # standalone (public repo): the module directory IS the project root.
+    $script:ProjectRoot = $script:ModuleDir
 }
 
 # Set environment variables

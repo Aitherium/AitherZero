@@ -6,9 +6,24 @@
 $current = $PSScriptRoot
 $found = $false
 
-# Walk up the directory tree to find the repo root (marked by .PRODUCTS/.AITHERZERO/AitherZero.psd1)
+# Locate the module manifest, supporting BOTH shipped layouts (2026-07-25):
+#   monorepo   <root>/.PRODUCTS/.AITHERZERO/AitherZero.psd1
+#   standalone <root>/AitherZero.psd1     <- the public Aitherium/AitherZero repo
+# Only the monorepo marker used to be accepted. The public repo has no
+# .PRODUCTS/ directory at all, so this walk-up ran to the drive root, found
+# nothing, and threw "FATAL: Could not locate AitherZero project root" — and
+# because EVERY automation script dot-sources this file, not one of the
+# published scripts could run. Monorepo is probed first so a nested checkout
+# still binds to the outer root rather than to itself.
+$manifestRel = $null
 while ($current -and -not $found) {
     if (Test-Path (Join-Path $current ".PRODUCTS/.AITHERZERO/AitherZero.psd1")) {
+        $manifestRel = ".PRODUCTS/.AITHERZERO/AitherZero.psd1"
+        $found = $true
+        break
+    }
+    if (Test-Path (Join-Path $current "AitherZero.psd1")) {
+        $manifestRel = "AitherZero.psd1"
         $found = $true
         break
     }
@@ -18,14 +33,21 @@ while ($current -and -not $found) {
 }
 
 if (-not $found) {
-    # Fallback to env var if set
+    # Fallback to env var if set — again accepting either layout.
     if ($env:AITHERZERO_ROOT -and (Test-Path (Join-Path $env:AITHERZERO_ROOT ".PRODUCTS/.AITHERZERO/AitherZero.psd1"))) {
         $current = $env:AITHERZERO_ROOT
+        $manifestRel = ".PRODUCTS/.AITHERZERO/AitherZero.psd1"
+    }
+    elseif ($env:AITHERZERO_ROOT -and (Test-Path (Join-Path $env:AITHERZERO_ROOT "AitherZero.psd1"))) {
+        $current = $env:AITHERZERO_ROOT
+        $manifestRel = "AitherZero.psd1"
     }
     else {
         $errMsg = "FATAL: Could not locate AitherZero project root from $PSScriptRoot"
         if ($env:AITHERZERO_ROOT) {
-            $errMsg += " (AITHERZERO_ROOT='$env:AITHERZERO_ROOT' does not contain .PRODUCTS/.AITHERZERO/AitherZero.psd1)"
+            $errMsg += " (AITHERZERO_ROOT='$env:AITHERZERO_ROOT' contains neither .PRODUCTS/.AITHERZERO/AitherZero.psd1 nor AitherZero.psd1)"
+        } else {
+            $errMsg += " (set AITHERZERO_ROOT to the repo root, or run build.ps1 to generate AitherZero.psd1)"
         }
         Write-Error $errMsg
         throw $errMsg
@@ -57,7 +79,8 @@ $projectRoot = $current
 #   `Import-Module <path>\AitherZero.psd1 -Force` yourself, or use a new
 #   session, to pick up a rebuild.
 if ($projectRoot) {
-    $modulePath = Join-Path $projectRoot ".PRODUCTS/.AITHERZERO/AitherZero.psd1"
+    # $manifestRel was resolved above for whichever layout matched.
+    $modulePath = Join-Path $projectRoot ($manifestRel ?? ".PRODUCTS/.AITHERZERO/AitherZero.psd1")
     if (Test-Path $modulePath) {
         $expectedBase = Split-Path $modulePath -Parent
         $alreadyLoaded = Get-Module -Name 'AitherZero' |

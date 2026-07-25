@@ -1,5 +1,5 @@
 {
-  "generatedFrom": "C:\\Users\\wzns\\AppData\\Local\\Temp\\claude\\D--AitherOS-Fresh\\69fd749f-4755-40da-8cad-70028d24b4f0\\scratchpad\\_az\\library\\automation-scripts",
+  "generatedFrom": "automation-scripts",
   "scriptCount": 69,
   "categories": [
     {
@@ -80,7 +80,7 @@
       "id": "0769",
       "name": "Setup-WebDeveloperToolkit",
       "category": "10-devtools",
-      "file": "10-devtools\\0769_Setup-WebDeveloperToolkit.ps1",
+      "file": "10-devtools/0769_Setup-WebDeveloperToolkit.ps1",
       "synopsis": "Sets up Aither's Web Developer Toolkit for creating and deploying websites.",
       "params": [
         {
@@ -138,7 +138,7 @@
       "id": "1001",
       "name": "Install-Chocolatey",
       "category": "10-devtools",
-      "file": "10-devtools\\1001_Install-Chocolatey.ps1",
+      "file": "10-devtools/1001_Install-Chocolatey.ps1",
       "synopsis": "",
       "params": [
         {
@@ -170,7 +170,7 @@
       "id": "1002",
       "name": "Install-Git",
       "category": "10-devtools",
-      "file": "10-devtools\\1002_Install-Git.ps1",
+      "file": "10-devtools/1002_Install-Git.ps1",
       "synopsis": "",
       "params": [
         {
@@ -188,7 +188,7 @@
       "id": "1003",
       "name": "Install-Node",
       "category": "10-devtools",
-      "file": "10-devtools\\1003_Install-Node.ps1",
+      "file": "10-devtools/1003_Install-Node.ps1",
       "synopsis": "",
       "params": [
         {
@@ -209,7 +209,7 @@
       "id": "1004",
       "name": "Install-Python",
       "category": "10-devtools",
-      "file": "10-devtools\\1004_Install-Python.ps1",
+      "file": "10-devtools/1004_Install-Python.ps1",
       "synopsis": "",
       "params": [
         {
@@ -231,7 +231,7 @@
       "id": "1005",
       "name": "Install-VSCode",
       "category": "10-devtools",
-      "file": "10-devtools\\1005_Install-VSCode.ps1",
+      "file": "10-devtools/1005_Install-VSCode.ps1",
       "synopsis": "",
       "params": [
         {
@@ -254,7 +254,7 @@
       "id": "1006",
       "name": "Install-7Zip",
       "category": "10-devtools",
-      "file": "10-devtools\\1006_Install-7Zip.ps1",
+      "file": "10-devtools/1006_Install-7Zip.ps1",
       "synopsis": "",
       "params": [
         {
@@ -276,7 +276,7 @@
       "id": "1007",
       "name": "Install-GitHubCLI",
       "category": "10-devtools",
-      "file": "10-devtools\\1007_Install-GitHubCLI.ps1",
+      "file": "10-devtools/1007_Install-GitHubCLI.ps1",
       "synopsis": "Install GitHub CLI (gh)",
       "params": [
         {
@@ -302,7 +302,7 @@
       "id": "1008",
       "name": "Install-AzureCLI",
       "category": "10-devtools",
-      "file": "10-devtools\\1008_Install-AzureCLI.ps1",
+      "file": "10-devtools/1008_Install-AzureCLI.ps1",
       "synopsis": "",
       "params": [
         {
@@ -327,7 +327,7 @@
       "id": "1009",
       "name": "Install-AWSCLI",
       "category": "10-devtools",
-      "file": "10-devtools\\1009_Install-AWSCLI.ps1",
+      "file": "10-devtools/1009_Install-AWSCLI.ps1",
       "synopsis": "",
       "params": [
         {
@@ -351,7 +351,7 @@
       "id": "1010",
       "name": "Install-GCloudCLI",
       "category": "10-devtools",
-      "file": "10-devtools\\1010_Install-GCloudCLI.ps1",
+      "file": "10-devtools/1010_Install-GCloudCLI.ps1",
       "synopsis": "Installs Google Cloud SDK (gcloud CLI) for AitherOS cloud deployments.",
       "params": [
         {
@@ -400,7 +400,7 @@
       "id": "1013",
       "name": "Install-VSBuildTools",
       "category": "10-devtools",
-      "file": "10-devtools\\1013_Install-VSBuildTools.ps1",
+      "file": "10-devtools/1013_Install-VSBuildTools.ps1",
       "synopsis": "",
       "params": [
         {
@@ -428,7 +428,7 @@
       "id": "1014",
       "name": "Install-VisualCppBuildTools",
       "category": "10-devtools",
-      "file": "10-devtools\\1014_Install-VisualCppBuildTools.ps1",
+      "file": "10-devtools/1014_Install-VisualCppBuildTools.ps1",
       "synopsis": "Installs Microsoft Visual C++ Build Tools for compiling Python C extensions.",
       "params": [
         {
@@ -462,7 +462,7 @@
       "id": "1015",
       "name": "Install-Poetry",
       "category": "10-devtools",
-      "file": "10-devtools\\1015_Install-Poetry.ps1",
+      "file": "10-devtools/1015_Install-Poetry.ps1",
       "synopsis": "",
       "params": [
         {
@@ -488,7 +488,7 @@
       "id": "1016",
       "name": "Install-Servy",
       "category": "10-devtools",
-      "file": "10-devtools\\1016_Install-Servy.ps1",
+      "file": "10-devtools/1016_Install-Servy.ps1",
       "synopsis": "Installs Servy for Windows service management.",
       "params": [
         {
@@ -514,7 +514,7 @@
       "id": "1020",
       "name": "Install-TestingTools",
       "category": "10-devtools",
-      "file": "10-devtools\\1020_Install-TestingTools.ps1",
+      "file": "10-devtools/1020_Install-TestingTools.ps1",
       "synopsis": "Install testing and validation tools for AitherZero",
       "params": [
         {
@@ -542,7 +542,7 @@
       "id": "1021",
       "name": "Install-Cosign",
       "category": "10-devtools",
-      "file": "10-devtools\\1021_Install-Cosign.ps1",
+      "file": "10-devtools/1021_Install-Cosign.ps1",
       "synopsis": "Install Sigstore Cosign",
       "params": [
         {
@@ -560,7 +560,7 @@
       "id": "1030",
       "name": "Invoke-FileSplice",
       "category": "10-devtools",
-      "file": "10-devtools\\1030_Invoke-FileSplice.ps1",
+      "file": "10-devtools/1030_Invoke-FileSplice.ps1",
       "synopsis": "Splice (replace) a range of lines in a target file with content from a source file or inline text.",
       "params": [
         {
@@ -642,7 +642,7 @@
       "id": "1031",
       "name": "Invoke-FileGrep",
       "category": "10-devtools",
-      "file": "10-devtools\\1031_Invoke-FileGrep.ps1",
+      "file": "10-devtools/1031_Invoke-FileGrep.ps1",
       "synopsis": "Search for text or regex patterns inside files (content grep).",
       "params": [
         {
@@ -708,7 +708,7 @@
       "id": "1032",
       "name": "Invoke-FileDiff",
       "category": "10-devtools",
-      "file": "10-devtools\\1032_Invoke-FileDiff.ps1",
+      "file": "10-devtools/1032_Invoke-FileDiff.ps1",
       "synopsis": "Compare two files or a file vs inline string and show a unified diff.",
       "params": [
         {
@@ -750,7 +750,7 @@
       "id": "1033",
       "name": "Invoke-BulkReplace",
       "category": "10-devtools",
-      "file": "10-devtools\\1033_Invoke-BulkReplace.ps1",
+      "file": "10-devtools/1033_Invoke-BulkReplace.ps1",
       "synopsis": "Find and replace text across multiple files matching a glob pattern.",
       "params": [
         {
@@ -824,7 +824,7 @@
       "id": "0720",
       "name": "Install-StableDiffusionWebUI",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0720_Install-StableDiffusionWebUI.ps1",
+      "file": "20-ai-tools/0720_Install-StableDiffusionWebUI.ps1",
       "synopsis": "",
       "params": [
         {
@@ -850,7 +850,7 @@
       "id": "0721",
       "name": "Configure-SDWebUI-Models",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0721_Configure-SDWebUI-Models.ps1",
+      "file": "20-ai-tools/0721_Configure-SDWebUI-Models.ps1",
       "synopsis": "",
       "params": [
         {
@@ -881,7 +881,7 @@
       "id": "0725",
       "name": "Install-TextGenWebUI",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0725_Install-TextGenWebUI.ps1",
+      "file": "20-ai-tools/0725_Install-TextGenWebUI.ps1",
       "synopsis": "",
       "params": [
         {
@@ -907,7 +907,7 @@
       "id": "0726",
       "name": "Install-Fooocus",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0726_Install-Fooocus.ps1",
+      "file": "20-ai-tools/0726_Install-Fooocus.ps1",
       "synopsis": "",
       "params": [
         {
@@ -933,7 +933,7 @@
       "id": "0728",
       "name": "Install-SillyTavern",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0728_Install-SillyTavern.ps1",
+      "file": "20-ai-tools/0728_Install-SillyTavern.ps1",
       "synopsis": "",
       "params": [
         {
@@ -951,7 +951,7 @@
       "id": "0730",
       "name": "Install-ComfyUI",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0730_Install-ComfyUI.ps1",
+      "file": "20-ai-tools/0730_Install-ComfyUI.ps1",
       "synopsis": "",
       "params": [
         {
@@ -991,7 +991,7 @@
       "id": "0731",
       "name": "Install-ComfyUI-Models",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0731_Install-ComfyUI-Models.ps1",
+      "file": "20-ai-tools/0731_Install-ComfyUI-Models.ps1",
       "synopsis": "",
       "params": [
         {
@@ -1023,7 +1023,7 @@
       "id": "0733",
       "name": "Fix-ComfyUI-CUDA",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0733_Fix-ComfyUI-CUDA.ps1",
+      "file": "20-ai-tools/0733_Fix-ComfyUI-CUDA.ps1",
       "synopsis": "Fixes common ComfyUI CUDA and PyTorch issues on the local machine.",
       "params": [
         {
@@ -1055,7 +1055,7 @@
       "id": "0734",
       "name": "Start-ComfyUI",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0734_Start-ComfyUI.ps1",
+      "file": "20-ai-tools/0734_Start-ComfyUI.ps1",
       "synopsis": "",
       "params": [
         {
@@ -1120,7 +1120,7 @@
       "id": "0735",
       "name": "Install-ComfyUI-Nodes",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0735_Install-ComfyUI-Nodes.ps1",
+      "file": "20-ai-tools/0735_Install-ComfyUI-Nodes.ps1",
       "synopsis": "Installs recommended ComfyUI custom nodes for Wan 2.1 optimization.",
       "params": [
         {
@@ -1138,7 +1138,7 @@
       "id": "0737",
       "name": "Start-Ollama",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0737_Start-Ollama.ps1",
+      "file": "20-ai-tools/0737_Start-Ollama.ps1",
       "synopsis": "Starts the Ollama service.",
       "params": [
         {
@@ -1164,7 +1164,7 @@
       "id": "0740",
       "name": "Install-Ollama",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0740_Install-Ollama.ps1",
+      "file": "20-ai-tools/0740_Install-Ollama.ps1",
       "synopsis": "Installs and configures Ollama for local LLM inference.",
       "params": [
         {
@@ -1190,7 +1190,7 @@
       "id": "0741",
       "name": "Setup-LocalLLM",
       "category": "20-ai-tools",
-      "file": "20-ai-tools\\0741_Setup-LocalLLM.ps1",
+      "file": "20-ai-tools/0741_Setup-LocalLLM.ps1",
       "synopsis": "Installs and configures local LLM models via Ollama.",
       "params": [
         {
@@ -1242,7 +1242,7 @@
       "id": "3214",
       "name": "Onboard-ClusterNode",
       "category": "32-onboarding",
-      "file": "32-onboarding\\3214_Onboard-ClusterNode.ps1",
+      "file": "32-onboarding/3214_Onboard-ClusterNode.ps1",
       "synopsis": "Onboard THIS machine as a secure AitherOS cluster node — cross-platform.",
       "params": [
         {
@@ -1304,7 +1304,7 @@
       "id": "0650",
       "name": "Sync-Observability",
       "category": "60-monitoring",
-      "file": "60-monitoring\\0650_Sync-Observability.ps1",
+      "file": "60-monitoring/0650_Sync-Observability.ps1",
       "synopsis": "Syncs observability data (logs/metrics) to Git for GitHub Pages publishing.",
       "params": [
         {
@@ -1338,7 +1338,7 @@
       "id": "0751",
       "name": "Generate-SLOReport",
       "category": "60-monitoring",
-      "file": "60-monitoring\\0751_Generate-SLOReport.ps1",
+      "file": "60-monitoring/0751_Generate-SLOReport.ps1",
       "synopsis": "Generate SLO report from Prometheus metrics and error budget data.",
       "params": [
         {
@@ -1404,7 +1404,7 @@
       "id": "6050",
       "name": "Get-ServiceStatus",
       "category": "60-monitoring",
-      "file": "60-monitoring\\6050_Get-ServiceStatus.ps1",
+      "file": "60-monitoring/6050_Get-ServiceStatus.ps1",
       "synopsis": "Shows the status of all AitherOS services.",
       "params": [
         {
@@ -1449,7 +1449,7 @@
       "id": "6051",
       "name": "Get-FlightDeck",
       "category": "60-monitoring",
-      "file": "60-monitoring\\6051_Get-FlightDeck.ps1",
+      "file": "60-monitoring/6051_Get-FlightDeck.ps1",
       "synopsis": "Unified Flight Deck — shows ALL in-flight requests, queues, GPU state, and background processes.",
       "params": [
         {
@@ -1491,7 +1491,7 @@
       "id": "6052",
       "name": "Check-VaultHealth",
       "category": "60-monitoring",
-      "file": "60-monitoring\\6052_Check-VaultHealth.ps1",
+      "file": "60-monitoring/6052_Check-VaultHealth.ps1",
       "synopsis": "Vault health & secret presence check — alerts on missing critical keys.",
       "params": [
         {
@@ -1517,7 +1517,7 @@
       "id": "7010",
       "name": "Setup-ProtonBridge",
       "category": "70-external-integrations",
-      "file": "70-external-integrations\\7010_Setup-ProtonBridge.ps1",
+      "file": "70-external-integrations/7010_Setup-ProtonBridge.ps1",
       "synopsis": "Fully automated Proton Mail Bridge setup for AitherOS SMTP relay.",
       "params": [
         {
@@ -1591,7 +1591,7 @@
       "id": "7012",
       "name": "Setup-Slack",
       "category": "70-external-integrations",
-      "file": "70-external-integrations\\7012_Setup-Slack.ps1",
+      "file": "70-external-integrations/7012_Setup-Slack.ps1",
       "synopsis": "Fully automated Slack bot integration setup for AitherOS.",
       "params": [
         {
@@ -1649,7 +1649,7 @@
       "id": "7013",
       "name": "Setup-WhatsApp",
       "category": "70-external-integrations",
-      "file": "70-external-integrations\\7013_Setup-WhatsApp.ps1",
+      "file": "70-external-integrations/7013_Setup-WhatsApp.ps1",
       "synopsis": "Fully automated WhatsApp Cloud API integration setup for AitherOS.",
       "params": [
         {
@@ -1715,7 +1715,7 @@
       "id": "7040",
       "name": "Setup-ObsidianVault",
       "category": "70-external-integrations",
-      "file": "70-external-integrations\\7040_Setup-ObsidianVault.ps1",
+      "file": "70-external-integrations/7040_Setup-ObsidianVault.ps1",
       "synopsis": "Easy-button Obsidian + AitherOS plugin deployment.",
       "params": [
         {
@@ -1781,7 +1781,7 @@
       "id": "7050",
       "name": "Sync-CloudflareTunnel",
       "category": "70-external-integrations",
-      "file": "70-external-integrations\\7050_Sync-CloudflareTunnel.ps1",
+      "file": "70-external-integrations/7050_Sync-CloudflareTunnel.ps1",
       "synopsis": "Sync Cloudflare Named Tunnel ingress from source-of-truth YAML.",
       "params": [
         {
@@ -1807,7 +1807,7 @@
       "id": "7051",
       "name": "Patch-CloudflareTunnelRule",
       "category": "70-external-integrations",
-      "file": "70-external-integrations\\7051_Patch-CloudflareTunnelRule.ps1",
+      "file": "70-external-integrations/7051_Patch-CloudflareTunnelRule.ps1",
       "synopsis": "Patch a SINGLE Cloudflare tunnel ingress rule's service, in place.",
       "params": [
         {
@@ -1841,7 +1841,7 @@
       "id": "0701",
       "name": "New-Branch",
       "category": "70-git",
-      "file": "70-git\\0701_New-Branch.ps1",
+      "file": "70-git/0701_New-Branch.ps1",
       "synopsis": "Creates a new Git branch from the current or specified base branch.",
       "params": [
         {
@@ -1875,7 +1875,7 @@
       "id": "0702",
       "name": "Commit-Changes",
       "category": "70-git",
-      "file": "70-git\\0702_Commit-Changes.ps1",
+      "file": "70-git/0702_Commit-Changes.ps1",
       "synopsis": "Stages and commits changes with a conventional commit message.",
       "params": [
         {
@@ -1925,7 +1925,7 @@
       "id": "0703",
       "name": "Create-PullRequest",
       "category": "70-git",
-      "file": "70-git\\0703_Create-PullRequest.ps1",
+      "file": "70-git/0703_Create-PullRequest.ps1",
       "synopsis": "Creates a GitHub Pull Request using the GitHub CLI.",
       "params": [
         {
@@ -1991,7 +1991,7 @@
       "id": "0704",
       "name": "Switch-GitHubAccount",
       "category": "70-git",
-      "file": "70-git\\0704_Switch-GitHubAccount.ps1",
+      "file": "70-git/0704_Switch-GitHubAccount.ps1",
       "synopsis": "Switch between GitHub accounts (git identity + gh CLI auth).",
       "params": [
         {
@@ -2017,7 +2017,7 @@
       "id": "0705",
       "name": "Sync-OpenSource",
       "category": "70-git",
-      "file": "70-git\\0705_Sync-OpenSource.ps1",
+      "file": "70-git/0705_Sync-OpenSource.ps1",
       "synopsis": "Synchronizes AitherZero with the public open-source repository.",
       "params": [
         {
@@ -2054,7 +2054,7 @@
       "id": "0706",
       "name": "Sync-AllRepos",
       "category": "70-git",
-      "file": "70-git\\0706_Sync-AllRepos.ps1",
+      "file": "70-git/0706_Sync-AllRepos.ps1",
       "synopsis": "Commits and pushes changes to ALL repositories in a single operation.",
       "params": [
         {
@@ -2136,7 +2136,7 @@
       "id": "0707",
       "name": "Package-PublicRelease",
       "category": "70-git",
-      "file": "70-git\\0707_Package-PublicRelease.ps1",
+      "file": "70-git/0707_Package-PublicRelease.ps1",
       "synopsis": "Packages a curated public-safe release bundle from the monorepo.",
       "params": [
         {
@@ -2218,7 +2218,7 @@
       "id": "0708",
       "name": "Setup-AgenticWorkflows",
       "category": "70-git",
-      "file": "70-git\\0708_Setup-AgenticWorkflows.ps1",
+      "file": "70-git/0708_Setup-AgenticWorkflows.ps1",
       "synopsis": "Sets up GitHub Agentic Workflows (gh-aw) with all required secrets and compiled workflows.",
       "params": [
         {
@@ -2276,7 +2276,7 @@
       "id": "0897",
       "name": "Import-RoadmapToGitHub",
       "category": "70-git",
-      "file": "70-git\\0897_Import-RoadmapToGitHub.ps1",
+      "file": "70-git/0897_Import-RoadmapToGitHub.ps1",
       "synopsis": "Sync ROADMAP items to/from GitHub via AitherAtlas + AitherFlow.",
       "params": [
         {
@@ -2380,7 +2380,7 @@
       "id": "0898",
       "name": "Submit-SessionLog",
       "category": "70-git",
-      "file": "70-git\\0898_Submit-SessionLog.ps1",
+      "file": "70-git/0898_Submit-SessionLog.ps1",
       "synopsis": "Automated IDE session logger for AitherOS.",
       "params": [
         {
@@ -2490,7 +2490,7 @@
       "id": "7001",
       "name": "Cleanup-Docker",
       "category": "70-maintenance",
-      "file": "70-maintenance\\7001_Cleanup-Docker.ps1",
+      "file": "70-maintenance/7001_Cleanup-Docker.ps1",
       "synopsis": "Cleans up Docker resources to free disk space.",
       "params": [
         {
@@ -2536,7 +2536,7 @@
       "id": "7002",
       "name": "Validate-Environment",
       "category": "70-maintenance",
-      "file": "70-maintenance\\7002_Validate-Environment.ps1",
+      "file": "70-maintenance/7002_Validate-Environment.ps1",
       "synopsis": "Validates the AitherOS environment configuration.",
       "params": [
         {
@@ -2554,7 +2554,7 @@
       "id": "9010",
       "name": "Scan-DiskUsage",
       "category": "70-maintenance",
-      "file": "70-maintenance\\9010_Scan-DiskUsage.ps1",
+      "file": "70-maintenance/9010_Scan-DiskUsage.ps1",
       "synopsis": "Scans local drives for large files and potential cleanup candidates.",
       "params": [
         {
@@ -2614,7 +2614,7 @@
       "id": "9020",
       "name": "Optimize-GPUMemory",
       "category": "70-maintenance",
-      "file": "70-maintenance\\9020_Optimize-GPUMemory.ps1",
+      "file": "70-maintenance/9020_Optimize-GPUMemory.ps1",
       "synopsis": "Reclaim VRAM and system RAM by killing non-essential GPU/memory consumers.",
       "params": [
         {
@@ -2661,7 +2661,7 @@
       "id": "0402",
       "name": "Run-UnitTests",
       "category": "80-testing",
-      "file": "80-testing\\0402_Run-UnitTests.ps1",
+      "file": "80-testing/0402_Run-UnitTests.ps1",
       "synopsis": "Execute unit tests for AitherZero",
       "params": [
         {
@@ -2687,7 +2687,7 @@
       "id": "0403",
       "name": "Run-IntegrationTests",
       "category": "80-testing",
-      "file": "80-testing\\0403_Run-IntegrationTests.ps1",
+      "file": "80-testing/0403_Run-IntegrationTests.ps1",
       "synopsis": "Execute integration tests for AitherZero",
       "params": [
         {
@@ -2746,7 +2746,7 @@
       "id": "0404",
       "name": "Run-PSScriptAnalyzer",
       "category": "80-testing",
-      "file": "80-testing\\0404_Run-PSScriptAnalyzer.ps1",
+      "file": "80-testing/0404_Run-PSScriptAnalyzer.ps1",
       "synopsis": "Run PSScriptAnalyzer on AitherZero codebase",
       "params": [
         {
@@ -2868,7 +2868,7 @@
       "id": "0405",
       "name": "Run-PythonTest",
       "category": "80-testing",
-      "file": "80-testing\\0405_Run-PythonTest.ps1",
+      "file": "80-testing/0405_Run-PythonTest.ps1",
       "synopsis": "Execute Python pytest tests for AitherOS",
       "params": [
         {
@@ -2950,7 +2950,7 @@
       "id": "0410",
       "name": "Audit-OpenSourceReadiness",
       "category": "80-testing",
-      "file": "80-testing\\0410_Audit-OpenSourceReadiness.ps1",
+      "file": "80-testing/0410_Audit-OpenSourceReadiness.ps1",
       "synopsis": "Audits the AitherZero codebase for content that should not be in the public repo.",
       "params": [
         {
@@ -2976,7 +2976,7 @@
       "id": "0810",
       "name": "Validate-MCPServers",
       "category": "80-testing",
-      "file": "80-testing\\0810_Validate-MCPServers.ps1",
+      "file": "80-testing/0810_Validate-MCPServers.ps1",
       "synopsis": "Validates all MCP servers are built, configured, and can start correctly.",
       "params": [
         {
@@ -3014,7 +3014,7 @@
       "id": "8001",
       "name": "Test-ServiceHealth",
       "category": "80-testing",
-      "file": "80-testing\\8001_Test-ServiceHealth.ps1",
+      "file": "80-testing/8001_Test-ServiceHealth.ps1",
       "synopsis": "Tests the health of AitherOS services.",
       "params": [
         {
@@ -3064,7 +3064,7 @@
       "id": "8010",
       "name": "Benchmark-InferenceModes",
       "category": "80-testing",
-      "file": "80-testing\\8010_Benchmark-InferenceModes.ps1",
+      "file": "80-testing/8010_Benchmark-InferenceModes.ps1",
       "synopsis": "Benchmark all AitherOS inference modes: vLLM vs Ollama vs Hybrid.",
       "params": [
         {

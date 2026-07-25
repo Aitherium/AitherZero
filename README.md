@@ -24,7 +24,7 @@ AitherZero is a **PowerShell 7+ automation framework** designed to get you up an
 | Product | What it is | Install with AitherZero |
 |---------|-----------|------------------------|
 | [**AitherNode**](https://github.com/Aitherium/aither) | Lightweight MCP compute node — 30+ AI tools, runs standalone or mesh-connected | `Invoke-AitherScript 0402` |
-| [**AitherADK**](https://github.com/Aitherium/aither/tree/main/aither-adk) | Agent Development Kit — `pip install aither-adk`, build agents in 3 lines | `Invoke-AitherScript 0225` |
+| [**AitherADK**](https://github.com/Aitherium/aither/tree/main/aither-adk) | Agent Development Kit — build agents in 3 lines | `pip install aither-adk` |
 | [**AitherDesktop**](https://github.com/Aitherium) | Native desktop client (Windows/Linux) with MCP, watchdog, and home widget | `Invoke-AitherPlaybook node-onboard` |
 | [**AitherConnect**](https://github.com/Aitherium) | Browser extension (Chrome/Edge) — connects to any AitherNode instance | `Invoke-AitherPlaybook node-onboard` |
 | [**AitherSDK**](https://github.com/Aitherium/aithersdk) | Python client library — `pip install aithersdk` | Auto-installed with ADK |
@@ -265,11 +265,11 @@ Invoke-AitherPlaybook node-onboard
 
 | Playbook | Description |
 |----------|-------------|
-| `dev-environment` | Full dev setup (Python, Node, Docker, Ollama) |
-| `test-quick` | Quick validation (syntax + unit tests) |
-| `ci-pr-validation` | CI/CD validation pipeline |
-| `build` | Build container images |
-| `deploy-local` | Deploy via Docker Compose |
+| `node-onboard` | Onboard THIS machine as a secure AitherOS cluster node (Windows / Linux / macOS) |
+
+Run `Get-AitherPlaybook` to list what your checkout actually ships — additional
+playbooks (build, deploy, CI) are part of the AitherOS Enterprise distribution
+and are not included in the public release.
 
 ---
 
