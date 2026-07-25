@@ -1,0 +1,556 @@
+<title>AitherZero Config Builder</title>
+<style>
+  :root{
+    --bg:#eef2f4; --panel:#fff; --panel-2:#f2f5f7; --panel-3:#e7edef; --line:#dbe2e5; --line-2:#e8edef;
+    --ink:#122029; --ink-2:#48606c; --ink-3:#8496a0;
+    --accent:#0d8f9e; --accent-ink:#fff; --accent-soft:#dcf0f2;
+    --ok:#0f7a56; --warn:#8a6000; --err:#bd2e48;
+    --ok-soft:#dbeee6; --warn-soft:#f6ead0; --err-soft:#f7d9df;
+    --mono:ui-monospace,"SF Mono","Cascadia Code","JetBrains Mono",Menlo,monospace;
+    --ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --shadow:0 1px 1px rgba(18,32,41,.04),0 8px 24px rgba(18,32,41,.07);
+    --shadow-sm:0 1px 2px rgba(18,32,41,.06);
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#0a1014;--panel:#121b21;--panel-2:#0e161b;--panel-3:#182530;--line:#213039;--line-2:#1a2831;
+    --ink:#e9f0f3;--ink-2:#9db0ba;--ink-3:#63767f;
+    --accent:#38cad9;--accent-ink:#052228;--accent-soft:#0d2a31;
+    --ok:#46d197;--warn:#e8b657;--err:#f2657f;--ok-soft:#0d2a23;--warn-soft:#2a230f;--err-soft:#2e1620;
+    --shadow:0 1px 1px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);--shadow-sm:0 1px 3px rgba(0,0,0,.4);
+  }}
+  :root[data-theme="light"]{--bg:#eef2f4;--panel:#fff;--panel-2:#f2f5f7;--panel-3:#e7edef;--line:#dbe2e5;--line-2:#e8edef;--ink:#122029;--ink-2:#48606c;--ink-3:#8496a0;--accent:#0d8f9e;--accent-ink:#fff;--accent-soft:#dcf0f2;--ok:#0f7a56;--warn:#8a6000;--err:#bd2e48;--ok-soft:#dbeee6;--warn-soft:#f6ead0;--err-soft:#f7d9df;--shadow:0 1px 1px rgba(18,32,41,.04),0 8px 24px rgba(18,32,41,.07);--shadow-sm:0 1px 2px rgba(18,32,41,.06);}
+  :root[data-theme="dark"]{--bg:#0a1014;--panel:#121b21;--panel-2:#0e161b;--panel-3:#182530;--line:#213039;--line-2:#1a2831;--ink:#e9f0f3;--ink-2:#9db0ba;--ink-3:#63767f;--accent:#38cad9;--accent-ink:#052228;--accent-soft:#0d2a31;--ok:#46d197;--warn:#e8b657;--err:#f2657f;--ok-soft:#0d2a23;--warn-soft:#2a230f;--err-soft:#2e1620;--shadow:0 1px 1px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);--shadow-sm:0 1px 3px rgba(0,0,0,.4);}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1420px;margin:0 auto;min-height:100vh;}
+  header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .top-in{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:12px clamp(14px,3vw,28px);}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mk{width:36px;height:36px;border-radius:10px;background:linear-gradient(145deg,var(--accent),color-mix(in srgb,var(--accent) 50%,#000));display:grid;place-items:center;color:var(--accent-ink);font-weight:800;letter-spacing:-.02em;box-shadow:var(--shadow-sm);}
+  .brand h1{font-size:17px;margin:0;letter-spacing:-.01em;font-weight:700;}
+  .brand .sub{font-size:12px;color:var(--ink-3);margin-top:1px;}
+  .top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .modes{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:2px;}
+  .mtab{font:inherit;font-size:12.5px;font-weight:600;border:0;background:transparent;color:var(--ink-2);padding:6px 12px;border-radius:7px;cursor:pointer;}
+  .mtab.on{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow-sm);}
+  .script-card{border:1px solid var(--line);border-radius:11px;margin:0 18px 12px;background:var(--panel-2);overflow:hidden;}
+  .script-card>summary{list-style:none;cursor:pointer;padding:11px 13px;display:flex;align-items:center;gap:10px;font-weight:600;font-size:13.5px;}
+  .script-card>summary::-webkit-details-marker{display:none;}
+  .script-card .snum{font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--accent-soft);border-radius:5px;padding:1px 6px;flex:none;}
+  .script-card .ssyn{color:var(--ink-3);font-weight:400;font-size:12px;margin-left:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:50%;}
+  .script-card .pc{font-size:11px;color:var(--ink-3);background:var(--panel-3);border:1px solid var(--line);border-radius:10px;padding:0 7px;flex:none;}
+  .loadschema{padding:16px 18px;text-align:center;color:var(--ink-2);}
+  .loadschema .cmd{font-family:var(--mono);font-size:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:7px;padding:8px 10px;margin:10px auto;max-width:640px;overflow-x:auto;text-align:left;}
+  button.btn{font:inherit;font-size:13px;font-weight:600;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 13px;transition:border-color .12s,background .12s,transform .05s;}
+  button.btn:hover{border-color:var(--accent);} button.btn:active{transform:translateY(1px);}
+  button.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);} button.btn.primary:hover{filter:brightness(1.06);}
+  button.btn.sm{padding:6px 10px;font-size:12px;border-radius:8px;}
+  button.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2);}
+  button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .shell{display:grid;grid-template-columns:220px 1fr 400px;gap:0;align-items:start;}
+  @media (max-width:1180px){.shell{grid-template-columns:200px 1fr;} .rail{display:none;}}
+  @media (max-width:820px){.shell{grid-template-columns:1fr;} .nav{display:none;}}
+
+  /* left nav */
+  .nav{position:sticky;top:61px;align-self:start;height:calc(100vh - 61px);overflow-y:auto;padding:16px 10px 30px clamp(14px,3vw,24px);border-right:1px solid var(--line);}
+  .nav .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);margin:14px 8px 6px;font-weight:700;}
+  .nav a{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:var(--ink-2);text-decoration:none;font-size:13.5px;font-weight:500;cursor:pointer;}
+  .nav a:hover{background:var(--panel-2);color:var(--ink);}
+  .nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:650;}
+  .nav a .nic{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:12px;background:var(--panel-3);color:var(--ink-3);flex:none;}
+  .nav a.on .nic{background:var(--accent);color:var(--accent-ink);}
+  .nav a .ct{margin-left:auto;font-size:10.5px;font-weight:700;background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:0 6px;line-height:16px;min-width:16px;text-align:center;}
+  .nav a .ct.hide{display:none;}
+
+  /* center */
+  .main{padding:18px clamp(14px,3vw,28px) 80px;min-width:0;}
+  .strip{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px 14px;display:flex;flex-direction:column;min-width:96px;box-shadow:var(--shadow-sm);}
+  .stat .n{font-size:20px;font-weight:750;font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+  .stat .l{font-size:10.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;}
+  .stat.err .n{color:var(--err);} .stat.warn .n{color:var(--warn);} .stat.ok .n{color:var(--ok);}
+  .controls{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .search{flex:1;min-width:180px;position:relative;}
+  .search input{width:100%;font:inherit;font-size:14px;padding:9px 12px 9px 32px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--ink);box-shadow:var(--shadow-sm);}
+  .search::before{content:"⌕";position:absolute;left:11px;top:8px;color:var(--ink-3);font-size:16px;}
+  .swrap{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);cursor:pointer;user-select:none;}
+  .presets{display:flex;gap:6px;flex-wrap:wrap;}
+  .presets button{font:inherit;font-size:12px;font-weight:600;padding:6px 11px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);cursor:pointer;box-shadow:var(--shadow-sm);}
+  .presets button:hover{border-color:var(--accent);color:var(--ink);}
+
+  section.sec{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:16px;box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:72px;}
+  .sec-hd{display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line-2);}
+  .sec-hd .ic{width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:15px;flex:none;}
+  .sec-hd .tt{font-weight:700;font-size:15.5px;letter-spacing:-.01em;}
+  .sec-hd .dd{font-size:12.5px;color:var(--ink-3);}
+  .subhd{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:700;padding:14px 18px 2px;}
+  .rows{display:flex;flex-direction:column;}
+  .row{display:flex;align-items:center;gap:16px;padding:12px 18px;border-top:1px solid var(--line-2);}
+  .row:first-child{border-top:0;}
+  .row.changed{background:color-mix(in srgb,var(--accent-soft) 40%,transparent);}
+  .row .meta{flex:1;min-width:0;}
+  .row .lab{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .row .lab .path{color:var(--ink-3);font-weight:500;font-size:12px;font-family:var(--mono);}
+  .row .desc{font-size:12.5px;color:var(--ink-3);margin-top:2px;line-height:1.4;}
+  .row .ctl{flex:none;display:flex;align-items:center;gap:8px;}
+  .row.wide{flex-direction:column;align-items:stretch;gap:8px;}
+  .row.wide .ctl{width:100%;}
+  input.tin,select.sel{font:inherit;font-size:13.5px;padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);}
+  input.tin{width:190px;} input.tin.mono{font-family:var(--mono);font-size:12.5px;width:100%;}
+  select.sel{min-width:150px;cursor:pointer;}
+  .row.wide input.tin{width:100%;}
+  .badge{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:2px 6px;border-radius:5px;}
+  .badge.canon{background:var(--warn-soft);color:var(--warn);} .badge.risk{background:var(--err-soft);color:var(--err);}
+  .badge.edit{background:var(--accent-soft);color:var(--accent);}
+  /* switch */
+  .switch{position:relative;display:inline-flex;flex:none;}
+  .switch input{position:absolute;opacity:0;width:0;height:0;}
+  .track{width:42px;height:24px;border-radius:20px;background:var(--panel-3);border:1px solid var(--line);position:relative;transition:.16s;cursor:pointer;}
+  .track::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:var(--shadow-sm);transition:.16s;}
+  .switch input:checked+.track{background:var(--accent);border-color:var(--accent);}
+  .switch input:checked+.track::after{transform:translateX(18px);}
+  /* vLLM workers */
+  .workers{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;padding:16px 18px;}
+  .worker{border:1px solid var(--line);border-radius:11px;padding:13px 14px;background:var(--panel-2);}
+  .worker h4{margin:0 0 10px;font-size:14px;display:flex;justify-content:space-between;align-items:center;}
+  .worker .wg{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;}
+  .wf{display:flex;flex-direction:column;gap:4px;} .wf label{font-size:11.5px;color:var(--ink-2);font-weight:600;}
+  .wf input{font:inherit;font-size:13px;padding:7px 9px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--ink);width:100%;}
+  .wf.full{grid-column:1/-1;} .wf.full input{font-family:var(--mono);font-size:12px;}
+  .gmeter{padding:0 18px 16px;} .gmeter .lbl{font-size:12px;color:var(--ink-2);margin-bottom:6px;display:flex;justify-content:space-between;}
+  .meter{height:9px;border-radius:6px;background:var(--panel-3);border:1px solid var(--line);overflow:hidden;}
+  .meter>i{display:block;height:100%;background:var(--accent);transition:width .25s,background .25s;}
+  .nodewrap{padding:14px 18px;} .nodehd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .node{border:1px solid var(--line);border-radius:11px;padding:13px 14px;background:var(--panel-2);margin-bottom:11px;}
+  .node .nh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:650;}
+  .ng{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 12px;}
+
+  /* right rail */
+  .rail{position:sticky;top:61px;align-self:start;height:calc(100vh - 61px);overflow-y:auto;padding:18px clamp(14px,3vw,24px) 30px 12px;display:flex;flex-direction:column;gap:14px;}
+  .card2{background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);}
+  .card2 .hd{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--line-2);}
+  .card2 .hd .t{font-weight:700;font-size:13.5px;}
+  .card2 .hd .cnt{font-size:11px;color:var(--ink-3);}
+  .valbody{padding:13px 15px;}
+  .status{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:650;margin-bottom:8px;}
+  .status .pip{width:9px;height:9px;border-radius:50%;}
+  .msg{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;padding:9px 11px;border-radius:8px;margin-top:7px;line-height:1.45;}
+  .msg .mic{font-weight:800;flex:none;width:15px;text-align:center;}
+  .msg.err{background:var(--err-soft);color:var(--err);} .msg.warn{background:var(--warn-soft);color:var(--warn);} .msg.ok{background:var(--ok-soft);color:var(--ok);}
+  pre#out{margin:0;padding:14px 15px;font-family:var(--mono);font-size:12px;line-height:1.55;overflow:auto;max-height:52vh;}
+  .tok-key{color:var(--accent);} .tok-str{color:var(--ok);} .tok-num{color:var(--warn);} .tok-bool{color:var(--err);} .tok-cmt{color:var(--ink-3);font-style:italic;}
+  code.inl{font-family:var(--mono);font-size:.9em;background:var(--panel-2);padding:1px 5px;border-radius:4px;}
+  .hidden{display:none !important;}
+  dialog#imp{border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--ink);padding:0;width:min(660px,93vw);box-shadow:var(--shadow);}
+  dialog#imp::backdrop{background:rgba(6,14,18,.55);backdrop-filter:blur(2px);}
+  dialog#imp .dh{padding:14px 17px;border-bottom:1px solid var(--line-2);font-weight:700;display:flex;justify-content:space-between;align-items:center;}
+  dialog#imp textarea{width:100%;height:240px;font-family:var(--mono);font-size:12px;border:0;background:var(--panel-2);color:var(--ink);padding:13px 15px;resize:vertical;}
+  dialog#imp .df{padding:13px 17px;display:flex;gap:9px;justify-content:flex-end;border-top:1px solid var(--line-2);}
+</style>
+
+<div class="app">
+  <header class="top"><div class="top-in">
+    <div class="brand"><div class="mk">AZ</div>
+      <div><h1>AitherZero Config Builder</h1><div class="sub">Build or edit a config.local.psd1 — the traps caught before bootstrap</div></div></div>
+    <div class="top-actions">
+      <div class="modes" id="modes">
+        <button class="mtab on" data-mode="config">Config sections</button>
+        <button class="mtab" data-mode="automation">Automation inventory</button>
+      </div>
+      <button class="btn" id="importBtn">Import…</button>
+      <button class="btn sm ghost" id="themeBtn" aria-label="Toggle theme">◑ Theme</button>
+      <button class="btn sm ghost" id="resetBtn">Reset</button>
+      <input type="file" id="schemaFile" accept=".json,application/json" hidden>
+    </div>
+  </div></header>
+
+  <div class="shell">
+    <nav class="nav" id="nav"></nav>
+
+    <div class="main">
+      <div class="strip" id="strip"></div>
+      <div class="controls">
+        <div class="search"><input id="search" type="text" placeholder="Search settings…" aria-label="Search settings"></div>
+        <label class="swrap"><span class="switch"><input type="checkbox" id="advToggle"><span class="track"></span></span> Advanced</label>
+        <div class="presets" id="presets"></div>
+      </div>
+      <div id="form"></div>
+    </div>
+
+    <aside class="rail">
+      <div class="card2">
+        <div class="hd"><span class="t">Validation</span><span class="cnt" id="valcount"></span></div>
+        <div class="valbody" id="valBody"></div>
+      </div>
+      <div class="card2">
+        <div class="hd"><span class="t">config.local.psd1</span>
+          <span style="display:flex;gap:7px;"><button class="btn sm" id="copyBtn">Copy</button><button class="btn sm primary" id="dlBtn">Download</button></span></div>
+        <pre id="out"></pre>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<dialog id="imp">
+  <div class="dh"><span>Paste an existing config.local.psd1 to edit</span><button class="btn sm ghost" id="impClose">✕</button></div>
+  <textarea id="impText" placeholder="@{&#10;  Core = @{ Environment = 'Production' }&#10;  AI = @{ MultiModelMode = $true }&#10;}"></textarea>
+  <div class="df"><span id="impMsg" style="align-self:center;font-size:12px;color:var(--err);margin-right:auto;"></span>
+    <button class="btn primary" id="impLoad">Load into editor</button></div>
+</dialog>
+
+<script>
+"use strict";
+const SERVICES_PORTS={}; // replaced below with generated map
+Object.assign(SERVICES_PORTS, {0:"TenantScheduler",2583:"AitherPDS",3000:"Veil",3001:"DesktopWeb",3002:"Grafana",3100:"Elysium",3200:"PrometheusViewer",3300:"AitherCreate",3400:"MCPPortal",3500:"ForgeIDE",3600:"AitherAdmin",3700:"RemotionRenderer",6379:"Redis",7337:"Repowise",8001:"Genesis",8081:"Pulse",8082:"Watch",8084:"PerceptionMedia",8087:"Spirit",8088:"Mind",8090:"Node",8093:"Reasoning",8094:"Connect",8095:"AutomationCore",8096:"PerceptionCore",8097:"CognitionCore",8098:"LiveContext",8101:"WorkingMemory",8106:"TrainingPipeline",8109:"AitherNanoGPT",8111:"Secrets",8113:"Cert",8114:"Search",8115:"SecurityCore",8116:"MemoryCore",8117:"Flux",8119:"Exo",8120:"VLLM",8121:"ChronicleLog",8122:"Nexus",8124:"ExoNodes",8125:"MeshCore",8127:"SecurityDefense",8128:"MeshBalancer",8129:"Failover",8131:"Sandbox",8132:"Browser",8133:"ThreatGuard",8134:"Geo",8136:"StrataData",8137:"Documentation",8138:"Faculties",8139:"SovereignNode",8140:"Demiurge",8142:"ForgeIDEBackend",8145:"Stream",8146:"Transcoder",8148:"AitherCivics",8149:"Registry",8150:"MicroScheduler",8151:"AitherSlots",8153:"CognitionAdvanced",8154:"AitherGraph",8159:"Worker",8160:"Chaos",8161:"MeterRollup",8162:"AitherFleet",8164:"CognitionCI",8168:"Compute",8169:"Jail",8170:"TenantDataPlane",8175:"WorkflowHub",8178:"Prometheus",8179:"KodokEvo",8181:"Moltbook",8182:"MCPGateway",8183:"Telegram",8185:"ExternalGateway",8186:"AitherAppStore",8187:"AitherLinkedIn",8189:"MCPBridges",8190:"CreativeEngine",8191:"OmniParser",8192:"AitherStructuredML",8193:"Conductor",8194:"AitherCNS",8195:"SocialHub",8196:"KnowledgeGraph",8197:"AitherWorldModel",8198:"ArcPlayground",8199:"RCA",8200:"Canvas",8201:"VLLMSwap",8204:"Quota",8205:"CommunicationCore",8206:"PortalGateway",8208:"SocialIntelligence",8209:"VLLMEmbeddings",8210:"Bastion",8211:"KnowledgeRAGIngestWorker",8213:"Firewall",8214:"Directory",8215:"CompetitiveIntel",8216:"Medic",8218:"AitherCRM",8219:"AitherSupport",8220:"Discord",8221:"Slack",8222:"WhatsApp",8223:"AitherChronos",8224:"AitherOne",8225:"AitherLedger",8226:"ClusterAgent",8227:"ElysiumBackend",8230:"Telephony",8250:"BenchmarkLab",8251:"AutoResearch",8260:"AitherMarketplace",8261:"AitherBooking",8270:"LyraWiki",8271:"AitherBrain",8289:"ComfyUI3D",8310:"Tunnel",8350:"Room",8360:"ClaudeSDKRunner",8500:"TexelStudio",8766:"A2A",8767:"Aeon",8770:"Saga",8771:"DeployExecutor",8772:"AutomationAgent",8773:"AitherAgent",8776:"GenesisAgent",8777:"Gateway",8778:"Atlas",8780:"Skills",8781:"Vera",8782:"Hera",8784:"AitherForge3D",8786:"Iris",8787:"ChaosAgent",8788:"AitherMeshGen",8791:"Themis",8793:"AitherSaga",8794:"AutoRig",8795:"PrometheusAgent",8796:"Sana",8797:"AutoScale",8799:"CoCRemaster",9000:"MinIO",9090:"PrometheusMon",9093:"AlertManager",9339:"ACC",9350:"STTP",9998:"FluxGossipBridge",9999:"StrataMeshReplicationTrigger"});
+const E={Environment:["Development","Testing","Staging","Production","CI"],Profile:["Minimal","Standard","Full","CI","AIWorkload"],Platform:["auto","windows","linux","macos"],ContainerRuntime:["docker","podman"],Orchestrator:["compose","kubernetes"],OutputFormat:["Console","JSON"],InferenceMode:["vllm","ollama"],DeviceRequest:["all","0","1"],Provider:["opentofu","terraform"],Hypervisor:["hyperv"],ImageArch:["x86_64","aarch64"],BootstrapMode:["pull","build","hybrid"],RockyProfile:["minimal","core","standard","full","gpu"],SwitchType:["Internal","External","Private"],Drive:["auto","C","D","E"],PreferMediaType:["SSD","NVMe","HDD"],MeshRole:["primary","replica","standalone"],HyperVAuth:["certificate","password"],Theme:["auto","dark","light"]};
+// n = friendly label, g = sub-group heading (optional)
+const S=[
+ {id:"ProjectContext",title:"Project",icon:"◆",desc:"What AitherZero manages",f:[
+   {k:"ProjectName",t:"s",d:"aitheros",n:"Project name",h:"docker-compose project prefix"},
+   {k:"ContainerPrefix",t:"s",d:"aitheros",n:"Container prefix",h:"container filter — keep equal to Project name"},
+   {k:"ComposeFile",t:"s",d:"docker-compose.aitheros.yml",n:"Compose file",adv:1},
+   {k:"RegistryURL",t:"s",d:"",n:"Registry URL",adv:1,h:"empty = Docker Hub public"},
+   {k:"OrchestratorURL",t:"s",d:"http://localhost:8001",n:"Orchestrator URL",adv:1}]},
+ {id:"Core",title:"Core",icon:"⚙",desc:"Platform essentials",f:[
+   {k:"Environment",t:"e",d:"Development",n:"Environment",h:"Production applies stricter defaults"},
+   {k:"Profile",t:"e",d:"Standard",n:"Profile",h:"which categories of scripts run"},
+   {k:"Platform",t:"e",d:"auto",n:"Platform",h:"leave on auto unless forcing an OS"},
+   {k:"ContainerRuntime",t:"e",d:"docker",n:"Container runtime"},
+   {k:"Orchestrator",t:"e",d:"compose",n:"Orchestrator",h:"compose = single box, kubernetes = cluster"},
+   {k:"OutputFormat",t:"e",d:"Console",n:"Output format"},
+   {k:"ClearScreenOnStart",t:"b",d:true,n:"Clear screen on start",g:"Experience",adv:1},
+   {k:"ShowWelcomeMessage",t:"b",d:true,n:"Welcome message",g:"Experience",adv:1},
+   {k:"EnableAnimations",t:"b",d:true,n:"Animations",g:"Experience",adv:1},
+   {k:"DebugMode",t:"b",d:false,n:"Debug mode",g:"Debugging"},
+   {k:"VerboseOutput",t:"b",d:false,n:"Verbose output",g:"Debugging"},
+   {k:"WhatIf",t:"b",d:false,n:"What-if (preview only)",g:"Debugging",adv:1,h:"show changes, apply nothing"},
+   {k:"DryRun",t:"b",d:false,n:"Dry run",g:"Debugging",adv:1,h:"run logic, execute nothing"},
+   {k:"ContinueOnError",t:"b",d:false,n:"Continue on error",g:"Execution",adv:1,risk:1,h:"keep going when a step fails"},
+   {k:"SkipPrerequisites",t:"b",d:false,n:"Skip prerequisites",g:"Execution",adv:1,risk:1},
+   {k:"ForceReinstall",t:"b",d:false,n:"Force reinstall",g:"Execution",adv:1,risk:1,h:"purge & reinstall existing"}]},
+ {id:"Container",title:"Container",icon:"▣",desc:"Registry & images",f:[
+   {k:"Registry.URL",t:"s",d:"",n:"Registry URL",h:"empty = Docker Hub public"},
+   {k:"Registry.DefaultTag",t:"s",d:"latest",n:"Default image tag"}]},
+ {id:"AI",title:"AI · inference",icon:"◈",desc:"vLLM multi-model stack",vllm:1,f:[
+   {k:"InferenceMode",t:"e",d:"vllm",n:"Inference mode"},
+   {k:"MultiModelMode",t:"b",d:true,n:"Multi-model mode",h:"run the four specialist workers in parallel"},
+   {k:"GPU.Enabled",t:"b",d:true,n:"GPU acceleration",g:"GPU"},
+   {k:"GPU.NvidiaRuntime",t:"b",d:true,n:"NVIDIA container runtime",g:"GPU",adv:1},
+   {k:"GPU.DeviceRequest",t:"e",d:"all",n:"GPU devices",g:"GPU",adv:1},
+   {k:"ComfyUI.Port",t:"n",d:8188,n:"ComfyUI port",g:"ComfyUI",adv:1}]},
+ {id:"Features",title:"Features",icon:"◉",desc:"What gets installed & run",f:[
+   {k:"AI.vLLM.Enabled",t:"b",d:true,n:"vLLM",g:"AI"},
+   {k:"AI.MultiModel.Enabled",t:"b",d:true,n:"Multi-model",g:"AI"},
+   {k:"AI.GPU.Enabled",t:"b",d:true,n:"GPU",g:"AI"},
+   {k:"Monitoring.Prometheus.Enabled",t:"b",d:false,n:"Prometheus",g:"Monitoring"},
+   {k:"Monitoring.Grafana.Enabled",t:"b",d:false,n:"Grafana",g:"Monitoring"},
+   {k:"Deployment.LocalCompose.Enabled",t:"b",d:true,n:"Local compose",g:"Deployment",adv:1},
+   {k:"Deployment.Kubernetes.Enabled",t:"b",d:false,n:"Kubernetes",g:"Deployment",adv:1}]},
+ {id:"LLM",title:"LLM providers",icon:"❖",desc:"Fallback cascade",cascade:1,f:[
+   {k:"MicroScheduler.Url",t:"s",d:"http://localhost:8150",n:"MicroScheduler URL",g:"MicroScheduler",adv:1},
+   {k:"Ollama.Url",t:"s",d:"http://localhost:11434",n:"Ollama URL",g:"Ollama",adv:1},
+   {k:"Ollama.DefaultModel",t:"s",d:"llama3.2",n:"Ollama model",g:"Ollama"},
+   {k:"OpenAI.DefaultModel",t:"s",d:"gpt-4o-mini",n:"OpenAI model",g:"OpenAI",adv:1},
+   {k:"Azure.ApiVersion",t:"s",d:"2024-02-15-preview",n:"Azure API version",g:"Azure",adv:1},
+   {k:"EffortModels.Small",t:"s",d:"llama3.2",n:"Small (effort 1–2)",g:"Effort → model",adv:1},
+   {k:"EffortModels.Reasoning",t:"s",d:"deepseek-r1:14b",n:"Reasoning (effort 7–10)",g:"Effort → model",adv:1}]},
+ {id:"Infrastructure",title:"Infrastructure",icon:"⬡",desc:"VM & mesh provisioning",node:1,f:[
+   {k:"Enabled",t:"b",d:false,n:"Enable infrastructure",h:"master toggle for IaC/VM provisioning"},
+   {k:"Provider",t:"e",d:"opentofu",n:"IaC provider"},{k:"Hypervisor",t:"e",d:"hyperv",n:"Hypervisor"},
+   {k:"VM.DefaultCPUs",t:"n",d:4,min:1,max:256,n:"Default CPUs",g:"Virtual machine"},
+   {k:"VM.DefaultMemoryGB",t:"n",d:8,min:1,max:4096,n:"Default memory (GB)",g:"Virtual machine"},
+   {k:"VM.DefaultDiskGB",t:"n",d:100,min:20,max:8000,n:"System disk (GB)",g:"Virtual machine",adv:1},
+   {k:"VM.SwitchName",t:"s",d:"AitherSwitch",n:"Hyper-V switch",g:"Virtual machine",adv:1},
+   {k:"VM.SwitchType",t:"e",d:"Internal",n:"Switch type",g:"Virtual machine",adv:1},
+   {k:"Storage.Drive",t:"e",d:"auto",n:"Storage drive",g:"Storage"},
+   {k:"Storage.MinFreeGB",t:"n",d:40,min:5,max:2000,n:"Min free space (GB)",g:"Storage",adv:1},
+   {k:"Storage.PreferMediaType",t:"e",d:"SSD",n:"Prefer media",g:"Storage",adv:1},
+   {k:"RockyLinux.ImageVersion",t:"s",d:"9.5",n:"Rocky version",g:"Rocky Linux",adv:1},
+   {k:"RockyLinux.ImageArch",t:"e",d:"x86_64",n:"Architecture",g:"Rocky Linux",adv:1},
+   {k:"RockyLinux.BootstrapMode",t:"e",d:"pull",n:"Bootstrap mode",g:"Rocky Linux",adv:1}]},
+ {id:"UI",title:"Interface",icon:"◐",desc:"Display",adv:1,f:[
+   {k:"Theme",t:"e",d:"auto",n:"Theme"},{k:"ShowHints",t:"b",d:true,n:"Show hints"},{k:"UseEmojis",t:"b",d:true,n:"Use emojis"}]},
+ {id:"Paths",title:"Paths",icon:"⌘",desc:"Directories",adv:1,f:[
+   {k:"Logs",t:"s",d:"./logs",n:"Logs"},{k:"Data",t:"s",d:"./data",n:"Data"},{k:"Cache",t:"s",d:"./.cache",n:"Cache"}]},
+ {id:"Dependencies",title:"Dependencies",icon:"⧉",desc:"Module versions",adv:1,f:[
+   {k:"Pester",t:"s",d:"5.5.0",n:"Pester"},{k:"PSScriptAnalyzer",t:"s",d:"1.22.0",n:"PSScriptAnalyzer"},{k:"ThreadJob",t:"s",d:"2.0.3",n:"ThreadJob"}]}
+];
+const WK=[{name:"Orchestrator",port:8200,model:"cerebras/GLM-4.7-Flash-REAP-23B-A3B",gpu:0.19,seqs:8,ctx:16384},
+ {name:"Reasoning",port:8201,model:"cerebras/Qwen3-Coder-REAP-25B-A3B",gpu:0.22,seqs:4,ctx:16384},
+ {name:"Vision",port:8202,model:"Qwen/Qwen2.5-VL-7B-Instruct",gpu:0.16,seqs:4,ctx:16384},
+ {name:"Coding",port:8203,model:"deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct",gpu:0.13,seqs:4,ctx:16384}];
+const CASC=["microscheduler","ollama","openai","anthropic"];
+const ENUMKEY=k=>k.split(".").pop();
+const PRESETS={
+ Minimal:{"Core.Profile":"Minimal","AI.MultiModelMode":false,"Features.AI.vLLM.Enabled":false,"Features.AI.MultiModel.Enabled":false,"Features.Monitoring.Prometheus.Enabled":false},
+ Standard:{"Core.Profile":"Standard","AI.MultiModelMode":true,"Features.AI.vLLM.Enabled":true},
+ Full:{"Core.Profile":"Full","AI.MultiModelMode":true,"Features.AI.vLLM.Enabled":true,"Features.Monitoring.Prometheus.Enabled":true,"Features.Monitoring.Grafana.Enabled":true,"Infrastructure.Enabled":true},
+ AIWorkload:{"Core.Profile":"AIWorkload","AI.InferenceMode":"vllm","AI.MultiModelMode":true,"AI.GPU.Enabled":true,"Features.AI.vLLM.Enabled":true,"Features.AI.GPU.Enabled":true},
+ CI:{"Core.Profile":"CI","Core.Environment":"CI","Core.OutputFormat":"JSON","AI.MultiModelMode":false,"Features.AI.vLLM.Enabled":false}
+};
+const D={}; S.forEach(s=>s.f.forEach(f=>D[s.id+"."+f.k]=f.d));
+const st={f:{...D},wk:WK.map(w=>({...w})),casc:Object.fromEntries(CASC.map(p=>[p,true])),
+  nodes:[{Name:"aither-rocky-01",MeshRole:"primary",MeshPrimaryHost:"",HyperVAuth:"certificate",CPUs:4,MemoryGB:8}]};
+let active=S[0].id;
+
+/* ---------- Automation inventory mode (schema-driven) ---------- */
+let MODE="config", SCHEMA=null, ACAT=null;
+const SOV={};                                   // per-script overrides: "cat/name" -> {param:value}
+const AA=x=>Array.isArray(x)?x:(x==null?[]:[x]); // coerce PS-JSON single/null → array
+function schemaCats(){const m={};AA(SCHEMA&&SCHEMA.scripts).forEach(s=>{const c=s.category||"misc";(m[c]=m[c]||[]).push(s);});return m;}
+function autoControl(s,p){
+  const key=s.category+"/"+s.name, cur=(SOV[key]||{})[p.name];
+  const set=v=>{SOV[key]=SOV[key]||{};const def=(p.default==="$true"?true:p.default==="$false"?false:p.default);
+    if(v===""||v==null||JSON.stringify(v)===JSON.stringify(def))delete SOV[key][p.name];else SOV[key][p.name]=v;
+    if(!Object.keys(SOV[key]).length)delete SOV[key];refreshAuto();};
+  if(p.type==="b"){const sw=el("label","switch"),i=el("input");i.type="checkbox";i.checked=cur!=null?!!cur:(p.default===true||p.default==="$true");i.onchange=()=>set(i.checked);sw.append(i,el("span","track"));return sw;}
+  if(p.type==="e"){const sel=el("select","sel");AA(p.enum).forEach(o=>{const op=el("option",null,o);op.value=o;if((cur!=null?cur:p.default)===o)op.selected=1;sel.append(op);});sel.onchange=()=>set(sel.value);return sel;}
+  if(p.type==="n"){const i=el("input","tin");i.type="number";i.value=cur!=null?cur:(p.default??"");i.oninput=()=>set(i.value===""?"":+i.value);return i;}
+  const i=el("input","tin mono");i.type="text";i.value=cur!=null?cur:(p.default||"");i.placeholder=String(p.default||"");i.oninput=()=>set(i.value);return i;
+}
+function renderAutomation(){
+  const root=$("#form");root.innerHTML="";$("#nav").innerHTML="";
+  if(!SCHEMA){const card=el("section","sec"),inner=el("div","loadschema");
+    inner.append(el("div",null,"Configure every automation script — including your private ones. Generate the inventory schema, then load it here:"));
+    inner.append(el("div","cmd","pwsh .PRODUCTS/.AITHERZERO/tools/config-editor/Export-AitherConfigSchema.ps1 -ScriptRoot <automation-scripts> -PlaybookRoot <playbooks>"));
+    const b=el("button","btn primary","Load config-schema.json…");b.onclick=()=>$("#schemaFile").click();inner.append(b);
+    inner.append(el("div","desc","Reads every script's param() block — enums, defaults, help — from whatever inventory you point it at. Add a new script, regenerate, and it appears here automatically."));
+    card.append(inner);root.append(card);refreshAuto();return;}
+  const cats=schemaCats();if(!ACAT||!cats[ACAT])ACAT=Object.keys(cats).sort()[0];
+  const sec=el("section","sec"),hd=el("div","sec-hd");hd.append(el("div","ic","⛭"));
+  const tw=el("div");tw.append(el("div","tt",ACAT));tw.append(el("div","dd",(cats[ACAT]||[]).length+" scripts · set any parameter; only changes are written"));hd.append(tw);sec.append(hd);
+  (cats[ACAT]||[]).forEach(s=>{const params=AA(s.params).filter(p=>typeof p==="object");if(!params.length)return;
+    const key=s.category+"/"+s.name, ov=SOV[key]||{};
+    const c=el("details","script-card");c.dataset.q=(s.name+" "+(s.synopsis||"")+" "+s.category).toLowerCase();
+    const sm=el("summary");if(s.id)sm.append(el("span","snum",s.id));sm.append(el("span",null,s.name));
+    if(s.synopsis)sm.append(el("span","ssyn",s.synopsis));const pc=el("span","pc",params.length+"p");sm.append(pc);c.append(sm);
+    const rows=el("div","rows");
+    params.forEach(p=>{const r=el("div","row"+(p.type==="s"&&/Url|Path|Key/i.test(p.name)?" wide":""));
+      const meta=el("div","meta"),lab=el("div","lab");lab.append(document.createTextNode(p.name));
+      if(p.mandatory)lab.append(el("span","badge risk","required"));if(ov[p.name]!=null)lab.append(el("span","badge edit","set"));
+      meta.append(lab);if(p.help)meta.append(el("div","desc",p.help));else if(AA(p.enum).length)meta.append(el("div","desc","one of: "+AA(p.enum).join(", ")));
+      const ctl=el("div","ctl");ctl.append(autoControl(s,p));r.append(meta,ctl);rows.append(r);});
+    c.append(rows);sec.append(c);});
+  root.append(sec);buildAutoNav();applySearch();refreshAuto();
+}
+function buildAutoNav(){if(!SCHEMA)return;const nav=$("#nav");nav.innerHTML="";nav.append(el("div","grp","Categories · "+AA(SCHEMA.scripts).length+" scripts"));
+  const cats=schemaCats();Object.keys(cats).sort().forEach(cat=>{const a=el("a",cat===ACAT?"on":"");a.append(el("span","nic","▤"));a.append(el("span",null,cat));
+    const ov=Object.keys(SOV).filter(k=>k.startsWith(cat+"/")).length,c=el("span","ct",ov||"");c.classList.toggle("hide",!ov);a.append(c);
+    a.onclick=()=>{ACAT=cat;renderAutomation();};nav.append(a);});}
+function toPsd1Auto(){if(!Object.keys(SOV).length)return "# config.local.psd1 — AutomationDefaults\n@{ }\n";
+  let s="# config.local.psd1 — AutomationDefaults (per-script parameter overrides)\n# bootstrap.ps1 / playbooks pass these to each script as its parameters.\n@{\n    AutomationDefaults = @{\n";
+  for(const key in SOV)s+="        '"+key+"' = @{ "+Object.entries(SOV[key]).map(([k,v])=>k+" = "+psv(v)).join("; ")+" }\n";
+  return s+"    }\n}\n";}
+function refreshAuto(){
+  last=toPsd1Auto();$("#out").innerHTML=hi(last);
+  const nover=Object.values(SOV).reduce((a,o)=>a+Object.keys(o).length,0),nscr=Object.keys(SOV).length;
+  const scr=AA(SCHEMA&&SCHEMA.scripts);
+  $("#strip").innerHTML="";
+  [["Overrides",nover],["Scripts set",nscr],["Categories",Object.keys(schemaCats()).length],["Scripts",scr.length],["Params",scr.reduce((a,s)=>a+AA(s.params).length,0)]].forEach(([l,n])=>{const c=el("div","stat");c.append(el("div","n",String(n)));c.append(el("div","l",l));$("#strip").append(c);});
+  const vb=$("#valBody");vb.innerHTML="";const s2=el("div","status"),pip=el("span","pip");pip.style.background="var(--ok)";s2.append(pip,document.createTextNode(SCHEMA?(nover?nover+" override"+(nover>1?"s":""):"No overrides yet"):"No schema loaded"));vb.append(s2);
+  if(SCHEMA)vb.append(el("div","msg ok","Written under AutomationDefaults keyed by script. Anyone who adds a pwsh script with a param() block extends this inventory — regenerate the schema and it shows up."));
+  $("#valcount").textContent=SCHEMA?(nover?nover+" set":"clean"):"—";
+  if(SCHEMA)buildAutoNav();
+}
+function go(){document.querySelectorAll("#modes .mtab").forEach(b=>b.classList.toggle("on",b.dataset.mode===MODE));
+  $("#presets").style.display=MODE==="config"?"":"none";$("#importBtn").style.display=MODE==="config"?"":"none";
+  if(MODE==="config")render();else renderAutomation();}
+
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const isDef=p=>JSON.stringify(st.f[p])===JSON.stringify(D[p]);
+
+function control(sec,f){
+  const p=sec.id+"."+f.k;
+  if(f.t==="b"){const s=el("label","switch"),i=el("input");i.type="checkbox";i.checked=!!st.f[p];
+    i.onchange=()=>{st.f[p]=i.checked;refresh();};s.append(i,el("span","track"));return s;}
+  if(f.t==="e"){const sel=el("select","sel");(E[ENUMKEY(f.k)]||[]).forEach(o=>{const op=el("option",null,o);op.value=o;if(st.f[p]===o)op.selected=1;sel.append(op);});
+    sel.onchange=()=>{st.f[p]=sel.value;refresh();};return sel;}
+  if(f.t==="n"){const i=el("input","tin");i.type="number";i.value=st.f[p];if(f.min!=null)i.min=f.min;if(f.max!=null)i.max=f.max;
+    i.oninput=()=>{st.f[p]=i.value===""?"":+i.value;refresh();};return i;}
+  const i=el("input","tin"+((f.k.includes("Url")||f.k.includes("URL")||f.k.includes("Model")||f.k.includes("Path"))?" mono":""));
+  i.type="text";i.value=st.f[p];i.placeholder=f.d||"";i.oninput=()=>{st.f[p]=i.value;refresh();};return i;
+}
+function row(sec,f){
+  const p=sec.id+"."+f.k, wide=f.t==="s"&&(f.k.includes("Url")||f.k.includes("URL"));
+  const r=el("div","row"+(wide?" wide":"")); r.dataset.adv=(f.adv||sec.adv)?"1":"0";
+  r.dataset.q=((sec.title+" "+f.n+" "+f.k)).toLowerCase(); r.classList.toggle("changed",!isDef(p)&&st.f[p]!=="");
+  const meta=el("div","meta"),lab=el("div","lab");lab.append(document.createTextNode(f.n));
+  if(f.canon)lab.append(el("span","badge canon","services.yaml"));
+  if(f.risk)lab.append(el("span","badge risk","risky"));
+  if(!isDef(p)&&st.f[p]!=="")lab.append(el("span","badge edit","edited"));
+  meta.append(lab); if(f.h)meta.append(el("div","desc",f.h));
+  const ctl=el("div","ctl");ctl.append(control(sec,f));
+  if(wide){r.append(meta,ctl);} else {r.append(meta,ctl);}
+  return r;
+}
+function workers(){
+  const box=el("div"); const g=el("div","workers");
+  st.wk.forEach((w,i)=>{const c=el("div","worker"),h=el("h4");h.append(document.createTextNode(w.name));h.append(el("span","badge canon",(w.gpu*100).toFixed(0)+"% GPU"));c.append(h);
+    const wg=el("div","wg");
+    wg.append(wcell("Port","number",w.port,v=>{st.wk[i].port=+v;refresh();}));
+    wg.append(wcell("GPU fraction","number",w.gpu,v=>{st.wk[i].gpu=+v;refresh();},{step:.01,min:0,max:1}));
+    wg.append(wcell("Max seqs","number",w.seqs,v=>{st.wk[i].seqs=+v;refresh();}));
+    wg.append(wcell("Context","number",w.ctx,v=>{st.wk[i].ctx=+v;refresh();}));
+    const mf=el("div","wf full");mf.append(el("label",null,"Model"));const mi=el("input");mi.type="text";mi.value=w.model;mi.oninput=()=>{st.wk[i].model=mi.value;refresh();};mf.append(mi);wg.append(mf);
+    c.append(wg);g.append(c);});
+  box.append(g);
+  const gm=el("div","gmeter");gm.id="gmeter";box.append(gm);return box;
+}
+function wcell(label,type,val,cb,o){const d=el("div","wf");d.append(el("label",null,label));const i=el("input");i.type=type;i.value=val;if(o){if(o.step)i.step=o.step;if(o.min!=null)i.min=o.min;if(o.max!=null)i.max=o.max;}i.oninput=()=>cb(i.value);d.append(i);return d;}
+function cascade(){
+  const box=el("div","nodewrap");box.append(el("div","subhd","Provider cascade — tried in order"));
+  const r=el("div");r.style.cssText="display:flex;flex-direction:column;gap:2px";
+  CASC.forEach((p,idx)=>{const rr=el("div","row");const m=el("div","meta"),l=el("div","lab");l.append(document.createTextNode((idx+1)+". "+p));
+    if(p==="openai"||p==="anthropic")l.append(el("span","badge risk","costs $"));m.append(l);rr.append(m);
+    const s=el("label","switch"),i=el("input");i.type="checkbox";i.checked=st.casc[p];i.onchange=()=>{st.casc[p]=i.checked;refresh();};
+    const c=el("div","ctl");c.append(s);s.append(i,el("span","track"));rr.append(c);r.append(rr);});
+  box.append(r);return box;
+}
+function nodes(){
+  const box=el("div","nodewrap"),hd=el("div","nodehd");hd.append(el("div","subhd","Mesh nodes"));
+  const add=el("button","btn sm","+ Add node");add.onclick=()=>{st.nodes.push({Name:"node-"+(st.nodes.length+1),MeshRole:"replica",MeshPrimaryHost:"",HyperVAuth:"certificate",CPUs:4,MemoryGB:8});render();};hd.append(add);box.append(hd);
+  st.nodes.forEach((n,idx)=>{const c=el("div","node"),nh=el("div","nh");nh.append(el("span",null,n.Name||("node "+(idx+1))));
+    if(st.nodes.length>1){const rm=el("button","btn sm ghost","Remove");rm.onclick=()=>{st.nodes.splice(idx,1);render();};nh.append(rm);}c.append(nh);
+    const g=el("div","ng");
+    const add2=(lab,type,key,opts,ph)=>{const d=el("div","wf");d.append(el("label",null,lab));
+      if(type==="enum"){const sel=el("select","sel");sel.style.width="100%";opts.forEach(o=>{const op=el("option",null,o);op.value=o;if(n[key]===o)op.selected=1;sel.append(op);});sel.onchange=()=>{n[key]=sel.value;refresh();};d.append(sel);}
+      else{const i=el("input");i.type=type;i.value=n[key];if(ph)i.placeholder=ph;i.oninput=()=>{n[key]=type==="number"?+i.value:i.value;refresh();};d.append(i);if(key==="MeshPrimaryHost")n._i=i;}
+      g.append(d);};
+    add2("Name","text","Name");add2("Role","enum","MeshRole",E.MeshRole);add2("Primary IP","text","MeshPrimaryHost",null,"192.168.1.112");
+    add2("Hyper-V auth","enum","HyperVAuth",E.HyperVAuth);add2("CPUs","number","CPUs");add2("Memory (GB)","number","MemoryGB");
+    c.append(g);box.append(c);});
+  box.append(el("div","desc","A replica must point at the primary's LAN IP. Certificate auth forces WinRM to HTTPS on 5986."));
+  return box;
+}
+function render(){
+  const root=$("#form");root.innerHTML="";
+  const sec=S.find(s=>s.id===active); if(!sec)return;
+  const card=el("section","sec");card.id="sec-"+sec.id;
+  const hd=el("div","sec-hd");hd.append(el("div","ic",sec.icon));
+  const tw=el("div");tw.append(el("div","tt",sec.title));tw.append(el("div","dd",sec.desc));hd.append(tw);card.append(hd);
+  // grouped rows
+  let lastG=null;const rows=el("div","rows");
+  sec.f.forEach(f=>{ if(f.g&&f.g!==lastG){rows.append(el("div","subhd",f.g));lastG=f.g;} rows.append(row(sec,f)); });
+  card.append(rows);
+  if(sec.vllm)card.append(workers());
+  if(sec.cascade)card.append(cascade());
+  if(sec.node)card.append(nodes());
+  root.append(card);
+  buildNav(); applySearch(); refresh();
+}
+function buildNav(){
+  const nav=$("#nav");nav.innerHTML="";nav.append(el("div","grp","Sections"));
+  const show=$("#advToggle").checked;
+  S.forEach(sec=>{ if(sec.adv&&!show)return;
+    const a=el("a",sec.id===active?"on":"");a.append(el("span","nic",sec.icon));a.append(el("span",null,sec.title));
+    const c=el("span","ct");a.append(c);a._cnt=c;a.onclick=()=>{active=sec.id;render();};nav.append(a);a._sec=sec.id;});
+}
+
+/* psd1 */
+function psv(v){return typeof v==="boolean"?(v?"$true":"$false"):typeof v==="number"?String(v):"'"+String(v).replace(/'/g,"''")+"'";}
+function setN(o,path,v){const a=path.split(".");let c=o;for(let i=0;i<a.length-1;i++){c[a[i]]=c[a[i]]||{};c=c[a[i]];}c[a[a.length-1]]=v;}
+function tree(){const t={};
+  S.forEach(sec=>sec.f.forEach(f=>{const p=sec.id+"."+f.k,v=st.f[p];if(!isDef(p)&&v!=="")setN(t,p,v);}));
+  if(st.wk.some((w,i)=>w.port!==WK[i].port||w.gpu!==WK[i].gpu||w.model!==WK[i].model||w.seqs!==WK[i].seqs||w.ctx!==WK[i].ctx)){
+    const vl={};st.wk.forEach(w=>vl[w.name]={Port:w.port,Model:w.model,GPUMemory:w.gpu,MaxConcurrentSeqs:w.seqs,MaxContextLength:w.ctx});setN(t,"AI.vLLM",vl);}
+  const c=CASC.filter(p=>st.casc[p]);if(JSON.stringify(c)!==JSON.stringify(CASC))setN(t,"LLM.ProviderCascade",{__arr:c});
+  if(st.f["Infrastructure.Enabled"]===true)setN(t,"Infrastructure.Nodes",{__nodes:st.nodes.map(n=>{const{_i,...clean}=n;return clean;})});
+  return t;}
+function emit(o,ind){const pad="    ".repeat(ind);let s="@{\n";for(const k of Object.keys(o)){const v=o[k];
+  if(v&&v.__arr)s+=pad+"    "+k+" = @("+v.__arr.map(psv).join(", ")+")\n";
+  else if(v&&v.__nodes)s+=pad+"    "+k+" = @(\n"+v.__nodes.map(n=>pad+"        @{ "+Object.entries(n).map(([a,b])=>a+" = "+psv(b)).join("; ")+" }").join(",\n")+"\n"+pad+"    )\n";
+  else if(v&&typeof v==="object")s+=pad+"    "+k+" = "+emit(v,ind+1);
+  else s+=pad+"    "+k+" = "+psv(v)+"\n";}return s+pad+"}\n";}
+function toPsd1(t){return "# config.local.psd1 — generated by AitherZero Config Builder\n# Only your overrides. Merges over base at load (base < platform < local < env).\n"+(Object.keys(t).length?emit(t,0):"@{ }\n");}
+
+/* import */
+function parsePsd1(text){let i=0;const s=text.replace(/#[^\n]*/g,"");
+  const ws=()=>{while(i<s.length&&/\s/.test(s[i]))i++;};
+  function val(){ws();
+    if(s.startsWith("@{",i)){i+=2;const o={};ws();while(i<s.length&&s[i]!=="}"){const k=key();ws();if(s[i]==="=")i++;o[k]=val();ws();if(s[i]===";")i++;ws();}i++;return o;}
+    if(s.startsWith("@(",i)){i+=2;const a=[];ws();while(i<s.length&&s[i]!==")"){a.push(val());ws();if(s[i]===","||s[i]===";")i++;ws();}i++;return a;}
+    if(s[i]==="'"||s[i]==='"'){const q=s[i++];let r="";while(i<s.length&&s[i]!==q)r+=s[i++];i++;return r;}
+    if(s.startsWith("$true",i)){i+=5;return true;}if(s.startsWith("$false",i)){i+=6;return false;}
+    let r="";while(i<s.length&&!/[\s;,}\)]/.test(s[i]))r+=s[i++];const n=Number(r);return isNaN(n)?r:n;}
+  function key(){ws();let r="";if(s[i]==="'"||s[i]==='"'){const q=s[i++];while(i<s.length&&s[i]!==q)r+=s[i++];i++;}else while(i<s.length&&!/[\s=]/.test(s[i]))r+=s[i++];return r;}
+  ws();return val();}
+function flatten(o,pre,out){for(const k in o){const v=o[k],p=pre?pre+"."+k:k;if(v&&typeof v==="object"&&!Array.isArray(v))flatten(v,p,out);else out[p]=v;}return out;}
+function loadConfig(o){Object.assign(st.f,{...D});st.wk=WK.map(w=>({...w}));st.casc=Object.fromEntries(CASC.map(p=>[p,true]));
+  const flat=flatten(o,"",{});for(const p in flat)if(p in D)st.f[p]=flat[p];
+  if(o.AI&&o.AI.vLLM)for(const wn in o.AI.vLLM){const w=st.wk.find(x=>x.name===wn);if(w){const x=o.AI.vLLM[wn];if(x.Port!=null)w.port=+x.Port;if(x.GPUMemory!=null)w.gpu=+x.GPUMemory;if(x.Model)w.model=x.Model;if(x.MaxConcurrentSeqs!=null)w.seqs=+x.MaxConcurrentSeqs;if(x.MaxContextLength!=null)w.ctx=+x.MaxContextLength;}}
+  if(o.LLM&&Array.isArray(o.LLM.ProviderCascade))st.casc=Object.fromEntries(CASC.map(p=>[p,o.LLM.ProviderCascade.includes(p)]));
+  if(o.Infrastructure&&Array.isArray(o.Infrastructure.Nodes)&&o.Infrastructure.Nodes.length)st.nodes=o.Infrastructure.Nodes.map(n=>({Name:n.Name||"node",MeshRole:n.MeshRole||"replica",MeshPrimaryHost:n.MeshPrimaryHost||"",HyperVAuth:n.HyperVAuth||"certificate",CPUs:+n.CPUs||4,MemoryGB:+n.MemoryGB||8}));
+  render();}
+
+/* validate */
+const ip=v=>/^(\d{1,3}\.){3}\d{1,3}$/.test(String(v).trim());
+function validate(){const m=[];
+  const on=st.f["AI.MultiModelMode"]!==false&&st.f["AI.GPU.Enabled"]!==false;
+  const sum=st.wk.reduce((a,w)=>a+(+w.gpu||0),0);
+  if(on){if(sum>1.0001)m.push(["err","GPU fractions total "+(sum*100).toFixed(0)+"% — over 100%. It will OOM. Lower a worker."]);
+    else if(sum>0.92)m.push(["warn","GPU fractions total "+(sum*100).toFixed(0)+"% — very tight; leave KV-cache headroom."]);}
+  st.wk.forEach(w=>{const o=SERVICES_PORTS[w.port];if(o&&o!=="VLLM"&&o!=="VLLMSwap")m.push(["err","vLLM "+w.name+" is on :"+w.port+", which services.yaml gives to “"+o+"”. get_service_url() routes callers there, not to your worker. Use a free port (8210+)."]);});
+  const seen={};st.wk.forEach(w=>{if(seen[w.port])m.push(["err","Two vLLM workers share port "+w.port+"."]);seen[w.port]=1;});
+  if(st.f["ProjectContext.ProjectName"]!==st.f["ProjectContext.ContainerPrefix"])m.push(["warn","Project name and Container prefix differ — scripts filter containers by prefix and won't find them."]);
+  if(st.f["Core.Profile"]==="AIWorkload"&&st.f["Features.AI.vLLM.Enabled"]===false)m.push(["err","Profile “AIWorkload” needs Features › AI › vLLM enabled."]);
+  if(st.f["Infrastructure.Enabled"]===true)st.nodes.forEach(n=>{if(n.MeshRole==="replica"&&!ip(n.MeshPrimaryHost))m.push(["err","Node “"+(n.Name||"?")+"” is a replica but Primary IP isn't a valid address."]);});
+  if(st.f["Core.ContinueOnError"]===true)m.push(["warn","Continue-on-error hides failures — risky in Production."]);
+  if(st.f["Core.Environment"]==="Production"&&st.f["Core.DebugMode"]===true)m.push(["warn","Debug mode in Production leaks verbose internals."]);
+  if(st.f["Infrastructure.VM.SwitchType"]==="External")m.push(["warn","An External switch needs a real physical NIC bound to it."]);
+  return m;}
+function hi(c){return c.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/(#.*)$/gm,'<span class="tok-cmt">$1</span>').replace(/(\$true|\$false)/g,'<span class="tok-bool">$1</span>').replace(/'([^']*)'/g,"<span class='tok-str'>'$1'</span>").replace(/\b(\d+(?:\.\d+)?)\b/g,'<span class="tok-num">$1</span>').replace(/^(\s*)([A-Za-z_][\w]*) =/gm,'$1<span class="tok-key">$2</span> =');}
+
+let last="";
+function refresh(){
+  st.nodes.forEach(n=>{if(n.HyperVAuth==="certificate"){n.HyperVPort=5986;n.HyperVUseHTTPS=true;}else{n.HyperVPort=5985;n.HyperVUseHTTPS=false;}
+    if(n._i){const need=st.f["Infrastructure.Enabled"]===true&&n.MeshRole==="replica";n._i.style.borderColor=need&&!ip(n.MeshPrimaryHost)?"var(--err)":"var(--line)";}});
+  const gm=$("#gmeter");if(gm){const sum=st.wk.reduce((a,w)=>a+(+w.gpu||0),0);gm.innerHTML="";
+    const l=el("div","lbl");l.append(el("span",null,"Total GPU allocation"));l.append(el("span",null,(sum*100).toFixed(0)+"%"+(sum>1?" · over 100%":"")));
+    const mt=el("div","meter"),i=el("i");i.style.width=Math.min(100,sum*100)+"%";i.style.background=sum>1?"var(--err)":sum>0.92?"var(--warn)":"var(--accent)";mt.append(i);gm.append(l,mt);}
+  last=toPsd1(tree());$("#out").innerHTML=hi(last);
+  const m=validate(),errs=m.filter(x=>x[0]==="err").length,warns=m.filter(x=>x[0]==="warn").length;
+  const vb=$("#valBody");vb.innerHTML="";const s=el("div","status"),p=el("span","pip");p.style.background=errs?"var(--err)":warns?"var(--warn)":"var(--ok)";
+  s.append(p,document.createTextNode(errs?errs+" to fix":warns?warns+" warning"+(warns>1?"s":""):"All clear"));vb.append(s);
+  m.forEach(([l,t])=>{const d=el("div","msg "+l);d.append(el("span","mic",l==="err"?"!":l==="warn"?"▲":"✓"));d.append(el("span",null,t));vb.append(d);});
+  if(!m.length)vb.append(el("div","msg ok","No traps tripped — safe to export."));
+  $("#valcount").textContent=(errs?errs+" err ":"")+(warns?warns+" warn":"")||"clean";
+  const changed=S.reduce((a,sec)=>a+sec.f.filter(f=>!isDef(sec.id+"."+f.k)&&st.f[sec.id+"."+f.k]!=="").length,0)
+    +(st.wk.some((w,i)=>w.port!==WK[i].port||w.gpu!==WK[i].gpu||w.model!==WK[i].model)?1:0);
+  const gpu=(st.wk.reduce((a,w)=>a+(+w.gpu||0),0)*100).toFixed(0);
+  $("#strip").innerHTML="";
+  [["Overrides",changed,""],["Errors",errs,errs?"err":"ok"],["Warnings",warns,warns?"warn":"ok"],["GPU alloc",gpu+"%",gpu>100?"err":gpu>92?"warn":"ok"],["Mesh nodes",st.f["Infrastructure.Enabled"]===true?st.nodes.length:0,""]].forEach(([l,n,cls])=>{const c=el("div","stat "+cls);c.append(el("div","n",String(n)));c.append(el("div","l",l));$("#strip").append(c);});
+  // nav counts + active row edited state
+  $$("#nav a").forEach(a=>{const sec=S.find(x=>x.id===a._sec);if(!sec)return;const n=sec.f.filter(f=>!isDef(sec.id+"."+f.k)&&st.f[sec.id+"."+f.k]!=="").length;a._cnt.textContent=n||"";a._cnt.classList.toggle("hide",!n);});
+  $$("#form .row").forEach(r=>{});
+}
+function applySearch(){const q=$("#search").value.trim().toLowerCase();
+  $$("#form .script-card").forEach(c=>{const hit=!q||(c.dataset.q||"").includes(q);c.style.display=hit?"":"none";if(q&&hit)c.open=true;});
+  $$("#form .row").forEach(r=>{if(!r.dataset.q)return;const hitAdv=$("#advToggle").checked||r.dataset.adv!=="1";r.style.display=(hitAdv&&(!q||r.dataset.q.includes(q)))?"":"none";});}
+function applyAdv(){const show=$("#advToggle").checked;buildNav();applySearch();
+  if(!show&&S.find(s=>s.id===active&&s.adv)){active=S[0].id;render();}}
+
+$("#advToggle").onchange=applyAdv;
+$("#search").oninput=applySearch;
+$("#copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText(last);$("#copyBtn").textContent="Copied";setTimeout(()=>$("#copyBtn").textContent="Copy",1200);}catch(e){}};
+$("#dlBtn").onclick=()=>{const b=new Blob([last],{type:"text/plain"}),a=el("a");a.href=URL.createObjectURL(b);a.download="config.local.psd1";a.click();URL.revokeObjectURL(a.href);};
+$("#resetBtn").onclick=()=>{Object.assign(st.f,{...D});st.wk=WK.map(w=>({...w}));st.casc=Object.fromEntries(CASC.map(p=>[p,true]));st.nodes=[{Name:"aither-rocky-01",MeshRole:"primary",MeshPrimaryHost:"",HyperVAuth:"certificate",CPUs:4,MemoryGB:8}];active=S[0].id;render();};
+$("#themeBtn").onclick=()=>{const r=document.documentElement,cur=r.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");r.setAttribute("data-theme",cur==="dark"?"light":"dark");};
+$("#importBtn").onclick=()=>$("#imp").showModal();
+$("#impClose").onclick=()=>$("#imp").close();
+$("#impLoad").onclick=()=>{try{const o=parsePsd1($("#impText").value);if(!o||typeof o!=="object")throw 0;loadConfig(o);$("#impMsg").textContent="";$("#imp").close();}catch(e){$("#impMsg").textContent="Couldn't parse — make sure it's a @{ … } block.";}};
+const pr=$("#presets");Object.keys(PRESETS).forEach(name=>{const b=el("button",null,name);b.onclick=()=>{Object.entries(PRESETS[name]).forEach(([k,v])=>{if(k in st.f)st.f[k]=v;});render();};pr.append(b);});
+
+// mode tabs (Config sections ⇄ Automation inventory)
+document.querySelectorAll("#modes .mtab").forEach(b=>b.onclick=()=>{MODE=b.dataset.mode;go();});
+// schema file loader — CSP blocks runtime fetch and the schema exceeds the artifact limit,
+// so the user loads config-schema.json (public OR their own private inventory) from disk.
+$("#schemaFile").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;
+  const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result);
+    if(!j||!j.scripts)throw 0;SCHEMA=j;ACAT=null;renderAutomation();
+  }catch(err){$("#valBody").innerHTML="";const m=el("div","msg risk","That file isn't a valid config-schema.json (expected a { scripts: [...] } object). Regenerate with Export-AitherConfigSchema.ps1.");$("#valBody").append(m);}};
+  rd.readAsText(f);e.target.value="";};
+
+go();
+</script>

@@ -1,0 +1,3140 @@
+{
+  "generatedFrom": "C:\\Users\\wzns\\AppData\\Local\\Temp\\claude\\D--AitherOS-Fresh\\69fd749f-4755-40da-8cad-70028d24b4f0\\scratchpad\\_az\\library\\automation-scripts",
+  "scriptCount": 69,
+  "categories": [
+    {
+      "category": "10-devtools",
+      "scripts": 21
+    },
+    {
+      "category": "20-ai-tools",
+      "scripts": 13
+    },
+    {
+      "category": "32-onboarding",
+      "scripts": 1
+    },
+    {
+      "category": "60-monitoring",
+      "scripts": 5
+    },
+    {
+      "category": "70-external-integrations",
+      "scripts": 6
+    },
+    {
+      "category": "70-git",
+      "scripts": 10
+    },
+    {
+      "category": "70-maintenance",
+      "scripts": 4
+    },
+    {
+      "category": "80-testing",
+      "scripts": 8
+    },
+    {
+      "category": "misc",
+      "scripts": 1
+    }
+  ],
+  "scripts": [
+    {
+      "id": "",
+      "name": "_init",
+      "category": "misc",
+      "file": "_init.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Section",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "Key",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "Name",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Core.NonInteractive"
+      ]
+    },
+    {
+      "id": "0769",
+      "name": "Setup-WebDeveloperToolkit",
+      "category": "10-devtools",
+      "file": "10-devtools\\0769_Setup-WebDeveloperToolkit.ps1",
+      "synopsis": "Sets up Aither's Web Developer Toolkit for creating and deploying websites.",
+      "params": [
+        {
+          "name": "InstallCloudflared",
+          "type": "b",
+          "enum": [],
+          "default": "$true",
+          "mandatory": false,
+          "help": "Install cloudflared binary if not present. Default: $true"
+        },
+        {
+          "name": "SetupNeocitiesConfig",
+          "type": "b",
+          "enum": [],
+          "default": "$true",
+          "mandatory": false,
+          "help": "Create neocities.yaml config template. Default: $true"
+        },
+        {
+          "name": "ApiKey",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Neocities API key to configure (optional, can be set later)"
+        },
+        {
+          "name": "SiteName",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Neocities site name (optional, can be set later)"
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Overwrite existing configuration files. Default: $false"
+        },
+        {
+          "name": "SkipCloudflared",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip cloudflared installation check"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1001",
+      "name": "Install-Chocolatey",
+      "category": "10-devtools",
+      "file": "10-devtools\\1001_Install-Chocolatey.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.DevTools",
+        "Features.DevTools.Chocolatey",
+        "Features.DevTools.Chocolatey.CheckForUpdates",
+        "Features.DevTools.Chocolatey.Enabled",
+        "Features.DevTools.Chocolatey.InitialPackages",
+        "Features.DevTools.Chocolatey.InstallPath",
+        "Features.DevTools.Chocolatey.Proxy",
+        "Features.DevTools.Chocolatey.Proxy.Password",
+        "Features.DevTools.Chocolatey.Proxy.Url",
+        "Features.DevTools.Chocolatey.Proxy.Username",
+        "Features.DevTools.Chocolatey.Settings",
+        "Features.DevTools.Chocolatey.Settings.GetEnumerator",
+        "Features.DevTools.Chocolatey.Sources"
+      ]
+    },
+    {
+      "id": "1002",
+      "name": "Install-Git",
+      "category": "10-devtools",
+      "file": "10-devtools\\1002_Install-Git.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1003",
+      "name": "Install-Node",
+      "category": "10-devtools",
+      "file": "10-devtools\\1003_Install-Node.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.Development.Node",
+        "Features.Development.Node.GlobalPackages"
+      ]
+    },
+    {
+      "id": "1004",
+      "name": "Install-Python",
+      "category": "10-devtools",
+      "file": "10-devtools\\1004_Install-Python.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.Development.Python",
+        "Features.Development.Python.Packages",
+        "Features.Development.Python.UpgradePip"
+      ]
+    },
+    {
+      "id": "1005",
+      "name": "Install-VSCode",
+      "category": "10-devtools",
+      "file": "10-devtools\\1005_Install-VSCode.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.Development",
+        "Features.Development.VSCode",
+        "Features.Development.VSCode.Enabled",
+        "Features.Development.VSCode.Extensions"
+      ]
+    },
+    {
+      "id": "1006",
+      "name": "Install-7Zip",
+      "category": "10-devtools",
+      "file": "10-devtools\\1006_Install-7Zip.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.DevTools",
+        "Features.DevTools.SevenZip",
+        "Features.DevTools.SevenZip.Enabled"
+      ]
+    },
+    {
+      "id": "1007",
+      "name": "Install-GitHubCLI",
+      "category": "10-devtools",
+      "file": "10-devtools\\1007_Install-GitHubCLI.ps1",
+      "synopsis": "Install GitHub CLI (gh)",
+      "params": [
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Force reinstallation even if already installed"
+        },
+        {
+          "name": "Configure",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Configure gh after installation (authentication)"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1008",
+      "name": "Install-AzureCLI",
+      "category": "10-devtools",
+      "file": "10-devtools\\1008_Install-AzureCLI.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.Cloud",
+        "Features.Cloud.AzureCLI",
+        "Features.Cloud.AzureCLI.DefaultSettings",
+        "Features.Cloud.AzureCLI.DefaultSettings.Keys",
+        "Features.Cloud.AzureCLI.Enabled",
+        "Features.Cloud.AzureCLI.Extensions"
+      ]
+    },
+    {
+      "id": "1009",
+      "name": "Install-AWSCLI",
+      "category": "10-devtools",
+      "file": "10-devtools\\1009_Install-AWSCLI.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.Cloud",
+        "Features.Cloud.AWSCLI",
+        "Features.Cloud.AWSCLI.DefaultSettings",
+        "Features.Cloud.AWSCLI.DefaultSettings.Keys",
+        "Features.Cloud.AWSCLI.Enabled"
+      ]
+    },
+    {
+      "id": "1010",
+      "name": "Install-GCloudCLI",
+      "category": "10-devtools",
+      "file": "10-devtools\\1010_Install-GCloudCLI.ps1",
+      "synopsis": "Installs Google Cloud SDK (gcloud CLI) for AitherOS cloud deployments.",
+      "params": [
+        {
+          "name": "Method",
+          "type": "e",
+          "enum": [
+            "auto",
+            "winget",
+            "brew",
+            "apt",
+            "yum",
+            "installer"
+          ],
+          "default": "auto",
+          "mandatory": false,
+          "help": "Installation method: auto, winget, brew, apt, installer"
+        },
+        {
+          "name": "Configure",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Run initial configuration after installation"
+        },
+        {
+          "name": "ProjectId",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "GCP Project ID to configure after installation"
+        },
+        {
+          "name": "ShowOutput",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show detailed output"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1013",
+      "name": "Install-VSBuildTools",
+      "category": "10-devtools",
+      "file": "10-devtools\\1013_Install-VSBuildTools.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.DevTools",
+        "Features.DevTools.VSBuildTools",
+        "Features.DevTools.VSBuildTools.Components",
+        "Features.DevTools.VSBuildTools.Enabled",
+        "Features.DevTools.VSBuildTools.ForceReinstall",
+        "Features.DevTools.VSBuildTools.IncludeRecommended",
+        "Features.DevTools.VSBuildTools.InstallPath",
+        "Features.DevTools.VSBuildTools.SetEnvironmentVariables",
+        "Features.DevTools.VSBuildTools.Workloads"
+      ]
+    },
+    {
+      "id": "1014",
+      "name": "Install-VisualCppBuildTools",
+      "category": "10-devtools",
+      "file": "10-devtools\\1014_Install-VisualCppBuildTools.ps1",
+      "synopsis": "Installs Microsoft Visual C++ Build Tools for compiling Python C extensions.",
+      "params": [
+        {
+          "name": "ShowOutput",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show detailed output during installation."
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Force reinstallation even if already installed."
+        },
+        {
+          "name": "Minimal",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Install only the minimal C++ build tools (faster, smaller)."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1015",
+      "name": "Install-Poetry",
+      "category": "10-devtools",
+      "file": "10-devtools\\1015_Install-Poetry.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "Configuration",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.DevTools",
+        "Features.DevTools.Poetry",
+        "Features.DevTools.Poetry.CheckForUpdates",
+        "Features.DevTools.Poetry.Enabled",
+        "Features.DevTools.Poetry.Settings",
+        "Features.DevTools.Poetry.Settings.GetEnumerator",
+        "Features.DevTools.Poetry.Version"
+      ]
+    },
+    {
+      "id": "1016",
+      "name": "Install-Servy",
+      "category": "10-devtools",
+      "file": "10-devtools\\1016_Install-Servy.ps1",
+      "synopsis": "Installs Servy for Windows service management.",
+      "params": [
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": true,
+          "help": "Reinstall even if already present."
+        },
+        {
+          "name": "ShowOutput",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": true,
+          "help": "Show verbose output during installation."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1020",
+      "name": "Install-TestingTools",
+      "category": "10-devtools",
+      "file": "10-devtools\\1020_Install-TestingTools.ps1",
+      "synopsis": "Install testing and validation tools for AitherZero",
+      "params": [
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features"
+      ]
+    },
+    {
+      "id": "1021",
+      "name": "Install-Cosign",
+      "category": "10-devtools",
+      "file": "10-devtools\\1021_Install-Cosign.ps1",
+      "synopsis": "Install Sigstore Cosign",
+      "params": [
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1030",
+      "name": "Invoke-FileSplice",
+      "category": "10-devtools",
+      "file": "10-devtools\\1030_Invoke-FileSplice.ps1",
+      "synopsis": "Splice (replace) a range of lines in a target file with content from a source file or inline text.",
+      "params": [
+        {
+          "name": "TargetFile",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Path to the file being modified (required)."
+        },
+        {
+          "name": "StartLine",
+          "type": "n",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "First line to replace (1-indexed, inclusive, required)."
+        },
+        {
+          "name": "EndLine",
+          "type": "n",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Last line to replace (1-indexed, inclusive, required)."
+        },
+        {
+          "name": "SourceFile",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Path to a file whose content replaces the target range."
+        },
+        {
+          "name": "Content",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Inline string content to splice in (alternative to -SourceFile)."
+        },
+        {
+          "name": "DeleteOnly",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Remove the line range without inserting replacement content."
+        },
+        {
+          "name": "Encoding",
+          "type": "s",
+          "enum": [],
+          "default": "UTF8",
+          "mandatory": false,
+          "help": "File encoding (default: UTF8)."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show what would happen without writing."
+        },
+        {
+          "name": "PassThru",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Return the result object instead of writing host output."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1031",
+      "name": "Invoke-FileGrep",
+      "category": "10-devtools",
+      "file": "10-devtools\\1031_Invoke-FileGrep.ps1",
+      "synopsis": "Search for text or regex patterns inside files (content grep).",
+      "params": [
+        {
+          "name": "Pattern",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Text or regex pattern to look for."
+        },
+        {
+          "name": "Path",
+          "type": "s",
+          "enum": [],
+          "default": "(Get-Location).Path",
+          "mandatory": false,
+          "help": "Root directory to search in (default: current location)."
+        },
+        {
+          "name": "Filter",
+          "type": "s",
+          "enum": [],
+          "default": "*",
+          "mandatory": false,
+          "help": "File glob filter, e.g. \"*.py\", \"*.yaml\" (default: all files)."
+        },
+        {
+          "name": "Regex",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Treat -Pattern as a regular expression."
+        },
+        {
+          "name": "CaseSensitive",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Use case-sensitive matching (default is case-insensitive)."
+        },
+        {
+          "name": "ContextLines",
+          "type": "n",
+          "enum": [],
+          "default": "0",
+          "mandatory": false,
+          "help": "Lines of context before and after each match (default: 0)."
+        },
+        {
+          "name": "MaxResults",
+          "type": "n",
+          "enum": [],
+          "default": "200",
+          "mandatory": false,
+          "help": "Maximum number of matches to return (default: 200)."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1032",
+      "name": "Invoke-FileDiff",
+      "category": "10-devtools",
+      "file": "10-devtools\\1032_Invoke-FileDiff.ps1",
+      "synopsis": "Compare two files or a file vs inline string and show a unified diff.",
+      "params": [
+        {
+          "name": "FileA",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Path to the first (original) file."
+        },
+        {
+          "name": "FileB",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Path to the second file to compare against."
+        },
+        {
+          "name": "ContentB",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Inline string to compare against FileA (used when FileB is omitted)."
+        },
+        {
+          "name": "ContextLines",
+          "type": "n",
+          "enum": [],
+          "default": "3",
+          "mandatory": false,
+          "help": "Number of context lines around changes (default: 3)."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "1033",
+      "name": "Invoke-BulkReplace",
+      "category": "10-devtools",
+      "file": "10-devtools\\1033_Invoke-BulkReplace.ps1",
+      "synopsis": "Find and replace text across multiple files matching a glob pattern.",
+      "params": [
+        {
+          "name": "Find",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Text or regex to search for."
+        },
+        {
+          "name": "Replace",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Replacement text (supports $1, $2 backreferences when -Regex is used)."
+        },
+        {
+          "name": "Path",
+          "type": "s",
+          "enum": [],
+          "default": "(Get-Location).Path",
+          "mandatory": false,
+          "help": "Root directory to search in (default: current location)."
+        },
+        {
+          "name": "Filter",
+          "type": "s",
+          "enum": [],
+          "default": "*",
+          "mandatory": false,
+          "help": "File glob filter, e.g. \"*.yaml\" (default: all files)."
+        },
+        {
+          "name": "Regex",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Treat -Find as a regular expression."
+        },
+        {
+          "name": "CaseSensitive",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Use case-sensitive matching (default: case-insensitive)."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Preview which files would be changed without writing."
+        },
+        {
+          "name": "MaxFiles",
+          "type": "n",
+          "enum": [],
+          "default": "50",
+          "mandatory": false,
+          "help": "Maximum files to modify (safety limit, default: 50)."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0720",
+      "name": "Install-StableDiffusionWebUI",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0720_Install-StableDiffusionWebUI.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "InstallPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "SkipRequirements",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0721",
+      "name": "Configure-SDWebUI-Models",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0721_Configure-SDWebUI-Models.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "InstallPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "ModelSet",
+          "type": "e",
+          "enum": [
+            "Auto",
+            "SD15",
+            "SDXL",
+            "All"
+          ],
+          "default": "Auto",
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0725",
+      "name": "Install-TextGenWebUI",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0725_Install-TextGenWebUI.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "InstallPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "SkipRequirements",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0726",
+      "name": "Install-Fooocus",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0726_Install-Fooocus.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "InstallPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "SkipRequirements",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0728",
+      "name": "Install-SillyTavern",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0728_Install-SillyTavern.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "InstallPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0730",
+      "name": "Install-ComfyUI",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0730_Install-ComfyUI.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "InstallPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "SkipRequirements",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "CudaVersion",
+          "type": "e",
+          "enum": [
+            "11.8",
+            "12.1",
+            "12.4",
+            "12.6",
+            "12.8"
+          ],
+          "default": "12.8",
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0731",
+      "name": "Install-ComfyUI-Models",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0731_Install-ComfyUI-Models.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "InstallPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "ModelSet",
+          "type": "e",
+          "enum": [
+            "All",
+            "Flux",
+            "SDXL",
+            "IPAdapter",
+            "ClipVision"
+          ],
+          "default": "All",
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0733",
+      "name": "Fix-ComfyUI-CUDA",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0733_Fix-ComfyUI-CUDA.ps1",
+      "synopsis": "Fixes common ComfyUI CUDA and PyTorch issues on the local machine.",
+      "params": [
+        {
+          "name": "ComfyPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Path to the ComfyUI installation. Defaults to \"C:\\ComfyUI\"."
+        },
+        {
+          "name": "CudaVersion",
+          "type": "e",
+          "enum": [
+            "11.8",
+            "12.1",
+            "12.4",
+            "12.6",
+            "12.8"
+          ],
+          "default": "12.8",
+          "mandatory": false,
+          "help": "The CUDA version to target for PyTorch. Options: \"11.8\", \"12.1\", \"12.4\", \"12.6\". Default is \"12.4\"."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0734",
+      "name": "Start-ComfyUI",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0734_Start-ComfyUI.ps1",
+      "synopsis": "",
+      "params": [
+        {
+          "name": "InstallPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "Listen",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "Port",
+          "type": "s",
+          "enum": [],
+          "default": "8188",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "VramMode",
+          "type": "e",
+          "enum": [
+            "auto",
+            "high",
+            "normal",
+            "low",
+            "no",
+            "cpu"
+          ],
+          "default": "auto",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "ReserveVramMB",
+          "type": "n",
+          "enum": [],
+          "default": "0",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "CpuVae",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0735",
+      "name": "Install-ComfyUI-Nodes",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0735_Install-ComfyUI-Nodes.ps1",
+      "synopsis": "Installs recommended ComfyUI custom nodes for Wan 2.1 optimization.",
+      "params": [
+        {
+          "name": "InstallPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0737",
+      "name": "Start-Ollama",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0737_Start-Ollama.ps1",
+      "synopsis": "Starts the Ollama service.",
+      "params": [
+        {
+          "name": "ShowOutput",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "Detached",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0740",
+      "name": "Install-Ollama",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0740_Install-Ollama.ps1",
+      "synopsis": "Installs and configures Ollama for local LLM inference.",
+      "params": [
+        {
+          "name": "Model",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "The default model to pull (default: llama3.2-vision)."
+        },
+        {
+          "name": "Port",
+          "type": "n",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "The port to run Ollama on (default: 11434)."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0741",
+      "name": "Setup-LocalLLM",
+      "category": "20-ai-tools",
+      "file": "20-ai-tools\\0741_Setup-LocalLLM.ps1",
+      "synopsis": "Installs and configures local LLM models via Ollama.",
+      "params": [
+        {
+          "name": "Model",
+          "type": "e",
+          "enum": [
+            "llama3.2",
+            "phi3.5",
+            "qwen2.5:3b",
+            "mistral-nemo",
+            "llama3.1:8b",
+            "gemma2:9b",
+            "gemma3",
+            "qwen2.5:7b",
+            "sealion",
+            "dolphin-mistral",
+            "mythomax",
+            "midnight-rose",
+            "nous-hermes2",
+            "llama3.1:70b",
+            "qwen2.5:72b",
+            "mixtral:8x7b",
+            "codellama:13b",
+            "deepseek-coder:6.7b",
+            "solar:10.7b",
+            "yi:34b",
+            "llama3.2-vision",
+            "llava:13b",
+            "nemotron:8b-instruct",
+            "nemotron:51b-instruct-q4_k_m",
+            "nemotron:70b-instruct-q4_k_m"
+          ],
+          "default": "llama3.2",
+          "mandatory": false,
+          "help": "The local model to use. Categories:"
+        },
+        {
+          "name": "SkipVision",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip pulling vision models (llama3.2-vision)."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3214",
+      "name": "Onboard-ClusterNode",
+      "category": "32-onboarding",
+      "file": "32-onboarding\\3214_Onboard-ClusterNode.ps1",
+      "synopsis": "Onboard THIS machine as a secure AitherOS cluster node — cross-platform.",
+      "params": [
+        {
+          "name": "Token",
+          "type": "s",
+          "enum": [],
+          "default": "$env:AITHER_NODE_TOKEN",
+          "mandatory": false,
+          "help": "Single-use enrollment token (minted in the portal \"My Nodes\" or via"
+        },
+        {
+          "name": "Gateway",
+          "type": "s",
+          "enum": [],
+          "default": "$(if ($env:AITHER_CLUSTER_GATEWAY) { $env:AITHER_CLUSTER_GATEWAY } else { 'https://cluster.aitherium.com' })",
+          "mandatory": false,
+          "help": "Gateway the node registers through. Default: https://cluster.aitherium.com"
+        },
+        {
+          "name": "NodeId",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Node identifier. Default: derived from the hostname by the installer."
+        },
+        {
+          "name": "Role",
+          "type": "e",
+          "enum": [
+            "sovereign",
+            "compute",
+            "edge"
+          ],
+          "default": "sovereign",
+          "mandatory": false,
+          "help": "Node role: sovereign (default), compute, or edge."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Preview the installer + flags without changing anything."
+        },
+        {
+          "name": "PassThru",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Return a result object."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0650",
+      "name": "Sync-Observability",
+      "category": "60-monitoring",
+      "file": "60-monitoring\\0650_Sync-Observability.ps1",
+      "synopsis": "Syncs observability data (logs/metrics) to Git for GitHub Pages publishing.",
+      "params": [
+        {
+          "name": "Remote",
+          "type": "s",
+          "enum": [],
+          "default": "origin",
+          "mandatory": false,
+          "help": "The git remote to push to (default: origin)"
+        },
+        {
+          "name": "Branch",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "The branch to push to (default: main)"
+        },
+        {
+          "name": "IntervalSeconds",
+          "type": "n",
+          "enum": [],
+          "default": "0",
+          "mandatory": false,
+          "help": "If set, runs in a loop with sleep interval."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0751",
+      "name": "Generate-SLOReport",
+      "category": "60-monitoring",
+      "file": "60-monitoring\\0751_Generate-SLOReport.ps1",
+      "synopsis": "Generate SLO report from Prometheus metrics and error budget data.",
+      "params": [
+        {
+          "name": "Period",
+          "type": "e",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly"
+          ],
+          "default": "monthly",
+          "mandatory": true,
+          "help": "Report period: \"daily\", \"weekly\", \"monthly\" (default: \"monthly\")"
+        },
+        {
+          "name": "Format",
+          "type": "e",
+          "enum": [
+            "html",
+            "json",
+            "text"
+          ],
+          "default": "html",
+          "mandatory": true,
+          "help": "Output format: \"html\", \"json\", \"text\" (default: \"html\")"
+        },
+        {
+          "name": "OutputPath",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": true,
+          "help": "Path to save report (default: ./reports/slo-report-YYYYMMDD.html)"
+        },
+        {
+          "name": "UploadToStrata",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": true,
+          "help": "Upload report to Strata for archival"
+        },
+        {
+          "name": "PrometheusUrl",
+          "type": "s",
+          "enum": [],
+          "default": "http://localhost:9090",
+          "mandatory": true,
+          "help": "Prometheus URL (default: http://localhost:9090)"
+        },
+        {
+          "name": "Services",
+          "type": "a",
+          "enum": [],
+          "default": "@(\"Genesis\", \"MicroScheduler\", \"Secrets\", \"Veil\", \"Pulse\", \"Chronicle\")",
+          "mandatory": true,
+          "help": "Comma-separated list of services to include (default: all critical services)"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "6050",
+      "name": "Get-ServiceStatus",
+      "category": "60-monitoring",
+      "file": "60-monitoring\\6050_Get-ServiceStatus.ps1",
+      "synopsis": "Shows the status of all AitherOS services.",
+      "params": [
+        {
+          "name": "Detailed",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show detailed metrics for each service."
+        },
+        {
+          "name": "Watch",
+          "type": "n",
+          "enum": [],
+          "default": "0",
+          "mandatory": false,
+          "help": "Continuously monitor services (refresh every N seconds)."
+        },
+        {
+          "name": "Json",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Output as JSON for automation."
+        },
+        {
+          "name": "Source",
+          "type": "e",
+          "enum": [
+            "genesis",
+            "docker"
+          ],
+          "default": "genesis",
+          "mandatory": false,
+          "help": "Status source: \"genesis\" (use Genesis API) or \"docker\" (direct Docker query)."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "6051",
+      "name": "Get-FlightDeck",
+      "category": "60-monitoring",
+      "file": "60-monitoring\\6051_Get-FlightDeck.ps1",
+      "synopsis": "Unified Flight Deck — shows ALL in-flight requests, queues, GPU state, and background processes.",
+      "params": [
+        {
+          "name": "Watch",
+          "type": "n",
+          "enum": [],
+          "default": "0",
+          "mandatory": false,
+          "help": "Continuously refresh every N seconds (0 = single pass)."
+        },
+        {
+          "name": "Json",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Output as JSON for automation."
+        },
+        {
+          "name": "Compact",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Compact output — only show non-empty queues and active work."
+        },
+        {
+          "name": "Sections",
+          "type": "s",
+          "enum": [],
+          "default": "all",
+          "mandatory": false,
+          "help": "Comma-separated list of sections to show. Default: all."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "6052",
+      "name": "Check-VaultHealth",
+      "category": "60-monitoring",
+      "file": "60-monitoring\\6052_Check-VaultHealth.ps1",
+      "synopsis": "Vault health & secret presence check — alerts on missing critical keys.",
+      "params": [
+        {
+          "name": "Keys",
+          "type": "a",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Override the default critical-secret list."
+        },
+        {
+          "name": "NoEmitPulse",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7010",
+      "name": "Setup-ProtonBridge",
+      "category": "70-external-integrations",
+      "file": "70-external-integrations\\7010_Setup-ProtonBridge.ps1",
+      "synopsis": "Fully automated Proton Mail Bridge setup for AitherOS SMTP relay.",
+      "params": [
+        {
+          "name": "ProtonUser",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Proton email address (e.g., user@pm.me or user@proton.me)"
+        },
+        {
+          "name": "ProtonPass",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Proton account password (NOT the Bridge-generated SMTP password — that is extracted automatically)"
+        },
+        {
+          "name": "TotpCode",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "2FA TOTP code if your Proton account has 2FA enabled"
+        },
+        {
+          "name": "SmtpPort",
+          "type": "n",
+          "enum": [],
+          "default": "1025",
+          "mandatory": false,
+          "help": "Bridge SMTP port (default 1025)"
+        },
+        {
+          "name": "FromAddress",
+          "type": "s",
+          "enum": [],
+          "default": "aither@aitherium.com",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "SkipDownload",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip downloading the installer (already have it)"
+        },
+        {
+          "name": "SkipInstall",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip installation (Bridge already installed)"
+        },
+        {
+          "name": "ResendVerification",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "After setup, resend account verification emails via AitherMail"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7012",
+      "name": "Setup-Slack",
+      "category": "70-external-integrations",
+      "file": "70-external-integrations\\7012_Setup-Slack.ps1",
+      "synopsis": "Fully automated Slack bot integration setup for AitherOS.",
+      "params": [
+        {
+          "name": "SlackBotToken",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Slack Bot User OAuth Token (xoxb-...). Required."
+        },
+        {
+          "name": "SlackAppToken",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Slack App-Level Token (xapp-...). Required for Socket Mode."
+        },
+        {
+          "name": "SlackSigningSecret",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Slack Signing Secret for request verification. Required."
+        },
+        {
+          "name": "SkipValidation",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip Slack API validation (useful for offline or air-gapped environments)"
+        },
+        {
+          "name": "SkipDocker",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip Docker service start (credentials-only mode)"
+        },
+        {
+          "name": "HealthCheckAttempts",
+          "type": "n",
+          "enum": [],
+          "default": "30",
+          "mandatory": false,
+          "help": "Number of health check polling attempts (default 30)"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7013",
+      "name": "Setup-WhatsApp",
+      "category": "70-external-integrations",
+      "file": "70-external-integrations\\7013_Setup-WhatsApp.ps1",
+      "synopsis": "Fully automated WhatsApp Cloud API integration setup for AitherOS.",
+      "params": [
+        {
+          "name": "WhatsAppApiToken",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Permanent access token from Meta Developer Console. Required."
+        },
+        {
+          "name": "WhatsAppPhoneNumberId",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Phone Number ID from Meta Developer Console. Required."
+        },
+        {
+          "name": "WhatsAppVerifyToken",
+          "type": "s",
+          "enum": [],
+          "default": "aitheros-whatsapp-verify",
+          "mandatory": false,
+          "help": "Webhook verification token. Optional, defaults to 'aitheros-whatsapp-verify'."
+        },
+        {
+          "name": "WhatsAppBusinessAccountId",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "WhatsApp Business Account ID. Optional, used for template management."
+        },
+        {
+          "name": "SkipValidation",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip Meta API validation (useful for offline or air-gapped environments)"
+        },
+        {
+          "name": "SkipDocker",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip Docker service start (credentials-only mode)"
+        },
+        {
+          "name": "HealthCheckAttempts",
+          "type": "n",
+          "enum": [],
+          "default": "30",
+          "mandatory": false,
+          "help": "Number of health check polling attempts (default 30)"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7040",
+      "name": "Setup-ObsidianVault",
+      "category": "70-external-integrations",
+      "file": "70-external-integrations\\7040_Setup-ObsidianVault.ps1",
+      "synopsis": "Easy-button Obsidian + AitherOS plugin deployment.",
+      "params": [
+        {
+          "name": "VaultPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Explicit vault path. If not set, auto-detects from Obsidian config or uses repo root."
+        },
+        {
+          "name": "SyncData",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Pull existing wiki/KG/memory data into the vault after install."
+        },
+        {
+          "name": "SkipBuild",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip npm install + build (use existing main.js)."
+        },
+        {
+          "name": "SkipRestart",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Don't restart Obsidian after install."
+        },
+        {
+          "name": "CreateVault",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Create a new vault at the specified path if it doesn't exist."
+        },
+        {
+          "name": "BaseUrl",
+          "type": "s",
+          "enum": [],
+          "default": "localhost",
+          "mandatory": false,
+          "help": "AitherOS host (default: localhost)."
+        },
+        {
+          "name": "ApiKey",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "API key for authenticated access. If empty, tries AitherSecrets vault."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7050",
+      "name": "Sync-CloudflareTunnel",
+      "category": "70-external-integrations",
+      "file": "70-external-integrations\\7050_Sync-CloudflareTunnel.ps1",
+      "synopsis": "Sync Cloudflare Named Tunnel ingress from source-of-truth YAML.",
+      "params": [
+        {
+          "name": "ConfigPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Path to tunnel-ingress.yaml. Defaults to repo source-of-truth."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print the diff between current and desired config without applying."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7051",
+      "name": "Patch-CloudflareTunnelRule",
+      "category": "70-external-integrations",
+      "file": "70-external-integrations\\7051_Patch-CloudflareTunnelRule.ps1",
+      "synopsis": "Patch a SINGLE Cloudflare tunnel ingress rule's service, in place.",
+      "params": [
+        {
+          "name": "Hostname",
+          "type": "s",
+          "enum": [],
+          "default": "*.aitherium.com",
+          "mandatory": false,
+          "help": "The ingress hostname to patch (default '*.aitherium.com')."
+        },
+        {
+          "name": "Service",
+          "type": "s",
+          "enum": [],
+          "default": "http://aitheros-veil-lb:3000",
+          "mandatory": false,
+          "help": "The new service URL (default 'http://aitheros-veil-lb:3000')."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show the before/after for the matched rule and exit without applying."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0701",
+      "name": "New-Branch",
+      "category": "70-git",
+      "file": "70-git\\0701_New-Branch.ps1",
+      "synopsis": "Creates a new Git branch from the current or specified base branch.",
+      "params": [
+        {
+          "name": "Name",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Branch name. If it doesn't include a prefix (feature/, fix/, chore/),"
+        },
+        {
+          "name": "Base",
+          "type": "s",
+          "enum": [],
+          "default": "develop",
+          "mandatory": false,
+          "help": "Base branch to create from. Defaults to 'develop'."
+        },
+        {
+          "name": "NoSwitch",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Create the branch but don't switch to it."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0702",
+      "name": "Commit-Changes",
+      "category": "70-git",
+      "file": "70-git\\0702_Commit-Changes.ps1",
+      "synopsis": "Stages and commits changes with a conventional commit message.",
+      "params": [
+        {
+          "name": "Message",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Commit message. Should follow conventional format: type(scope): description"
+        },
+        {
+          "name": "Files",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Specific files/patterns to stage. If omitted, stages all changes."
+        },
+        {
+          "name": "Push",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Push to remote after committing."
+        },
+        {
+          "name": "Remote",
+          "type": "s",
+          "enum": [],
+          "default": "origin",
+          "mandatory": false,
+          "help": "Remote to push to. Default: origin"
+        },
+        {
+          "name": "Branch",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Branch to push. Default: current branch."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0703",
+      "name": "Create-PullRequest",
+      "category": "70-git",
+      "file": "70-git\\0703_Create-PullRequest.ps1",
+      "synopsis": "Creates a GitHub Pull Request using the GitHub CLI.",
+      "params": [
+        {
+          "name": "Title",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "PR title. If omitted, uses the last commit message."
+        },
+        {
+          "name": "Body",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "PR body/description. If omitted, auto-generates from commit log."
+        },
+        {
+          "name": "Base",
+          "type": "s",
+          "enum": [],
+          "default": "develop",
+          "mandatory": false,
+          "help": "Target branch for the PR. Default: develop"
+        },
+        {
+          "name": "Draft",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Create as a draft PR."
+        },
+        {
+          "name": "Labels",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Comma-separated labels to apply."
+        },
+        {
+          "name": "Reviewers",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Comma-separated reviewer usernames."
+        },
+        {
+          "name": "AutoMerge",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Enable auto-merge when checks pass."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0704",
+      "name": "Switch-GitHubAccount",
+      "category": "70-git",
+      "file": "70-git\\0704_Switch-GitHubAccount.ps1",
+      "synopsis": "Switch between GitHub accounts (git identity + gh CLI auth).",
+      "params": [
+        {
+          "name": "Profile",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Which account profile to activate: 'personal' (wizzense) or 'work' (aither-wzns)."
+        },
+        {
+          "name": "Status",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show current identity without changing anything."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0705",
+      "name": "Sync-OpenSource",
+      "category": "70-git",
+      "file": "70-git\\0705_Sync-OpenSource.ps1",
+      "synopsis": "Synchronizes AitherZero with the public open-source repository.",
+      "params": [
+        {
+          "name": "Direction",
+          "type": "e",
+          "enum": [
+            "push",
+            "pull"
+          ],
+          "default": null,
+          "mandatory": false,
+          "help": "'push' to push monorepo changes to public repo."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show what would be done without making changes."
+        },
+        {
+          "name": "Message",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Custom commit message for push operations."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0706",
+      "name": "Sync-AllRepos",
+      "category": "70-git",
+      "file": "70-git\\0706_Sync-AllRepos.ps1",
+      "synopsis": "Commits and pushes changes to ALL repositories in a single operation.",
+      "params": [
+        {
+          "name": "Message",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Commit message. Auto-generates from changes if omitted."
+        },
+        {
+          "name": "SyncPublic",
+          "type": "b",
+          "enum": [],
+          "default": "$true",
+          "mandatory": false,
+          "help": "Also sync to public repos (AitherZero, aither). Default: true"
+        },
+        {
+          "name": "AitherZeroOnly",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Only sync to the AitherZero public repo (skip Alpha)."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show what would happen without executing."
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Force-push subtrees if they've diverged."
+        },
+        {
+          "name": "SkipCommit",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip the commit step (only push/sync existing commits)."
+        },
+        {
+          "name": "Branch",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Branch to push. Default: current branch."
+        },
+        {
+          "name": "PublicBundle",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Optional public bundle manifest name to package before the aither sync."
+        },
+        {
+          "name": "PublicTag",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Optional tag value passed to sync-alpha.yml and bundle packaging."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0707",
+      "name": "Package-PublicRelease",
+      "category": "70-git",
+      "file": "70-git\\0707_Package-PublicRelease.ps1",
+      "synopsis": "Packages a curated public-safe release bundle from the monorepo.",
+      "params": [
+        {
+          "name": "BundleName",
+          "type": "s",
+          "enum": [],
+          "default": "roboflow-local-demo",
+          "mandatory": false,
+          "help": "Name of the bundle manifest without the .manifest.json suffix."
+        },
+        {
+          "name": "Version",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Optional version label for the output folder and zip name."
+        },
+        {
+          "name": "OutputPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Output directory for generated bundles."
+        },
+        {
+          "name": "Tag",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Optional git tag to pass to sync-alpha.yml when TriggerAitherSync is used."
+        },
+        {
+          "name": "Branch",
+          "type": "s",
+          "enum": [],
+          "default": "develop",
+          "mandatory": false,
+          "help": "Branch/ref to use when triggering the GitHub workflow."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show what would be packaged without writing files."
+        },
+        {
+          "name": "SkipZip",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip zip creation after assembling the bundle."
+        },
+        {
+          "name": "TriggerAitherSync",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Trigger sync-alpha.yml after packaging completes."
+        },
+        {
+          "name": "PassThru",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0708",
+      "name": "Setup-AgenticWorkflows",
+      "category": "70-git",
+      "file": "70-git\\0708_Setup-AgenticWorkflows.ps1",
+      "synopsis": "Sets up GitHub Agentic Workflows (gh-aw) with all required secrets and compiled workflows.",
+      "params": [
+        {
+          "name": "Repo",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "GitHub repository in owner/repo format. Default: auto-detected from git remote."
+        },
+        {
+          "name": "CompileOnly",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Only compile workflows, skip secret validation."
+        },
+        {
+          "name": "TestRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "After setup, trigger the test-aitherium-mcp workflow to verify connectivity."
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip confirmation prompts."
+        },
+        {
+          "name": "NonInteractive",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Run in CI mode — skip anything requiring user input, fail on missing secrets."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show what would be done without making changes."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0897",
+      "name": "Import-RoadmapToGitHub",
+      "category": "70-git",
+      "file": "70-git\\0897_Import-RoadmapToGitHub.ps1",
+      "synopsis": "Sync ROADMAP items to/from GitHub via AitherAtlas + AitherFlow.",
+      "params": [
+        {
+          "name": "Direction",
+          "type": "e",
+          "enum": [
+            "roadmap_to_github",
+            "github_to_roadmap",
+            "bidirectional"
+          ],
+          "default": "roadmap_to_github",
+          "mandatory": false,
+          "help": "Sync direction: roadmap_to_github, github_to_roadmap, bidirectional"
+        },
+        {
+          "name": "Scope",
+          "type": "e",
+          "enum": [
+            "active",
+            "full",
+            "section"
+          ],
+          "default": "active",
+          "mandatory": false,
+          "help": "What to sync: active (sprint items), full (entire ROADMAP.md), section"
+        },
+        {
+          "name": "SectionFilter",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Section name filter when Scope=section (e.g. \"AitherSecrets\")"
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Preview changes without applying them."
+        },
+        {
+          "name": "CreateMilestones",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Create GitHub milestones from roadmap sections (default: true)."
+        },
+        {
+          "name": "ShowOutput",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Display verbose output during execution."
+        },
+        {
+          "name": "StatusOnly",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Just show current sync status without making changes."
+        },
+        {
+          "name": "Report",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Generate a sprint/release/health report after sync."
+        },
+        {
+          "name": "ReportType",
+          "type": "e",
+          "enum": [
+            "sprint",
+            "release",
+            "health",
+            "burndown",
+            "velocity"
+          ],
+          "default": "sprint",
+          "mandatory": false,
+          "help": "Report type: sprint, release, health, burndown, velocity"
+        },
+        {
+          "name": "LabelPrefix",
+          "type": "s",
+          "enum": [],
+          "default": "roadmap:",
+          "mandatory": false,
+          "help": "Prefix for auto-created labels (default: \"roadmap:\")"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0898",
+      "name": "Submit-SessionLog",
+      "category": "70-git",
+      "file": "70-git\\0898_Submit-SessionLog.ps1",
+      "synopsis": "Automated IDE session logger for AitherOS.",
+      "params": [
+        {
+          "name": "Summary",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": true,
+          "help": "One-line summary of the session (required)."
+        },
+        {
+          "name": "IDE",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "IDE/tool name (default: auto-detected from $env:TERM_PROGRAM or \"unknown\")."
+        },
+        {
+          "name": "FilesModified",
+          "type": "a",
+          "enum": [],
+          "default": "@()",
+          "mandatory": false,
+          "help": "Array of files modified during the session."
+        },
+        {
+          "name": "FilesCreated",
+          "type": "a",
+          "enum": [],
+          "default": "@()",
+          "mandatory": false,
+          "help": "Array of files created during the session."
+        },
+        {
+          "name": "FilesDeleted",
+          "type": "a",
+          "enum": [],
+          "default": "@()",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "KeyDecisions",
+          "type": "a",
+          "enum": [],
+          "default": "@()",
+          "mandatory": false,
+          "help": "Array of key decisions made during the session."
+        },
+        {
+          "name": "PatternsLearned",
+          "type": "a",
+          "enum": [],
+          "default": "@()",
+          "mandatory": false,
+          "help": "Array of patterns learned during the session."
+        },
+        {
+          "name": "Bullets",
+          "type": "a",
+          "enum": [],
+          "default": "@()",
+          "mandatory": false,
+          "help": "Array of markdown bullet points for the ROADMAP.md session log entry."
+        },
+        {
+          "name": "QualityScore",
+          "type": "n",
+          "enum": [],
+          "default": "0.8",
+          "mandatory": false,
+          "help": "0.0-1.0 quality score for the session (default: 0.8)."
+        },
+        {
+          "name": "Outcome",
+          "type": "e",
+          "enum": [
+            "success",
+            "partial",
+            "failed"
+          ],
+          "default": "success",
+          "mandatory": false,
+          "help": "Session outcome: success, partial, or failed (default: success)."
+        },
+        {
+          "name": "SyncGitHub",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "If set, also runs 0897_Import-RoadmapToGitHub.ps1 after updating ROADMAP."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "If set, prints what would be done without writing anything."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7001",
+      "name": "Cleanup-Docker",
+      "category": "70-maintenance",
+      "file": "70-maintenance\\7001_Cleanup-Docker.ps1",
+      "synopsis": "Cleans up Docker resources to free disk space.",
+      "params": [
+        {
+          "name": "Level",
+          "type": "e",
+          "enum": [
+            "safe",
+            "moderate",
+            "aggressive"
+          ],
+          "default": "safe",
+          "mandatory": false,
+          "help": "Cleanup level: \"safe\", \"moderate\", \"aggressive\". Default: \"safe\""
+        },
+        {
+          "name": "IncludeVolumes",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Include volume cleanup. Default: $false (dangerous!)"
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show what would be cleaned without actually doing it."
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip confirmation prompts."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7002",
+      "name": "Validate-Environment",
+      "category": "70-maintenance",
+      "file": "70-maintenance\\7002_Validate-Environment.ps1",
+      "synopsis": "Validates the AitherOS environment configuration.",
+      "params": [
+        {
+          "name": "Fix",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Attempt to fix issues found. Default: $false"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "9010",
+      "name": "Scan-DiskUsage",
+      "category": "70-maintenance",
+      "file": "70-maintenance\\9010_Scan-DiskUsage.ps1",
+      "synopsis": "Scans local drives for large files and potential cleanup candidates.",
+      "params": [
+        {
+          "name": "Path",
+          "type": "a",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "MinSizeMB",
+          "type": "n",
+          "enum": [],
+          "default": "500",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "ReportPath",
+          "type": "s",
+          "enum": [],
+          "default": "$PSScriptRoot/../../logs/disk-usage-report.json",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "ScanCachesOnly",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "PassThru",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "ShowReport",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Infrastructure.Defaults.DefaultDrive"
+      ]
+    },
+    {
+      "id": "9020",
+      "name": "Optimize-GPUMemory",
+      "category": "70-maintenance",
+      "file": "70-maintenance\\9020_Optimize-GPUMemory.ps1",
+      "synopsis": "Reclaim VRAM and system RAM by killing non-essential GPU/memory consumers.",
+      "params": [
+        {
+          "name": "Mode",
+          "type": "e",
+          "enum": [
+            "VRAM",
+            "RAM",
+            "Full",
+            "Status"
+          ],
+          "default": "VRAM",
+          "mandatory": false,
+          "help": "What to reclaim:"
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Skip confirmation prompt and kill immediately."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show what would be killed without actually doing it."
+        },
+        {
+          "name": "Custom",
+          "type": "a",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Additional process names to kill (comma-separated)."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0402",
+      "name": "Run-UnitTests",
+      "category": "80-testing",
+      "file": "80-testing\\0402_Run-UnitTests.ps1",
+      "synopsis": "Execute unit tests for AitherZero",
+      "params": [
+        {
+          "name": "ResultsPath",
+          "type": "s",
+          "enum": [],
+          "default": "AitherZero/library/tests/results",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "PassThru",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0403",
+      "name": "Run-IntegrationTests",
+      "category": "80-testing",
+      "file": "80-testing\\0403_Run-IntegrationTests.ps1",
+      "synopsis": "Execute integration tests for AitherZero",
+      "params": [
+        {
+          "name": "Path",
+          "type": "s",
+          "enum": [],
+          "default": "(Join-Path (Split-Path (Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent) -Parent) \"tests/integration\")",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "OutputPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "PassThru",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "IncludeE2E",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Features.Testing",
+        "Features.Testing.Pester",
+        "Features.Testing.Pester.Version",
+        "Manifest.FeatureDependencies",
+        "Manifest.FeatureDependencies.Testing",
+        "Manifest.FeatureDependencies.Testing.Pester",
+        "Manifest.FeatureDependencies.Testing.Pester.MinVersion",
+        "Testing.Pester"
+      ]
+    },
+    {
+      "id": "0404",
+      "name": "Run-PSScriptAnalyzer",
+      "category": "80-testing",
+      "file": "80-testing\\0404_Run-PSScriptAnalyzer.ps1",
+      "synopsis": "Run PSScriptAnalyzer on AitherZero codebase",
+      "params": [
+        {
+          "name": "Path",
+          "type": "s",
+          "enum": [],
+          "default": "(Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent)",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "OutputPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "Fast",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "UseCache",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "MaxFiles",
+          "type": "n",
+          "enum": [],
+          "default": "0",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "CoreOnly",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "Fix",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "IncludeSuppressed",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "ExcludePaths",
+          "type": "a",
+          "enum": [],
+          "default": "@('tests')",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "Severity",
+          "type": "a",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "ExcludeRules",
+          "type": "a",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "IncludeRules",
+          "type": "a",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": [
+        "Testing.PSScriptAnalyzer",
+        "Testing.PSScriptAnalyzer.ExcludeRules",
+        "Testing.PSScriptAnalyzer.IncludeRules",
+        "Testing.PSScriptAnalyzer.PSObject.Properties",
+        "Testing.PSScriptAnalyzer.Rules",
+        "Testing.PSScriptAnalyzer.Rules.GetEnumerator",
+        "Testing.PSScriptAnalyzer.Severity"
+      ]
+    },
+    {
+      "id": "0405",
+      "name": "Run-PythonTest",
+      "category": "80-testing",
+      "file": "80-testing\\0405_Run-PythonTest.ps1",
+      "synopsis": "Execute Python pytest tests for AitherOS",
+      "params": [
+        {
+          "name": "Path",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Path to test file or directory. Defaults to AitherOS/tests."
+        },
+        {
+          "name": "Filter",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Pytest -k filter expression (e.g. \"test_eval\" or \"not integration\")."
+        },
+        {
+          "name": "Marker",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Pytest -m marker expression (e.g. \"asyncio\", \"not integration\")."
+        },
+        {
+          "name": "OutputPath",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Path to write JUnit XML results. Auto-generated if not specified."
+        },
+        {
+          "name": "ShowDetail",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Show full pytest output (pytest -v)."
+        },
+        {
+          "name": "Coverage",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Enable coverage reporting via pytest-cov."
+        },
+        {
+          "name": "MaxFail",
+          "type": "n",
+          "enum": [],
+          "default": "0",
+          "mandatory": false,
+          "help": "Stop after N failures (pytest --maxfail)."
+        },
+        {
+          "name": "Fast",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Run with -x (stop on first failure) and no coverage."
+        },
+        {
+          "name": "PassThru",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Return the pytest exit code instead of throwing on failure."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0410",
+      "name": "Audit-OpenSourceReadiness",
+      "category": "80-testing",
+      "file": "80-testing\\0410_Audit-OpenSourceReadiness.ps1",
+      "synopsis": "Audits the AitherZero codebase for content that should not be in the public repo.",
+      "params": [
+        {
+          "name": "Path",
+          "type": "s",
+          "enum": [],
+          "default": "(Join-Path $PSScriptRoot '../../..')",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "FixMode",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "0810",
+      "name": "Validate-MCPServers",
+      "category": "80-testing",
+      "file": "80-testing\\0810_Validate-MCPServers.ps1",
+      "synopsis": "Validates all MCP servers are built, configured, and can start correctly.",
+      "params": [
+        {
+          "name": "Build",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Build the AitherZero MCP server before validation"
+        },
+        {
+          "name": "Start",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Start all MCP servers after validation"
+        },
+        {
+          "name": "Fix",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Attempt to fix common issues automatically"
+        }
+      ],
+      "configKeys": [
+        "Module",
+        "Path",
+        "Port"
+      ]
+    },
+    {
+      "id": "8001",
+      "name": "Test-ServiceHealth",
+      "category": "80-testing",
+      "file": "80-testing\\8001_Test-ServiceHealth.ps1",
+      "synopsis": "Tests the health of AitherOS services.",
+      "params": [
+        {
+          "name": "Services",
+          "type": "a",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Specific services to test. If not specified, tests all running services."
+        },
+        {
+          "name": "Timeout",
+          "type": "n",
+          "enum": [],
+          "default": "10",
+          "mandatory": false,
+          "help": "Timeout in seconds for each health check. Default: 10"
+        },
+        {
+          "name": "Retries",
+          "type": "n",
+          "enum": [],
+          "default": "3",
+          "mandatory": false,
+          "help": "Number of retries for failed checks. Default: 3"
+        },
+        {
+          "name": "Json",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Output results as JSON."
+        },
+        {
+          "name": "FailFast",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Stop on first failure. Default: $false"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "8010",
+      "name": "Benchmark-InferenceModes",
+      "category": "80-testing",
+      "file": "80-testing\\8010_Benchmark-InferenceModes.ps1",
+      "synopsis": "Benchmark all AitherOS inference modes: vLLM vs Ollama vs Hybrid.",
+      "params": [
+        {
+          "name": "Modes",
+          "type": "s",
+          "enum": [],
+          "default": "all",
+          "mandatory": false,
+          "help": "Comma-separated list of modes to benchmark."
+        },
+        {
+          "name": "Quick",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Fast mode: 1 run per test instead of 3."
+        },
+        {
+          "name": "Neurons",
+          "type": "n",
+          "enum": [],
+          "default": "5",
+          "mandatory": false,
+          "help": "Number of parallel neuron agents for concurrent tests. Default: 5."
+        },
+        {
+          "name": "Save",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Save results to JSON and Markdown files."
+        },
+        {
+          "name": "NemotronSize",
+          "type": "e",
+          "enum": [
+            "6b",
+            "9b",
+            "12b"
+          ],
+          "default": "6b",
+          "mandatory": false,
+          "help": "Nemotron model size for vLLM/hybrid modes: 6b, 9b, 12b (default: 6b)."
+        },
+        {
+          "name": "SkipModeSwitch",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Don't switch modes — assume current mode is already set."
+        },
+        {
+          "name": "WarmupSeconds",
+          "type": "n",
+          "enum": [],
+          "default": "15",
+          "mandatory": false,
+          "help": "Seconds to wait after mode switch for model loading. Default: 15."
+        }
+      ],
+      "configKeys": []
+    }
+  ],
+  "playbooks": [
+    {
+      "name": "node-onboard",
+      "file": "node-onboard.psd1"
+    }
+  ]
+}
