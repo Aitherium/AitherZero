@@ -6,9 +6,9 @@
 $current = $PSScriptRoot
 $found = $false
 
-# Walk up the directory tree to find the repo root (marked by AitherZero/AitherZero.psd1)
+# Walk up the directory tree to find the repo root (marked by .PRODUCTS/.AITHERZERO/AitherZero.psd1)
 while ($current -and -not $found) {
-    if (Test-Path (Join-Path $current "AitherZero/AitherZero.psd1")) {
+    if (Test-Path (Join-Path $current ".PRODUCTS/.AITHERZERO/AitherZero.psd1")) {
         $found = $true
         break
     }
@@ -19,13 +19,13 @@ while ($current -and -not $found) {
 
 if (-not $found) {
     # Fallback to env var if set
-    if ($env:AITHERZERO_ROOT -and (Test-Path (Join-Path $env:AITHERZERO_ROOT "AitherZero/AitherZero.psd1"))) {
+    if ($env:AITHERZERO_ROOT -and (Test-Path (Join-Path $env:AITHERZERO_ROOT ".PRODUCTS/.AITHERZERO/AitherZero.psd1"))) {
         $current = $env:AITHERZERO_ROOT
     }
     else {
         $errMsg = "FATAL: Could not locate AitherZero project root from $PSScriptRoot"
         if ($env:AITHERZERO_ROOT) {
-            $errMsg += " (AITHERZERO_ROOT='$env:AITHERZERO_ROOT' does not contain AitherZero/AitherZero.psd1)"
+            $errMsg += " (AITHERZERO_ROOT='$env:AITHERZERO_ROOT' does not contain .PRODUCTS/.AITHERZERO/AitherZero.psd1)"
         }
         Write-Error $errMsg
         throw $errMsg
@@ -36,10 +36,35 @@ if (-not $found) {
 $projectRoot = $current
 
 # 2. Import Core Module
+#
+# D-848 / root cause of D-844 - DO NOT restore the unconditional `-Force`.
+#   Every automation script dot-sources this file, and `Import-Module -Force`
+#   REMOVES the module before re-importing it. When a script is run BY the
+#   module (Invoke-AitherPlaybook lives inside AitherZero while it invokes each
+#   step), that removal destroys the session state of the code that is still
+#   running: the in-flight runner loses every module-PRIVATE function and every
+#   `$script:` variable it had, and dies at its next such reference with
+#   "The term '<X>' is not recognized" - AFTER the step itself completed fine.
+#   Exported functions survive, which is why the failure looked so arbitrary.
+#
+#   So: import only when THIS module is not already loaded. A standalone script
+#   run (nothing loaded) still gets the module exactly as before. `-Force` is
+#   kept for the case where a DIFFERENT AitherZero is loaded from another
+#   checkout, which genuinely must be replaced.
+#
+#   Trade-off, deliberately accepted: if you rebuild the module mid-session, a
+#   script run in that same session keeps the already-loaded copy. Run
+#   `Import-Module <path>\AitherZero.psd1 -Force` yourself, or use a new
+#   session, to pick up a rebuild.
 if ($projectRoot) {
-    $modulePath = Join-Path $projectRoot "AitherZero/AitherZero.psd1"
+    $modulePath = Join-Path $projectRoot ".PRODUCTS/.AITHERZERO/AitherZero.psd1"
     if (Test-Path $modulePath) {
-        Import-Module $modulePath -Force -ErrorAction SilentlyContinue
+        $expectedBase = Split-Path $modulePath -Parent
+        $alreadyLoaded = Get-Module -Name 'AitherZero' |
+            Where-Object { $_.ModuleBase -and ($_.ModuleBase.TrimEnd('\', '/') -eq $expectedBase.TrimEnd('\', '/')) }
+        if (-not $alreadyLoaded) {
+            Import-Module $modulePath -Force -ErrorAction SilentlyContinue
+        }
     }
 }
 

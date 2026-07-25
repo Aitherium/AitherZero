@@ -42,8 +42,13 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-# Import AitherZero module
-Import-Module (Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent) -Force
+# Import AitherZero module.
+# D-848: never -Force over an already-loaded AitherZero. This script runs as a
+# step of the test playbooks, and the re-import destroys the session state of
+# the runner executing it (it loses its module-private functions mid-run).
+if (-not (Get-Module -Name 'AitherZero')) {
+    Import-Module (Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent) -Force
+}
 
 # Determine output path based on mode
 if (-not $OutputPath) {

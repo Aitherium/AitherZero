@@ -182,7 +182,10 @@ try {
         $mainModule = Join-Path $projectRoot "AitherZero.psd1"
     }
 
-    if (Test-Path $mainModule) {
+    # D-848: never -Force over an already-loaded AitherZero. This script runs as
+    # a step of the test playbooks, and the re-import destroys the session state
+    # of the runner executing it (it loses its module-private functions mid-run).
+    if ((Test-Path $mainModule) -and -not (Get-Module -Name 'AitherZero')) {
         try {
             Write-ScriptLog -Level Debug -Message "Loading main module: AitherZero"
             Import-Module $mainModule -Force -ErrorAction Stop -DisableNameChecking

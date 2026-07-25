@@ -593,6 +593,61 @@ function Invoke-AitherPlaybook {
                     # ── end Command-step support ─────────────────────────────
 
                     if (-not $scriptId) { $scriptId = $item }
+
+                    # ── Condition gate for SCRIPT steps (D-849) ──────────────
+                    # `Condition` used to be honored ONLY for Command steps and
+                    # for ForEach-expanded items, so a gate written on an
+                    # ordinary Script step was silently ignored and the step
+                    # ALWAYS ran. That is how `optimize-host -Variables
+                    # @{Report=$true}` — documented as inspect-only — still
+                    # reached its disk-cleanup step.
+                    #
+                    # MIGRATION SAFETY — this gate FAILS OPEN on purpose.
+                    # ~35 existing playbooks carry conditions that were never
+                    # evaluated, and some are not PowerShell at all: mustache
+                    # templates the engine never substitutes ('{{Target}} -eq
+                    # "hyperv"') and the bare word 'Always'. Evaluating those
+                    # THROWS, and skipping on a throw would silently disable
+                    # every hyperv/gke/gce deploy step the moment this shipped.
+                    # So: a cleanly-evaluated $false SKIPS (the declared
+                    # intent); anything that cannot be evaluated RUNS, exactly
+                    # as it did before. This is an execution gate, not a
+                    # security decision — fail-open is the safe direction here.
+                    $stepCondition = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'Condition' } else { $null }
+                    if ($stepCondition -is [string] -and $stepCondition.Trim()) {
+                        $condText = $stepCondition.Trim()
+                        # Legacy non-expressions: an unsubstituted mustache
+                        # placeholder or the sentinel word 'Always'. Both mean
+                        # "run" and must not produce warning noise.
+                        $isLegacyAlways = ($condText -eq 'Always') -or ($condText -like '*{{*')
+                        if (-not $isLegacyAlways) {
+                            $scriptCondPass = $true
+                            try {
+                                foreach ($vk in $mergedVariables.Keys) {
+                                    Set-Variable -Name $vk -Value $mergedVariables[$vk] -Scope Local -Force
+                                }
+                                $scriptCondPass = [bool](Invoke-Expression $condText)
+                            }
+                            catch {
+                                # Cannot evaluate -> preserve legacy behaviour and
+                                # SAY SO, so a broken condition is visible instead
+                                # of quietly gating (or quietly not gating).
+                                Write-AitherLog -Message "Condition '$condText' on step '$scriptId' could not be evaluated ($($_.Exception.Message)) - RUNNING the step (legacy behaviour)" -Level Warning -Source 'Invoke-AitherPlaybook'
+                                $scriptCondPass = $true
+                            }
+                            if (-not $scriptCondPass) {
+                                Write-AitherLog -Message "Skipping script: $scriptId (condition false: $condText)" -Level Information -Source 'Invoke-AitherPlaybook'
+                                $skipped++
+                                $scriptResults += [PSCustomObject]@{
+                                    Script = $scriptId; Success = $true; Duration = [timespan]::Zero
+                                    Output = '(skipped: condition false)'; Error = $null
+                                }
+                                continue
+                            }
+                        }
+                    }
+                    # ── end Condition gate ───────────────────────────────────
+
                     $itemParams = Get-AitherMember $item 'Parameters'
                     if (-not $itemParams) { $itemParams = Get-AitherMember $item 'Params' }
                     $scriptParams = if ($itemParams) { $itemParams.Clone() } else { @{} }
