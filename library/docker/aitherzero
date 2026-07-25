@@ -1,2 +1,0 @@
-#!/bin/bash
-pwsh -File /opt/aitherzero/Start-AitherZero.ps1 "$@"

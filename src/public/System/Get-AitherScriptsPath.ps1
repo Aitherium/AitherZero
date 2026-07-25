@@ -50,6 +50,21 @@ function Get-AitherScriptsPath {
             }
         }
 
+        # CANONICAL layout in the AitherOS monorepo. Without this the upward walk
+        # from the repo root finds nothing (scripts live under .PRODUCTS\.AITHERZERO\,
+        # not ./AitherZero\ or ./library\), so resolution fell through to the depth-5
+        # glob below, which returned whatever sorted first — on a tree containing a
+        # stray worktree/harness copy that is the STALE copy. Every az/playbook call
+        # then silently ran old scripts and reported new ones as "not found" (2026-07-25).
+        $productsDir = Join-Path $current ".PRODUCTS\.AITHERZERO\library\automation-scripts"
+        if (Test-Path $productsDir) {
+            $markerPath = Join-Path $productsDir $marker
+            if (Test-Path $markerPath) {
+                Write-Verbose "Found scripts path via .PRODUCTS canonical search: $productsDir"
+                return $productsDir
+            }
+        }
+
         $parent = Split-Path $current -Parent
         if ($parent -eq $current -or [string]::IsNullOrEmpty($parent)) { break }
         $current = $parent
@@ -84,8 +99,21 @@ function Get-AitherScriptsPath {
 
     # 4. Final deep search from PWD, excluding _archive
     Write-Verbose "Performing final deep search for automation scripts from PWD..."
+    # Deterministic + junk-resistant. Previously this took Select-Object -First 1
+    # off raw enumeration order, so '..claudeworktreestoolcall-harness' (malformed
+    # worktree debris, sorts before '.PRODUCTS') silently won and the whole
+    # toolchain ran STALE scripts.
+    $junkSegment = '[\/]\.\.[^\/]+[\/]'      # a path segment starting with '..'
     $found = Get-ChildItem -Path $PWD.Path -Filter $marker -Recurse -ErrorAction SilentlyContinue -Depth 5 |
-        Where-Object { $_.DirectoryName -notmatch '_archive' -and $_.DirectoryName -notlike '*\_archive\*' } |
+        Where-Object {
+            $d = $_.DirectoryName
+            $d -notmatch '_archive' -and
+            $d -notlike '*\_archive\*' -and
+            $d -notmatch $junkSegment -and
+            $d -notmatch '[\/]\.worktrees[\/]' -and
+            $d -notmatch '[\/]node_modules[\/]'
+        } |
+        Sort-Object @{ Expression = { ($_.FullName -split '[\/]').Count } }, FullName |
         Select-Object -First 1
 
     if ($found) {

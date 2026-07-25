@@ -155,7 +155,7 @@ begin {
     }
 
     $moduleRoot = Get-AitherModuleRoot
-    $logsPath = Join-Path $moduleRoot 'AitherZero/library/logs'
+    $logsPath = Join-Path $moduleRoot 'library/logs'
     $structuredPath = Join-Path $logsPath 'structured'
     $allErrors = @()
 }

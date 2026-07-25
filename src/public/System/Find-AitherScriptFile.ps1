@@ -136,6 +136,34 @@ function Find-AitherScriptFile {
         }
     }
 
+    # 6. Plugin script paths fallback. Registered plugins contribute their leaf
+    #    category dirs (e.g. plugins/<p>/scripts/30-deploy) to
+    #    [AitherPluginState]::ScriptPaths. A ScriptId like '30-deploy/3068_Name'
+    #    resolves against the single library root via its subdir; for plugin leaf
+    #    dirs we match on the final script-name segment instead.
+    if (-not $found) {
+        try { $pluginScriptPaths = [AitherPluginState]::ScriptPaths } catch { $pluginScriptPaths = $null }
+        if ($pluginScriptPaths) {
+            $leafName = ($ScriptId -split '/')[-1]
+            $leafPattern = if ($leafName -match '\.ps1$') { "*$leafName" } else { "*${leafName}*.ps1" }
+            foreach ($pp in $pluginScriptPaths) {
+                if (-not $pp -or -not (Test-Path $pp)) { continue }
+                $ppExact = Join-Path $pp "$leafName.ps1"
+                if (Test-Path $ppExact) {
+                    Write-Verbose "Found in plugin path (exact): $ppExact"
+                    return Get-Item $ppExact
+                }
+                $ppHit = Get-ChildItem -Path $pp -Filter $leafPattern -Recurse -ErrorAction SilentlyContinue |
+                    Where-Object { $_.DirectoryName -notmatch '_archive' } |
+                    Select-Object -First 1
+                if ($ppHit) {
+                    Write-Verbose "Found in plugin path (pattern): $($ppHit.FullName)"
+                    return $ppHit
+                }
+            }
+        }
+    }
+
     Write-Verbose "Find-AitherScriptFile: Searching for '$ScriptId' in '$ScriptsPath'"
     Write-Verbose "Pattern: $pattern"
 

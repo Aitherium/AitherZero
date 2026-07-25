@@ -124,7 +124,7 @@ begin {
     $moduleRoot = Get-AitherModuleRoot
 
     if (-not $OutputPath) {
-        $OutputPath = Join-Path $moduleRoot 'AitherZero/library/logs' 'error-reports'
+        $OutputPath = Join-Path $moduleRoot 'library/logs' 'error-reports'
     }
         if (-not (Test-Path $OutputPath)) {
         New-Item -Path $OutputPath -ItemType Directory -Force | Out-Null

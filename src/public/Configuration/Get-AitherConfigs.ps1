@@ -163,15 +163,11 @@ function Get-AitherConfigs {
         # No need to import aithercore modules
 
         if (-not $ConfigFile) {
-            # Try both possible config locations (handles running from repo root or module dir)
-            $possiblePaths = @(
-                (Join-Path $moduleRoot 'config/config.psd1'),           # When moduleRoot is AitherZero dir
-                (Join-Path $moduleRoot 'AitherZero/config/config.psd1') # When moduleRoot is repo root
-            )
-            $ConfigFile = $possiblePaths | Where-Object { Test-Path $_ } | Select-Object -First 1
-            if (-not $ConfigFile) {
-                # Fallback to standard path if neither exists
-                $ConfigFile = Join-Path $moduleRoot 'AitherZero/config/config.psd1'
+            # Config location (module is now at .PRODUCTS/.AITHERZERO/)
+            $ConfigFile = Join-Path $moduleRoot 'config/config.psd1'
+            if (-not (Test-Path $ConfigFile)) {
+                # Fallback to standard path if not found
+                $ConfigFile = Join-Path $moduleRoot 'config/config.psd1'
             }
         }
         elseif (-not [System.IO.Path]::IsPathRooted($ConfigFile)) {
@@ -194,10 +190,13 @@ function Get-AitherConfigs {
             # Load and merge configuration files
             # Determine base path for config files (handle both repo root and module dir)
             $configBasePath = if (Test-Path (Join-Path $moduleRoot 'config/config.psd1')) {
-                $moduleRoot  # moduleRoot is the AitherZero directory
+                $moduleRoot  # moduleRoot IS the AitherZero module dir
+            }
+            elseif (Test-Path (Join-Path $moduleRoot '.PRODUCTS/.AITHERZERO/config/config.psd1')) {
+                Join-Path $moduleRoot '.PRODUCTS/.AITHERZERO'  # moduleRoot is repo root; module relocated here
             }
             else {
-                Join-Path $moduleRoot 'AitherZero'  # moduleRoot is repo root
+                Join-Path $moduleRoot 'AitherZero'  # legacy repo-root layout (pre-.PRODUCTS relocation)
             }
 
             $baseConfigPath = Join-Path $configBasePath 'config/config.psd1'
@@ -314,7 +313,7 @@ function Get-AitherConfigs {
             }
 
             # Merge domain configurations
-            $domainsPath = Join-Path $moduleRoot 'AitherZero/config/domains'
+            $domainsPath = Join-Path $moduleRoot 'config/domains'
             if (Test-Path $domainsPath) {
                 $domainFiles = Get-ChildItem -Path $domainsPath -Filter '*.psd1' -File
                 foreach ($file in $domainFiles) {

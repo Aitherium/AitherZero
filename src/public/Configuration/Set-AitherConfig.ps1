@@ -195,10 +195,10 @@ begin {
 
     if (-not $Path) {
         if ($Global) {
-            $Path = Join-Path $moduleRoot 'AitherZero/config/config.psd1'
+            $Path = Join-Path $moduleRoot 'config/config.psd1'
         }
         else {
-            $Path = Join-Path $moduleRoot 'AitherZero/config/config.local.psd1'
+            $Path = Join-Path $moduleRoot 'config/config.local.psd1'
         }
     }
     elseif (-not [System.IO.Path]::IsPathRooted($Path)) {

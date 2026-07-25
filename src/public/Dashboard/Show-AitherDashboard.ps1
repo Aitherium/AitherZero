@@ -53,7 +53,7 @@ function Show-AitherDashboard {
             Write-AitherLog -Level Information -Message ("-" * 40) -Source 'Show-AitherDashboard'
 
             # Get latest report
-            $reportPath = Join-Path $ProjectPath "AitherZero/library/tests/reports"
+            $reportPath = Join-Path $ProjectPath ".PRODUCTS/.AITHERZERO/library/tests/reports"
             $latestReport = Get-ChildItem -Path $reportPath -Filter "ProjectReport-*.json" -ErrorAction SilentlyContinue |
                 Sort-Object LastWriteTime -Descending | Select-Object -First 1
 
@@ -79,7 +79,7 @@ function Show-AitherDashboard {
             Write-AitherLog -Level Information -Message "TEST RESULTS" -Source 'Show-AitherDashboard'
             Write-AitherLog -Level Information -Message ("-" * 40) -Source 'Show-AitherDashboard'
 
-            $testResultsPath = Join-Path $ProjectPath "AitherZero/library/tests/results"
+            $testResultsPath = Join-Path $ProjectPath ".PRODUCTS/.AITHERZERO/library/tests/results"
             if (-not (Test-Path $testResultsPath)) {
                 Write-AitherLog -Level Warning -Message "Test results directory not found" -Source 'Show-AitherDashboard'
                 return
@@ -116,7 +116,7 @@ function Show-AitherDashboard {
 
             $logPath = $null
             $searchPaths = @(
-                (Join-Path $ProjectPath "AitherZero/library/logs"),
+                (Join-Path $ProjectPath ".PRODUCTS/.AITHERZERO/library/logs"),
                 (Join-Path $ProjectPath "logs")
             )
 
@@ -166,10 +166,10 @@ function Show-AitherDashboard {
             Write-AitherLog -Level Information -Message "MODULE STATUS" -Source 'Show-AitherDashboard'
             Write-AitherLog -Level Information -Message ("-" * 40) -Source 'Show-AitherDashboard'
 
-            $domains = Get-ChildItem -Path (Join-Path $ProjectPath "AitherZero/src/public") -Directory -ErrorAction SilentlyContinue
+            $domains = Get-ChildItem -Path (Join-Path $ProjectPath ".PRODUCTS/.AITHERZERO/src/public") -Directory -ErrorAction SilentlyContinue
 
             if (-not $domains) {
-                Write-AitherLog -Level Error -Message "No domains found at $(Join-Path $ProjectPath "AitherZero/src/public")" -Source 'Show-AitherDashboard'
+                Write-AitherLog -Level Error -Message "No domains found at $(Join-Path $ProjectPath ".PRODUCTS/.AITHERZERO/src/public")" -Source 'Show-AitherDashboard'
             }
 
             foreach ($domain in $domains) {

@@ -30,20 +30,20 @@ param()
 process { try {
         # 1. Check environment variable first
         if ($env:AITHERZERO_ROOT -and (Test-Path $env:AITHERZERO_ROOT)) {
-            # Validate it looks like a project root (has config.psd1 or AitherZero folder)
-            if ((Test-Path (Join-Path $env:AITHERZERO_ROOT "AitherZero/config/config.psd1")) -or
-                (Test-Path (Join-Path $env:AITHERZERO_ROOT "AitherZero/AitherZero.psd1"))) {
+            # Validate it looks like a project root (has config.psd1 or .PRODUCTS/.AITHERZERO folder)
+            if ((Test-Path (Join-Path $env:AITHERZERO_ROOT ".PRODUCTS/.AITHERZERO/config/config.psd1")) -or
+                (Test-Path (Join-Path $env:AITHERZERO_ROOT ".PRODUCTS/.AITHERZERO/AitherZero.psd1"))) {
                 return $env:AITHERZERO_ROOT
             }
         }
 
         # 2. Try to find from module location
         # If this function is running from the module, we can derive root
-        # Module is usually at <Root>/AitherZero/AitherZero.psm1 or <Root>/AitherZero/bin/AitherZero.psm1
+        # Module is now at <Root>/.PRODUCTS/.AITHERZERO/AitherZero.psm1 or <Root>/.PRODUCTS/.AITHERZERO/bin/AitherZero.psm1
         if ($PSScriptRoot) {
             $testPath = $PSScriptRoot
-            for ($i = 0; $i -lt 4; $i++) {
-                if (Test-Path (Join-Path $testPath "AitherZero/config/config.psd1")) {
+            for ($i = 0; $i -lt 5; $i++) {
+                if (Test-Path (Join-Path $testPath ".PRODUCTS/.AITHERZERO/config/config.psd1")) {
                     return $testPath
                 }
                 $testPath = Split-Path $testPath -Parent
@@ -55,7 +55,7 @@ process { try {
         $currentPath = Get-Location
         $testPath = $currentPath.Path
         while ($testPath) {
-            if (Test-Path (Join-Path $testPath "AitherZero/config/config.psd1")) {
+            if (Test-Path (Join-Path $testPath ".PRODUCTS/.AITHERZERO/config/config.psd1")) {
                 return $testPath
             }
             $parent = Split-Path $testPath -Parent

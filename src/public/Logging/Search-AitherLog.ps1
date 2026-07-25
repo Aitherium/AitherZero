@@ -167,7 +167,7 @@ param(
 
 begin {
     $moduleRoot = Get-AitherModuleRoot
-    $logsPath = Join-Path $moduleRoot 'AitherZero/library/logs'
+    $logsPath = Join-Path $moduleRoot 'library/logs'
 
     if (-not $Path) {
         if ($AllLogs) {

@@ -235,10 +235,35 @@ function Invoke-AitherScript {
                 $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.ParameterAst] }, $true) |
                 ForEach-Object {
                     $paramName = $_.Name.VariablePath.UserPath
+                    # StrictMode-safe Mandatory extraction. The previous one-liner
+                    # (`.Attributes.Where({…}).Attributes.Where({…}).Argument.Value`)
+                    # chained `.Attributes` onto a collection, which throws a
+                    # property-not-found TERMINATING error under Set-StrictMode -Latest.
+                    # That error propagated out of the ForEach-Object and was caught by
+                    # the function-level catch, making Get-ScriptParameters return an
+                    # EMPTY map for EVERY script — which in turn disabled the param
+                    # filter below (playbook phases then failed with "a parameter cannot
+                    # be found that matches parameter name 'App'").
+                    $paramMandatory = $false
+                    try {
+                        foreach ($attr in @($_.Attributes)) {
+                            if ($attr.TypeName -and $attr.TypeName.Name -eq 'Parameter' -and $attr.NamedArguments) {
+                                foreach ($na in @($attr.NamedArguments)) {
+                                    if ($na.ArgumentName -eq 'Mandatory') {
+                                        $paramMandatory = ($na.Argument.Extent.Text -match '\$true')
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch { $paramMandatory = $false }
                     $paramInfo = @{
                         Name      = $paramName
-                        Type      = if ($_.TypeName) { $_.TypeName.FullName } else { 'object' }
-                        Mandatory = $_.Attributes.Where({ $_.TypeName.Name -eq 'Parameter' }).Attributes.Where({ $_.NamedArguments.ArgumentName -eq 'Mandatory' }).Argument.Value -eq $true
+                        # ParameterAst has NO .TypeName property (that access threw
+                        # "property 'TypeName' cannot be found" under StrictMode and made
+                        # this whole parse fail). The resolved type is .StaticType.
+                        Type      = if ($_.StaticType) { $_.StaticType.FullName } else { 'object' }
+                        Mandatory = $paramMandatory
                         Help      = ''
                     }
 
@@ -297,6 +322,23 @@ function Invoke-AitherScript {
 
             # Handle hashtable
             if ($Arguments -is [hashtable]) {
+                # Filter to only parameters the target script actually DECLARES.
+                # The playbook engine merges ALL playbook variables (App, Node,
+                # PlanOnly, ...) into every script's param bag; splatting an
+                # undeclared key onto `& $scriptPath @paramHash` throws
+                # "A parameter cannot be found that matches parameter name 'App'".
+                # When we know the declared params (AST parse succeeded), drop the
+                # extras. If AST parse returned nothing, pass through unchanged so
+                # we never accidentally strip everything.
+                if ($ScriptParams -and $ScriptParams.Keys.Count -gt 0) {
+                    $filtered = @{}
+                    foreach ($k in $Arguments.Keys) {
+                        if ($ScriptParams.ContainsKey($k)) {
+                            $filtered[$k] = $Arguments[$k]
+                        }
+                    }
+                    return $filtered
+                }
                 return $Arguments
             }
 
@@ -470,6 +512,29 @@ function Invoke-AitherScript {
                 $argsToUse = if ($Arguments) { $Arguments } else { $Parameters }
                 $paramHash = Format-Arguments -Arguments $argsToUse -ScriptParams $scriptParams
 
+                # Drop any argument the target script does NOT declare. The playbook
+                # runner merges the whole shared variable bag (App/Node/PlanOnly/…) into
+                # every phase's parameters; splatting an undeclared key to `& $script`
+                # throws "a parameter cannot be found that matches parameter name '…'".
+                # Source the declared-parameter set from PowerShell's OWN command
+                # metadata ((Get-Command <script>).Parameters) — authoritative and
+                # StrictMode-safe — rather than the custom AST walker, which can return
+                # an empty map and silently disable this filter.
+                $declaredKeys = $null
+                try {
+                    $cmdInfo = Get-Command -Name $scriptPath -CommandType ExternalScript -ErrorAction Stop
+                    if ($cmdInfo -and $cmdInfo.Parameters) { $declaredKeys = @($cmdInfo.Parameters.Keys) }
+                }
+                catch { $declaredKeys = $null }
+                if ((-not $declaredKeys -or $declaredKeys.Count -eq 0) -and $scriptParams -and $scriptParams.Count -gt 0) {
+                    $declaredKeys = @($scriptParams.Keys)
+                }
+                if ($declaredKeys -and $declaredKeys.Count -gt 0) {
+                    foreach ($__k in @($paramHash.Keys)) {
+                        if ($declaredKeys -notcontains $__k) { $paramHash.Remove($__k) }
+                    }
+                }
+
                 # Add OutputPath if specified
                 if ($OutputPath) {
                     $paramHash['OutputPath'] = $OutputPath
@@ -557,6 +622,14 @@ function Invoke-AitherScript {
 
                     if ($PSCmdlet.ShouldProcess($scriptPath, "Execute script")) {
                         & $scriptPath @paramHash
+                        # NOTE: a script's `exit N` is deliberately NOT converted to a
+                        # failure here. $LASTEXITCODE cannot distinguish a script's own
+                        # `exit N` from a benign native command inside the script setting
+                        # a non-zero code (native-bleed), so throwing on it caused false
+                        # failures for unrelated playbooks. Real errors throw and are
+                        # caught below; phases that must hard-stop rely on that + their
+                        # own fail-closed guards (e.g. 0312 refuses to apply if 0107 did
+                        # not produce the cert files).
                     }
                 }
                 finally {

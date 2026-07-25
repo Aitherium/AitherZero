@@ -99,49 +99,48 @@ function Register-AitherPlugin {
             }
         }
 
-        # 1b. Cross-plugin port conflict detection
-        if ($overlay -and $overlay.Services -and $overlay.Services.Ports) {
-            foreach ($existingPlugin in $script:RegisteredPlugins.Values) {
-                $existingPorts = $existingPlugin.Manifest.Services.Ports
-                if (-not $existingPorts) {
-                    # Check from merged config if plugin had ports (resolve from stored overlay)
-                    continue
-                }
-                # No action needed — config overlay was already merged.
-                # Just check if the incoming plugin shares ports with an already-loaded plugin.
-            }
-
-            # Check for actual port collisions with already-registered plugins
+        # 1b. Cross-plugin port conflict detection (best-effort, StrictMode-safe).
+        # Every member access below goes through Get-AitherMember because these
+        # are optional hashtable keys — bare `$overlay.Services` / `$manifest.Services`
+        # THROW under Set-StrictMode -Version Latest when the key is absent, which
+        # previously aborted registration whenever any already-registered plugin's
+        # manifest lacked a Services block.
+        $overlayServices = Get-AitherMember $overlay 'Services'
+        $overlayPorts = Get-AitherMember $overlayServices 'Ports'
+        if ($overlayPorts -is [System.Collections.IDictionary]) {
+            # Map incoming plugin's ports -> service name
             $newPorts = @{}
-            foreach ($key in $overlay.Services.Ports.Keys) {
-                $newPorts[$overlay.Services.Ports[$key]] = $key
+            foreach ($key in $overlayPorts.Keys) {
+                $newPorts[$overlayPorts[$key]] = $key
             }
 
             foreach ($existingPlugin in $script:RegisteredPlugins.Values) {
-                if (-not $existingPlugin.Manifest) { continue }
-                $epOverlayPath = if ($existingPlugin.Manifest.ConfigOverlay) {
-                    Join-Path $existingPlugin.Path $existingPlugin.Manifest.ConfigOverlay
-                }
-                if ($epOverlayPath -and (Test-Path $epOverlayPath)) {
-                    try {
-                        $epOverlay = Import-PowerShellDataFile -Path $epOverlayPath
-                        if ($epOverlay.Services -and $epOverlay.Services.Ports) {
-                            foreach ($epKey in $epOverlay.Services.Ports.Keys) {
-                                $epPort = $epOverlay.Services.Ports[$epKey]
-                                if ($newPorts.ContainsKey($epPort)) {
-                                    $conflictService = $newPorts[$epPort]
-                                    Write-Warning (
-                                        "Port conflict: plugin '$pluginName' service '$conflictService' " +
-                                        "and plugin '$($existingPlugin.Name)' service '$epKey' " +
-                                        "both use port $epPort. Containers/networks are isolated, " +
-                                        "but host port bindings will collide."
-                                    )
-                                }
+                $epManifest = Get-AitherMember $existingPlugin 'Manifest'
+                if (-not $epManifest) { continue }
+                $epConfigOverlay = Get-AitherMember $epManifest 'ConfigOverlay'
+                $epPath = Get-AitherMember $existingPlugin 'Path'
+                if (-not $epConfigOverlay -or -not $epPath) { continue }
+                $epOverlayPath = Join-Path $epPath $epConfigOverlay
+                if (-not (Test-Path $epOverlayPath)) { continue }
+                try {
+                    $epOverlay = Import-PowerShellDataFile -Path $epOverlayPath
+                    $epPorts = Get-AitherMember (Get-AitherMember $epOverlay 'Services') 'Ports'
+                    if ($epPorts -is [System.Collections.IDictionary]) {
+                        foreach ($epKey in $epPorts.Keys) {
+                            $epPort = $epPorts[$epKey]
+                            if ($newPorts.ContainsKey($epPort)) {
+                                $conflictService = $newPorts[$epPort]
+                                Write-Warning (
+                                    "Port conflict: plugin '$pluginName' service '$conflictService' " +
+                                    "and plugin '$(Get-AitherMember $existingPlugin 'Name')' service '$epKey' " +
+                                    "both use port $epPort. Containers/networks are isolated, " +
+                                    "but host port bindings will collide."
+                                )
                             }
                         }
-                    } catch {
-                        # Non-fatal — can't read existing overlay
                     }
+                } catch {
+                    # Non-fatal — can't read existing overlay
                 }
             }
         }
@@ -153,7 +152,7 @@ function Register-AitherPlugin {
                 $fullScriptPath = Join-Path $resolvedPath $scriptPath
                 if (Test-Path $fullScriptPath) {
                     [AitherPluginState]::ScriptPaths.Add($fullScriptPath)
-                    $registeredScripts += (Get-ChildItem -Path $fullScriptPath -Filter '*.ps1' -Recurse).Count
+                    $registeredScripts += @(Get-ChildItem -Path $fullScriptPath -Filter '*.ps1' -Recurse).Count
                     Write-Verbose "  Registered script path: $fullScriptPath"
                 }
             }
@@ -165,7 +164,7 @@ function Register-AitherPlugin {
             foreach ($funcPath in $manifest.FunctionPaths) {
                 $fullFuncPath = Join-Path $resolvedPath $funcPath
                 if (Test-Path $fullFuncPath) {
-                    $funcFiles = Get-ChildItem -Path $fullFuncPath -Filter '*.ps1' -Recurse
+                    $funcFiles = @(Get-ChildItem -Path $fullFuncPath -Filter '*.ps1' -Recurse)
                     foreach ($funcFile in $funcFiles) {
                         try {
                             . $funcFile.FullName
@@ -186,7 +185,7 @@ function Register-AitherPlugin {
                 $fullPlaybookPath = Join-Path $resolvedPath $playbookPath
                 if (Test-Path $fullPlaybookPath) {
                     [AitherPluginState]::PlaybookPaths.Add($fullPlaybookPath)
-                    $registeredPlaybooks += (Get-ChildItem -Path $fullPlaybookPath -Filter '*.psd1' -Recurse).Count
+                    $registeredPlaybooks += @(Get-ChildItem -Path $fullPlaybookPath -Filter '*.psd1' -Recurse).Count
                     Write-Verbose "  Registered playbook path: $fullPlaybookPath"
                 }
             }

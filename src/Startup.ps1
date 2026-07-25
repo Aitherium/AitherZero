@@ -2,11 +2,11 @@
 $script:ModuleRoot = $PSScriptRoot
 # Adjust ProjectRoot calculation based on location
 if ((Split-Path $PSScriptRoot -Leaf) -eq 'bin') {
-    # If running from bin/, we need to go up two levels to get to repo root
-    $script:ProjectRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    # If running from bin/, we need to go up three levels to get to repo root (.PRODUCTS/.AITHERZERO/bin)
+    $script:ProjectRoot = Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
 } else {
-    # If running from module root (AitherZero/), we need to go up one level
-    $script:ProjectRoot = Split-Path $PSScriptRoot -Parent
+    # If running from module root (.PRODUCTS/.AITHERZERO/), we need to go up two levels
+    $script:ProjectRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 }
 
 # Set environment variables
@@ -54,7 +54,7 @@ $script:TranscriptEnabled = -not $isTestOrCIMode
 
 # Start PowerShell transcription for complete activity logging (if enabled)
 if ($script:TranscriptEnabled) {
-    $transcriptPath = Join-Path $script:ProjectRoot 'AitherZero/library/logs' "transcript-$(Get-Date -Format 'yyyy-MM-dd').log"
+    $transcriptPath = Join-Path $script:ModuleRoot 'library/logs' "transcript-$(Get-Date -Format 'yyyy-MM-dd').log"
     $logsDir = Split-Path $transcriptPath -Parent
     if (-not (Test-Path $logsDir)) {
         New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
