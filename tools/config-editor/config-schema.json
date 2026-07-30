@@ -1,6 +1,6 @@
 {
   "generatedFrom": "automation-scripts",
-  "scriptCount": 69,
+  "scriptCount": 71,
   "categories": [
     {
       "category": "10-devtools",
@@ -28,7 +28,7 @@
     },
     {
       "category": "70-maintenance",
-      "scripts": 4
+      "scripts": 6
     },
     {
       "category": "80-testing",
@@ -2546,6 +2546,106 @@
           "default": null,
           "mandatory": false,
           "help": "Attempt to fix issues found. Default: $false"
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7003",
+      "name": "Repair-DeployRoot",
+      "category": "70-maintenance",
+      "file": "70-maintenance/7003_Repair-DeployRoot.ps1",
+      "synopsis": "Diagnose and self-heal drift between the repo tree and the tree the fleet DEPLOYS FROM.",
+      "params": [
+        {
+          "name": "Fix",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Apply the safe repairs. Without it the script only reports (exit 1 on drift)."
+        },
+        {
+          "name": "Json",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Emit a machine-readable result for a routine or alert path."
+        },
+        {
+          "name": "SkipRecreate",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Diagnose and reconcile files, but never recreate a container. Use when a build or"
+        },
+        {
+          "name": "MountsOnly",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Check ONLY that declared source-tree mounts are attached to the running containers,"
+        },
+        {
+          "name": "SelfTest",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Prove the checks can fail, using throwaway repos. Needs no fleet."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "7004",
+      "name": "Register-DeployRootSelfHeal",
+      "category": "70-maintenance",
+      "file": "70-maintenance/7004_Register-DeployRootSelfHeal.ps1",
+      "synopsis": "Register 7003_Repair-DeployRoot as an unattended self-heal task, and page when it cannot fix.",
+      "params": [
+        {
+          "name": "IntervalMinutes",
+          "type": "n",
+          "enum": [],
+          "default": "240",
+          "mandatory": false,
+          "help": "How often to re-check after logon. Default 240 (matches the debt-gate-probe routine, so"
+        },
+        {
+          "name": "TaskName",
+          "type": "s",
+          "enum": [],
+          "default": "AitherOS-DeployRootSelfHeal",
+          "mandatory": false,
+          "help": "Scheduled task name. Default 'AitherOS-DeployRootSelfHeal'."
+        },
+        {
+          "name": "NoFix",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Register in report-only mode (no -Fix). Use to observe before letting it repair."
+        },
+        {
+          "name": "Unregister",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Remove the task."
+        },
+        {
+          "name": "SelfTest",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Verify the generated command line and paging payload without touching the scheduler."
         }
       ],
       "configKeys": []
