@@ -3456,6 +3456,10 @@
       "file": "bootstrap-bonsai-device.psd1"
     },
     {
+      "name": "comfyui-backend",
+      "file": "comfyui-backend.psd1"
+    },
+    {
       "name": "node-onboard",
       "file": "node-onboard.psd1"
     }
