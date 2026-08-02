@@ -1,6 +1,6 @@
 {
   "generatedFrom": "automation-scripts",
-  "scriptCount": 71,
+  "scriptCount": 75,
   "categories": [
     {
       "category": "10-devtools",
@@ -12,7 +12,7 @@
     },
     {
       "category": "32-onboarding",
-      "scripts": 1
+      "scripts": 5
     },
     {
       "category": "60-monitoring",
@@ -1296,6 +1296,225 @@
           "default": null,
           "mandatory": false,
           "help": "Return a result object."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3250",
+      "name": "Install-ComfyUI",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3250_Install-ComfyUI.ps1",
+      "synopsis": "Install ComfyUI (image-generation backend) on a self-hosted node — venv, deps, CUDA-aware torch.",
+      "params": [
+        {
+          "name": "InstallRoot",
+          "type": "s",
+          "enum": [],
+          "default": "(Join-Path $HOME 'ComfyUI')",
+          "mandatory": false,
+          "help": "Where ComfyUI is cloned. Default: $HOME\\ComfyUI. The models tree lives under <InstallRoot>\\models."
+        },
+        {
+          "name": "Ref",
+          "type": "s",
+          "enum": [],
+          "default": "master",
+          "mandatory": false,
+          "help": "Git ref (branch/tag/sha) to check out. Default: master. Pin a sha for reproducible deploys."
+        },
+        {
+          "name": "TorchIndex",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Override the torch wheel index (e.g. https://download.pytorch.org/whl/cu130). Omit to auto-detect"
+        },
+        {
+          "name": "PythonExe",
+          "type": "s",
+          "enum": [],
+          "default": "python",
+          "mandatory": false,
+          "help": "Python interpreter to build the venv from. Default: the `python` on PATH (must be 3.10–3.12)."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Plan mode: show what would change, make no changes."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3251",
+      "name": "Fetch-ImageModelPack",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3251_Fetch-ImageModelPack.ps1",
+      "synopsis": "Download a default SFW SDXL checkpoint into a ComfyUI models tree — the image twin of 3243.",
+      "params": [
+        {
+          "name": "ModelsRoot",
+          "type": "s",
+          "enum": [],
+          "default": "(Join-Path $HOME 'ComfyUI\\models')",
+          "mandatory": false,
+          "help": "ComfyUI models root. Default: $HOME\\ComfyUI\\models. Checkpoints land in <ModelsRoot>\\checkpoints."
+        },
+        {
+          "name": "Pack",
+          "type": "e",
+          "enum": [
+            "sdxl-sfw",
+            "minimal"
+          ],
+          "default": "sdxl-sfw",
+          "mandatory": false,
+          "help": "Which pack to fetch. 'sdxl-sfw' (default): one general SDXL checkpoint + the SDXL VAE."
+        },
+        {
+          "name": "Url",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Override the checkpoint download URL (e.g. a self-hosted mirror or a Civitai/HF link). When set,"
+        },
+        {
+          "name": "Sha256",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Expected SHA256 of the checkpoint, for exact verification."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Plan mode: show what would be fetched, download nothing."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3252",
+      "name": "Start-ComfyUI",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3252_Start-ComfyUI.ps1",
+      "synopsis": "Start ComfyUI bound to the node's tailnet/LAN interface, with a proven-reachable /system_stats.",
+      "params": [
+        {
+          "name": "InstallRoot",
+          "type": "s",
+          "enum": [],
+          "default": "(Join-Path $HOME 'ComfyUI')",
+          "mandatory": false,
+          "help": "ComfyUI install dir (from 3250). Default: $HOME\\ComfyUI."
+        },
+        {
+          "name": "ListenHost",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Address to bind. Default: auto-detect the tailnet IP (100.64.*), else the LAN IP (192.168.*)."
+        },
+        {
+          "name": "Port",
+          "type": "n",
+          "enum": [],
+          "default": "8188",
+          "mandatory": false,
+          "help": "Listen port. Default: 8188 (ComfyUI default; matches the resolver's nodeComfyUrl fallback)."
+        },
+        {
+          "name": "AllowPublicBind",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Permit a non-private ListenHost. Off by default; ComfyUI's API is unauthenticated."
+        },
+        {
+          "name": "Stop",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Stop a ComfyUI started by this script (by port)."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Plan mode: show what would change, start nothing."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3253",
+      "name": "Register-ImageBackend",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3253_Register-ImageBackend.ps1",
+      "synopsis": "Register this node's ComfyUI as the caller's image backend so Canvas/Iris route jobs to it.",
+      "params": [
+        {
+          "name": "Address",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "The ComfyUI address advertised to the fleet (the SAME one 3252 bound). Default: auto-detect"
+        },
+        {
+          "name": "Port",
+          "type": "n",
+          "enum": [],
+          "default": "8188",
+          "mandatory": false,
+          "help": "ComfyUI port (from 3252). Default: 8188."
+        },
+        {
+          "name": "NodeName",
+          "type": "s",
+          "enum": [],
+          "default": "[System.Net.Dns]::GetHostName()",
+          "mandatory": false,
+          "help": "Friendly node name. Default: the machine hostname. The system keys on name+tenant."
+        },
+        {
+          "name": "PortalUrl",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Authenticated Veil edge base (e.g. https://portal.aitherium.com). Preferred path: the register goes"
+        },
+        {
+          "name": "SessionCookie",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "The aither_auth session cookie value for -PortalUrl (from an interactive login). Required with"
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Plan mode: show the exact request, send nothing."
         }
       ],
       "configKeys": []
