@@ -15,7 +15,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='Georgia,serif' font-weight='700' fill='%237FDBEA'>Ai</text></svg>">
 <style>/* ═══════════════════════════════════════════════════════════════════════════
    AITHERIUM WEB DESIGN LANGUAGE — canonical static-page stylesheet
-   @element-tokens v1
+   @element-tokens v2
 
    Source of truth for every public-facing STATIC page (GitHub Pages landing
    sites, generated docs). Tokens are extracted from the live aitherium.com
@@ -29,6 +29,12 @@
    Class contract (the generator's template depends on these):
      .wrap nav .brand .eyebrow .lede .cta .btn .btn-p .btn-s
      .code .grid .card .stats .stat .note footer .el h1 .g
+   v2 adds:
+     --accent (+ -a04/-a10/-a30/-a50/-glow) .... per-experience accent, set per repo
+     .uni .uni-stage .uni-canvas .uni-nodes .orb .orb.here ... the universe strip
+     .exp .exp .glyph ......................... the experience badge
+     .panel .panel-hd .field .field-row .chips .chip
+     .rows .row-item .empty .kv .bar-cmp .steps  live artifacts
    ═══════════════════════════════════════════════════════════════════════════ */
 
 *,*::before,*::after{box-sizing:border-box}
@@ -52,6 +58,20 @@
   --coral:oklch(0.78 0.14 25);
   --ok:var(--mint);
   --warn:oklch(0.80 0.15 85);
+
+  /* ─── per-experience accent ───────────────────────────────────────────
+     Each public repo is a named EXPERIENCE with its own accent, the same way
+     every sovereign agent on aitherium.com has one (agent-theme.ts: demiurge
+     is "The Forge", #f97316). The generator overrides this whole block per
+     repo; everything below themes off it, so a repo's identity is one edit
+     rather than a forked stylesheet. Defaults are the cyan house colour, so
+     an un-themed page still looks correct. */
+  --accent:oklch(0.80 0.13 195);
+  --accent-a04:oklch(0.80 0.13 195 / 4%);
+  --accent-a10:oklch(0.80 0.13 195 / 10%);
+  --accent-a30:oklch(0.80 0.13 195 / 30%);
+  --accent-a50:oklch(0.80 0.13 195 / 50%);
+  --accent-glow:oklch(0.80 0.13 195 / 18%);
 
   /* ─── signature gradients (cyan → blue → purple) ─── */
   --creation:linear-gradient(135deg,oklch(0.75 0.14 195),oklch(0.60 0.16 250),oklch(0.65 0.16 290));
@@ -79,8 +99,8 @@ body{
 body::before{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:
-    linear-gradient(oklch(0.80 0.13 195 / 4%) 1px,transparent 1px),
-    linear-gradient(90deg,oklch(0.80 0.13 195 / 4%) 1px,transparent 1px);
+    linear-gradient(var(--accent-a04) 1px,transparent 1px),
+    linear-gradient(90deg,var(--accent-a04) 1px,transparent 1px);
   background-size:80px 80px;
   -webkit-mask-image:radial-gradient(ellipse 60% 40% at 50% 12%,black 20%,transparent 70%);
   mask-image:radial-gradient(ellipse 60% 40% at 50% 12%,black 20%,transparent 70%);
@@ -94,9 +114,9 @@ body::after{
 }
 
 .wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 24px}
-a{color:var(--cyan);text-decoration:none}
+a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
-:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:4px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 
 /* ─── nav: sticky glass panel ─── */
 nav{
@@ -116,24 +136,26 @@ nav .wrap{display:flex;align-items:center;gap:18px;height:60px}
 }
 nav .sp{flex:1}
 nav a.nl{color:var(--tx-2);font-size:.9rem;font-weight:500}
-nav a.nl:hover{color:var(--cyan);text-decoration:none}
+nav a.nl:hover{color:var(--accent);text-decoration:none}
 @media(max-width:640px){nav a.nl.hide-sm{display:none}}
 
 /* ─── hero ─── */
 header{padding:88px 0 64px;position:relative}
 .eyebrow{
   display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);
-  font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);
-  border:1px solid oklch(0.80 0.13 195 / 30%);border-radius:999px;padding:5px 12px;
+  font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  border:1px solid var(--accent-a30);border-radius:999px;padding:5px 12px;
   margin-bottom:22px;
   background:oklch(0.12 0.02 250 / 60%);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
 }
 .eyebrow .dot{
-  width:6px;height:6px;border-radius:50%;background:var(--mint);
-  box-shadow:0 0 8px var(--mint);
+  width:6px;height:6px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 8px var(--accent);
+  animation:pulse-dot 2.4s ease-in-out infinite;
 }
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.45}}
 h1{
   font-family:var(--font-display);
   font-size:clamp(2.4rem,6vw,4rem);font-weight:700;line-height:1.08;
@@ -163,7 +185,7 @@ h1 .g{
   backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);
 }
-.btn-s:hover{background:oklch(1 0 0 / 10%);border-color:oklch(0.80 0.13 195 / 50%);color:var(--cyan)}
+.btn-s:hover{background:oklch(1 0 0 / 10%);border-color:var(--accent-a50);color:var(--accent)}
 
 /* ─── code blocks: glass with gradient hairline ─── */
 .code{
@@ -187,14 +209,14 @@ h1 .g{
   font-size:.845rem;line-height:1.75;color:var(--foreground);
 }
 .code .c{color:var(--tx-muted)}
-.code .k{color:var(--cyan)}
+.code .k{color:var(--accent)}
 .code .s{color:var(--mint)}
 .copy{
   position:absolute;top:8px;right:10px;background:transparent;
   border:1px solid oklch(1 0 0 / 12%);color:var(--tx-muted);border-radius:7px;
   padding:4px 9px;font-size:.7rem;cursor:pointer;font-family:var(--mono);transition:.16s;
 }
-.copy:hover{color:var(--cyan);border-color:oklch(0.80 0.13 195 / 50%)}
+.copy:hover{color:var(--accent);border-color:var(--accent-a50)}
 
 /* ─── sections ─── */
 section{padding:64px 0;border-top:1px solid oklch(1 0 0 / 6%)}
@@ -218,14 +240,14 @@ h2{
 }
 .card:hover{
   transform:translateY(-2px);
-  border-color:oklch(0.80 0.13 195 / 30%);
-  box-shadow:0 8px 32px oklch(0 0 0 / 40%),0 0 20px oklch(0.55 0.15 200 / 10%),
+  border-color:var(--accent-a30);
+  box-shadow:0 8px 32px oklch(0 0 0 / 40%),0 0 20px var(--accent-glow),
     inset 0 1px 0 oklch(1 0 0 / 8%);
 }
 .card h3{margin:0 0 8px;font-size:1.03rem;font-weight:600;letter-spacing:-0.012em}
 .card p{margin:0;color:var(--tx-2);font-size:.92rem;line-height:1.7}
 .card .ico{
-  font-family:var(--mono);font-size:.7rem;color:var(--lavender);letter-spacing:.14em;
+  font-family:var(--mono);font-size:.7rem;color:var(--accent);letter-spacing:.14em;
   text-transform:uppercase;display:block;margin-bottom:10px;
 }
 
@@ -275,6 +297,170 @@ footer a{color:var(--tx-2)}
   background:var(--creation);-webkit-background-clip:text;background-clip:text;color:transparent;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE UNIVERSE STRIP
+   The four public repos are organs of one system, and until now nothing on
+   the pages said so — the nav linked Features / Quick start / GitHub and
+   stopped. This renders the constellation on EVERY page: the current repo lit
+   and centred, its siblings dimmed but reachable. The links are real anchors
+   in the HTML, so it works with JS off; universe.js only adds the drifting
+   flight paths behind them.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.uni{position:relative;padding:38px 0 30px;border-top:1px solid oklch(1 0 0 / 6%)}
+.uni h2{font-size:clamp(1.15rem,2.2vw,1.4rem);margin-bottom:4px}
+.uni .sub{margin-bottom:22px;font-size:.92rem}
+/* The top band is deliberate empty room: the flight paths arc UP out of the orb
+   row into it. Without it the curves are drawn underneath the cards and are
+   invisible except in the 12px gutters, which looked like the canvas was dead. */
+.uni-stage{position:relative;min-height:190px;padding-top:52px}
+.uni-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.uni-nodes{
+  position:relative;z-index:1;display:grid;gap:12px;
+  grid-template-columns:repeat(auto-fit,minmax(146px,1fr));
+}
+.orb{
+  position:relative;
+  display:flex;flex-direction:column;gap:6px;padding:15px 14px;
+  border-radius:var(--radius);text-align:left;
+  background:oklch(0.12 0.02 250 / 55%);
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border:1px solid oklch(1 0 0 / 7%);
+  transition:all .28s cubic-bezier(0.16,1,0.3,1);
+}
+.orb:hover{
+  text-decoration:none;transform:translateY(-3px);
+  border-color:var(--accent-a30);
+  box-shadow:0 10px 30px oklch(0 0 0 / 40%),0 0 22px var(--accent-glow);
+}
+.orb .k{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tx-muted);display:flex;align-items:center;gap:7px;
+}
+.orb .k::before{
+  content:"";width:7px;height:7px;border-radius:50%;flex:none;
+  background:var(--orb,var(--tx-muted));box-shadow:0 0 9px var(--orb,transparent);
+}
+.orb .n{font-weight:600;font-size:.96rem;color:var(--foreground);letter-spacing:-0.01em}
+.orb .d{font-size:.79rem;color:var(--tx-muted);line-height:1.5}
+/* you are here */
+.orb.here{
+  border-color:var(--accent-a50);
+  background:oklch(0.14 0.03 250 / 70%);
+  box-shadow:0 0 0 1px var(--accent-a30),0 10px 34px var(--accent-glow);
+}
+.orb.here .n{color:var(--accent)}
+/* A pill on the top edge, not an ::after inside .k — inline it wrapped onto
+   three lines and made the lit card taller than every sibling. */
+.orb.here::after{
+  content:"you are here";position:absolute;top:-8px;left:14px;
+  font-family:var(--mono);font-size:.56rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--background);background:var(--accent);
+  padding:3px 8px;border-radius:999px;white-space:nowrap;
+}
+
+/* ─── experience badge: this repo's name in the estate ─── */
+/* display:flex, not inline-flex — inline it sat on the same line as .eyebrow
+   and the two badges read as one run-on chip. */
+.exp{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+  font-family:var(--font-display);font-size:.9rem;letter-spacing:.04em;
+  color:var(--tx-2);
+}
+.exp .glyph{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:9px;font-size:.95rem;
+  background:var(--accent-a10);border:1px solid var(--accent-a30);
+}
+.exp b{color:var(--accent);font-weight:700}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIVE ARTIFACTS
+   Each repo's page carries one real, interactive thing built from the payload
+   being published — a browsable catalogue, a composer, a calculator — instead
+   of six paragraphs of feature copy telling you to go and run `ls`.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.panel{
+  background:oklch(0.10 0.02 250 / 60%);
+  backdrop-filter:blur(20px) saturate(170%);
+  -webkit-backdrop-filter:blur(20px) saturate(170%);
+  border:1px solid oklch(1 0 0 / 8%);
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:0 8px 32px oklch(0 0 0 / 30%);
+}
+.panel-hd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:13px 16px;border-bottom:1px solid oklch(1 0 0 / 8%);
+  background:oklch(0.08 0.02 250 / 50%);
+}
+.panel-hd .t{font-family:var(--mono);font-size:.74rem;color:var(--tx-muted);letter-spacing:.06em}
+.panel-hd .sp{flex:1}
+.count{font-family:var(--mono);font-size:.74rem;color:var(--accent)}
+
+.field{
+  width:100%;padding:10px 13px;border-radius:9px;font-family:var(--font);font-size:.9rem;
+  background:oklch(0.06 0.015 250 / 70%);color:var(--foreground);
+  border:1px solid oklch(1 0 0 / 10%);
+}
+.field::placeholder{color:var(--tx-muted)}
+.field:focus{outline:none;border-color:var(--accent-a50);box-shadow:0 0 0 3px var(--accent-a10)}
+.field-row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));padding:16px}
+.field-row label{display:block;font-size:.74rem;color:var(--tx-muted);margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:.09em;font-family:var(--mono)}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px;padding:12px 16px;border-bottom:1px solid oklch(1 0 0 / 6%)}
+.chip{
+  font-family:var(--mono);font-size:.71rem;padding:5px 11px;border-radius:999px;cursor:pointer;
+  background:oklch(1 0 0 / 4%);border:1px solid oklch(1 0 0 / 9%);color:var(--tx-2);
+  transition:.18s;
+}
+.chip:hover{border-color:var(--accent-a30);color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent-a10);border-color:var(--accent-a50);color:var(--accent)}
+
+.rows{max-height:432px;overflow-y:auto}
+.row-item{
+  display:block;width:100%;text-align:left;padding:13px 16px;cursor:pointer;
+  border:0;border-bottom:1px solid oklch(1 0 0 / 5%);
+  background:transparent;color:inherit;font-family:var(--font);transition:.16s;
+}
+.row-item:hover{background:var(--accent-a10);text-decoration:none}
+.row-item .n{display:block;font-weight:600;font-size:.9rem;color:var(--foreground)}
+.row-item .d{display:block;font-size:.8rem;color:var(--tx-muted);line-height:1.55;margin-top:3px}
+.row-item .tag{
+  font-family:var(--mono);font-size:.65rem;color:var(--accent);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.empty{padding:34px 16px;text-align:center;color:var(--tx-muted);font-size:.88rem}
+
+/* key→value readout (calculator results, composed manifests) */
+.kv{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));padding:16px}
+.kv .cell{padding:13px;border-radius:10px;background:oklch(1 0 0 / 3%);border:1px solid oklch(1 0 0 / 7%)}
+.kv .cell .l{display:block;font-size:.68rem;color:var(--tx-muted);text-transform:uppercase;
+  letter-spacing:.1em;font-family:var(--mono)}
+.kv .cell .v{display:block;font-family:var(--mono);font-size:1.22rem;font-weight:700;margin-top:5px;
+  background:var(--creation);-webkit-background-clip:text;background-clip:text;color:transparent}
+.kv .cell.flat .v{background:none;color:var(--foreground);-webkit-text-fill-color:currentColor}
+
+/* compression / ratio bar */
+.bar-cmp{padding:0 16px 16px}
+.bar-cmp .track{height:9px;border-radius:99px;background:oklch(1 0 0 / 6%);overflow:hidden;margin-bottom:7px}
+.bar-cmp .fill{height:100%;background:var(--creation);border-radius:99px;transition:width .35s ease}
+.bar-cmp .lbl{display:flex;justify-content:space-between;font-family:var(--mono);
+  font-size:.71rem;color:var(--tx-muted)}
+
+/* ordered step sequence (playbooks) */
+.steps{list-style:none;margin:0;padding:16px;display:flex;flex-direction:column;gap:0}
+.steps li{position:relative;padding:0 0 16px 26px;font-size:.87rem;color:var(--tx-2)}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{
+  content:"";position:absolute;left:0;top:5px;width:9px;height:9px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 8px var(--accent-glow);
+}
+.steps li:not(:last-child)::after{
+  content:"";position:absolute;left:4px;top:16px;bottom:2px;width:1px;background:oklch(1 0 0 / 12%);
+}
+.steps li b{color:var(--foreground);font-weight:600}
+
 /* ─── motion ─── */
 @keyframes fade-in-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 header .wrap>*{animation:fade-in-up .6s ease-out both}
@@ -291,18 +477,23 @@ header .wrap>*:nth-child(6){animation-delay:.25s}
 ::-webkit-scrollbar-thumb{background:oklch(0.25 0.03 250);border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:oklch(0.35 0.05 260)}
 </style>
+<style>:root{--accent:oklch(0.82 0.12 165);--accent-a04:oklch(0.82 0.12 165 / 4%);--accent-a10:oklch(0.82 0.12 165 / 10%);--accent-a30:oklch(0.82 0.12 165 / 30%);--accent-a50:oklch(0.82 0.12 165 / 50%);--accent-glow:oklch(0.82 0.12 165 / 18%);}</style>
 </head>
 <body>
 <nav><div class="wrap">
   <a class="brand" href="https://aitherium.com"><span class="ai">Ai</span><span>Aitherium</span></a>
   <span class="sp"></span>
-  <a class="nl hide-sm" href="#features">Features</a>
+  <a class="nl hide-sm" href="#catalogue">Catalogue</a>
   <a class="nl hide-sm" href="#start">Quick start</a>
+  <a class="nl" href="#universe">The estate</a>
   <a class="nl" href="https://github.com/Aitherium/AitherZero">GitHub</a>
 </div></nav>
 
 <header><div class="wrap">
   <div class="eyebrow"><span class="dot"></span>PowerShell 7+ · MIT</div>
+  <div class="exp"><span class="glyph">⊙</span>
+    <span>You are in <b>The Range</b> — What shall we automate?</span>
+  </div>
   <h1>Automation that is <span class="g">discoverable</span></h1>
   <p class="lede">Numbered, self-describing scripts and declarative playbooks. Every script carries its own metadata, so you can search the catalogue instead of remembering filenames.</p>
   <div class="cta">
@@ -319,6 +510,8 @@ cd AitherZero
 <span class="k">Get-AitherScript</span></pre></div>
   <div class="stats"><div class="stat"><span class="v">77</span><span class="l">scripts</span></div><div class="stat"><span class="v">8</span><span class="l">categories</span></div><div class="stat"><span class="v">7+</span><span class="l">pwsh version</span></div><div class="stat"><span class="v">MIT</span><span class="l">license</span></div></div>
 </div></header>
+
+<section id="catalogue"><div class="wrap"><h2>The catalogue, in this page</h2><p class="sub">Every numbered script in the public distribution, with the synopsis parsed out of the file itself. Filter by category or search the descriptions; each row opens the script on GitHub.</p><div class="panel" data-catalogue="77"><div class="panel-hd"><span class="t">get-aitherscript</span><span class="sp"></span><span class="count js-count">77 of 77</span></div><div class="field-row"><div><label for="cat-q">search</label><input class="field js-q" id="cat-q" type="search" placeholder="search scripts, e.g. git, docker, test" autocomplete="off"></div></div><div class="chips"><button class="chip" type="button" aria-pressed="false" data-tag="10-devtools">10-devtools</button><button class="chip" type="button" aria-pressed="false" data-tag="20-ai-tools">20-ai-tools</button><button class="chip" type="button" aria-pressed="false" data-tag="32-onboarding">32-onboarding</button><button class="chip" type="button" aria-pressed="false" data-tag="60-monitoring">60-monitoring</button><button class="chip" type="button" aria-pressed="false" data-tag="70-external-integrations">70-external-integrations</button><button class="chip" type="button" aria-pressed="false" data-tag="70-git">70-git</button><button class="chip" type="button" aria-pressed="false" data-tag="70-maintenance">70-maintenance</button><button class="chip" type="button" aria-pressed="false" data-tag="80-testing">80-testing</button></div><div class="rows"><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/0769_Setup-WebDeveloperToolkit.ps1" data-tag="10-devtools" data-search="0769 setup-webdevelopertoolkit sets up aither&#x27;s web developer toolkit for creating and deploying websites. 10-devtools"><span class="n">0769 Setup-WebDeveloperToolkit</span><span class="d">Sets up Aither&#x27;s Web Developer Toolkit for creating and deploying websites.</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1001_Install-Chocolatey.ps1" data-tag="10-devtools" data-search="1001 install-chocolatey  10-devtools"><span class="n">1001 Install-Chocolatey</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1002_Install-Git.ps1" data-tag="10-devtools" data-search="1002 install-git  10-devtools"><span class="n">1002 Install-Git</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1003_Install-Node.ps1" data-tag="10-devtools" data-search="1003 install-node  10-devtools"><span class="n">1003 Install-Node</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1004_Install-Python.ps1" data-tag="10-devtools" data-search="1004 install-python  10-devtools"><span class="n">1004 Install-Python</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1005_Install-VSCode.ps1" data-tag="10-devtools" data-search="1005 install-vscode  10-devtools"><span class="n">1005 Install-VSCode</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1006_Install-7Zip.ps1" data-tag="10-devtools" data-search="1006 install-7zip  10-devtools"><span class="n">1006 Install-7Zip</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1007_Install-GitHubCLI.ps1" data-tag="10-devtools" data-search="1007 install-githubcli install github cli (gh) 10-devtools"><span class="n">1007 Install-GitHubCLI</span><span class="d">Install GitHub CLI (gh)</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1008_Install-AzureCLI.ps1" data-tag="10-devtools" data-search="1008 install-azurecli  10-devtools"><span class="n">1008 Install-AzureCLI</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1009_Install-AWSCLI.ps1" data-tag="10-devtools" data-search="1009 install-awscli  10-devtools"><span class="n">1009 Install-AWSCLI</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1010_Install-GCloudCLI.ps1" data-tag="10-devtools" data-search="1010 install-gcloudcli installs google cloud sdk (gcloud cli) for aitheros cloud deployments. 10-devtools"><span class="n">1010 Install-GCloudCLI</span><span class="d">Installs Google Cloud SDK (gcloud CLI) for AitherOS cloud deployments.</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1011_Install-Kubectl.ps1" data-tag="10-devtools" data-search="1011 install-kubectl installs kubectl (kubernetes cli). 10-devtools"><span class="n">1011 Install-Kubectl</span><span class="d">Installs kubectl (Kubernetes CLI).</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1012_Install-Helm.ps1" data-tag="10-devtools" data-search="1012 install-helm installs helm (kubernetes package manager). 10-devtools"><span class="n">1012 Install-Helm</span><span class="d">Installs Helm (Kubernetes Package Manager).</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1013_Install-VSBuildTools.ps1" data-tag="10-devtools" data-search="1013 install-vsbuildtools  10-devtools"><span class="n">1013 Install-VSBuildTools</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1014_Install-VisualCppBuildTools.ps1" data-tag="10-devtools" data-search="1014 install-visualcppbuildtools installs microsoft visual c++ build tools for compiling python c extensions. 10-devtools"><span class="n">1014 Install-VisualCppBuildTools</span><span class="d">Installs Microsoft Visual C++ Build Tools for compiling Python C extensions.</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1015_Install-Poetry.ps1" data-tag="10-devtools" data-search="1015 install-poetry  10-devtools"><span class="n">1015 Install-Poetry</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1016_Install-Servy.ps1" data-tag="10-devtools" data-search="1016 install-servy installs servy for windows service management. 10-devtools"><span class="n">1016 Install-Servy</span><span class="d">Installs Servy for Windows service management.</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1020_Install-TestingTools.ps1" data-tag="10-devtools" data-search="1020 install-testingtools install testing and validation tools for aitherzero 10-devtools"><span class="n">1020 Install-TestingTools</span><span class="d">Install testing and validation tools for AitherZero</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1021_Install-Cosign.ps1" data-tag="10-devtools" data-search="1021 install-cosign install sigstore cosign 10-devtools"><span class="n">1021 Install-Cosign</span><span class="d">Install Sigstore Cosign</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1030_Invoke-FileSplice.ps1" data-tag="10-devtools" data-search="1030 invoke-filesplice splice (replace) a range of lines in a target file with content from a source file or inline text. 10-devtools"><span class="n">1030 Invoke-FileSplice</span><span class="d">Splice (replace) a range of lines in a target file with content from a source file or inline text.</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1031_Invoke-FileGrep.ps1" data-tag="10-devtools" data-search="1031 invoke-filegrep search for text or regex patterns inside files (content grep). 10-devtools"><span class="n">1031 Invoke-FileGrep</span><span class="d">Search for text or regex patterns inside files (content grep).</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1032_Invoke-FileDiff.ps1" data-tag="10-devtools" data-search="1032 invoke-filediff compare two files or a file vs inline string and show a unified diff. 10-devtools"><span class="n">1032 Invoke-FileDiff</span><span class="d">Compare two files or a file vs inline string and show a unified diff.</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/10-devtools/1033_Invoke-BulkReplace.ps1" data-tag="10-devtools" data-search="1033 invoke-bulkreplace find and replace text across multiple files matching a glob pattern. 10-devtools"><span class="n">1033 Invoke-BulkReplace</span><span class="d">Find and replace text across multiple files matching a glob pattern.</span><span class="tag">10-devtools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0720_Install-StableDiffusionWebUI.ps1" data-tag="20-ai-tools" data-search="0720 install-stablediffusionwebui  20-ai-tools"><span class="n">0720 Install-StableDiffusionWebUI</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0721_Configure-SDWebUI-Models.ps1" data-tag="20-ai-tools" data-search="0721 configure-sdwebui-models  20-ai-tools"><span class="n">0721 Configure-SDWebUI-Models</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0725_Install-TextGenWebUI.ps1" data-tag="20-ai-tools" data-search="0725 install-textgenwebui  20-ai-tools"><span class="n">0725 Install-TextGenWebUI</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0726_Install-Fooocus.ps1" data-tag="20-ai-tools" data-search="0726 install-fooocus  20-ai-tools"><span class="n">0726 Install-Fooocus</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0728_Install-SillyTavern.ps1" data-tag="20-ai-tools" data-search="0728 install-sillytavern  20-ai-tools"><span class="n">0728 Install-SillyTavern</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0730_Install-ComfyUI.ps1" data-tag="20-ai-tools" data-search="0730 install-comfyui  20-ai-tools"><span class="n">0730 Install-ComfyUI</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0731_Install-ComfyUI-Models.ps1" data-tag="20-ai-tools" data-search="0731 install-comfyui-models  20-ai-tools"><span class="n">0731 Install-ComfyUI-Models</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0733_Fix-ComfyUI-CUDA.ps1" data-tag="20-ai-tools" data-search="0733 fix-comfyui-cuda fixes common comfyui cuda and pytorch issues on the local machine. 20-ai-tools"><span class="n">0733 Fix-ComfyUI-CUDA</span><span class="d">Fixes common ComfyUI CUDA and PyTorch issues on the local machine.</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0734_Start-ComfyUI.ps1" data-tag="20-ai-tools" data-search="0734 start-comfyui  20-ai-tools"><span class="n">0734 Start-ComfyUI</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0735_Install-ComfyUI-Nodes.ps1" data-tag="20-ai-tools" data-search="0735 install-comfyui-nodes installs recommended comfyui custom nodes for wan 2.1 optimization. 20-ai-tools"><span class="n">0735 Install-ComfyUI-Nodes</span><span class="d">Installs recommended ComfyUI custom nodes for Wan 2.1 optimization.</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0737_Start-Ollama.ps1" data-tag="20-ai-tools" data-search="0737 start-ollama starts the ollama service. 20-ai-tools"><span class="n">0737 Start-Ollama</span><span class="d">Starts the Ollama service.</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0740_Install-Ollama.ps1" data-tag="20-ai-tools" data-search="0740 install-ollama installs and configures ollama for local llm inference. 20-ai-tools"><span class="n">0740 Install-Ollama</span><span class="d">Installs and configures Ollama for local LLM inference.</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/20-ai-tools/0741_Setup-LocalLLM.ps1" data-tag="20-ai-tools" data-search="0741 setup-localllm installs and configures local llm models via ollama. 20-ai-tools"><span class="n">0741 Setup-LocalLLM</span><span class="d">Installs and configures local LLM models via Ollama.</span><span class="tag">20-ai-tools</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/32-onboarding/3214_Onboard-ClusterNode.ps1" data-tag="32-onboarding" data-search="3214 onboard-clusternode onboard this machine as a secure aitheros cluster node — cross-platform. 32-onboarding"><span class="n">3214 Onboard-ClusterNode</span><span class="d">Onboard THIS machine as a secure AitherOS cluster node — cross-platform.</span><span class="tag">32-onboarding</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/32-onboarding/3250_Install-ComfyUI.ps1" data-tag="32-onboarding" data-search="3250 install-comfyui install comfyui (image-generation backend) on a self-hosted node — venv, deps, cuda-aware torch. 32-onboarding"><span class="n">3250 Install-ComfyUI</span><span class="d">Install ComfyUI (image-generation backend) on a self-hosted node — venv, deps, CUDA-aware torch.</span><span class="tag">32-onboarding</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/32-onboarding/3251_Fetch-ImageModelPack.ps1" data-tag="32-onboarding" data-search="3251 fetch-imagemodelpack download a default sfw sdxl checkpoint into a comfyui models tree — the image twin of 3243. 32-onboarding"><span class="n">3251 Fetch-ImageModelPack</span><span class="d">Download a default SFW SDXL checkpoint into a ComfyUI models tree — the image twin of 3243.</span><span class="tag">32-onboarding</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/32-onboarding/3252_Start-ComfyUI.ps1" data-tag="32-onboarding" data-search="3252 start-comfyui start comfyui bound to the node&#x27;s tailnet/lan interface, with a proven-reachable /system_stats. 32-onboarding"><span class="n">3252 Start-ComfyUI</span><span class="d">Start ComfyUI bound to the node&#x27;s tailnet/LAN interface, with a proven-reachable /system_stats.</span><span class="tag">32-onboarding</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/32-onboarding/3253_Register-ImageBackend.ps1" data-tag="32-onboarding" data-search="3253 register-imagebackend register this node&#x27;s comfyui as the caller&#x27;s image backend so canvas/iris route jobs to it. 32-onboarding"><span class="n">3253 Register-ImageBackend</span><span class="d">Register this node&#x27;s ComfyUI as the caller&#x27;s image backend so Canvas/Iris route jobs to it.</span><span class="tag">32-onboarding</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/60-monitoring/0650_Sync-Observability.ps1" data-tag="60-monitoring" data-search="0650 sync-observability syncs observability data (logs/metrics) to git for github pages publishing. 60-monitoring"><span class="n">0650 Sync-Observability</span><span class="d">Syncs observability data (logs/metrics) to Git for GitHub Pages publishing.</span><span class="tag">60-monitoring</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/60-monitoring/0751_Generate-SLOReport.ps1" data-tag="60-monitoring" data-search="0751 generate-sloreport generate slo report from prometheus metrics and error budget data. 60-monitoring"><span class="n">0751 Generate-SLOReport</span><span class="d">Generate SLO report from Prometheus metrics and error budget data.</span><span class="tag">60-monitoring</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/60-monitoring/6050_Get-ServiceStatus.ps1" data-tag="60-monitoring" data-search="6050 get-servicestatus shows the status of all aitheros services. 60-monitoring"><span class="n">6050 Get-ServiceStatus</span><span class="d">Shows the status of all AitherOS services.</span><span class="tag">60-monitoring</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/60-monitoring/6051_Get-FlightDeck.ps1" data-tag="60-monitoring" data-search="6051 get-flightdeck unified flight deck — shows all in-flight requests, queues, gpu state, and background processes. 60-monitoring"><span class="n">6051 Get-FlightDeck</span><span class="d">Unified Flight Deck — shows ALL in-flight requests, queues, GPU state, and background processes.</span><span class="tag">60-monitoring</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/60-monitoring/6052_Check-VaultHealth.ps1" data-tag="60-monitoring" data-search="6052 check-vaulthealth vault health &amp; secret presence check — alerts on missing critical keys. 60-monitoring"><span class="n">6052 Check-VaultHealth</span><span class="d">Vault health &amp; secret presence check — alerts on missing critical keys.</span><span class="tag">60-monitoring</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-external-integrations/7010_Setup-ProtonBridge.ps1" data-tag="70-external-integrations" data-search="7010 setup-protonbridge fully automated proton mail bridge setup for aitheros smtp relay. 70-external-integrations"><span class="n">7010 Setup-ProtonBridge</span><span class="d">Fully automated Proton Mail Bridge setup for AitherOS SMTP relay.</span><span class="tag">70-external-integrations</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-external-integrations/7012_Setup-Slack.ps1" data-tag="70-external-integrations" data-search="7012 setup-slack fully automated slack bot integration setup for aitheros. 70-external-integrations"><span class="n">7012 Setup-Slack</span><span class="d">Fully automated Slack bot integration setup for AitherOS.</span><span class="tag">70-external-integrations</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-external-integrations/7013_Setup-WhatsApp.ps1" data-tag="70-external-integrations" data-search="7013 setup-whatsapp fully automated whatsapp cloud api integration setup for aitheros. 70-external-integrations"><span class="n">7013 Setup-WhatsApp</span><span class="d">Fully automated WhatsApp Cloud API integration setup for AitherOS.</span><span class="tag">70-external-integrations</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-external-integrations/7040_Setup-ObsidianVault.ps1" data-tag="70-external-integrations" data-search="7040 setup-obsidianvault easy-button obsidian + aitheros plugin deployment. 70-external-integrations"><span class="n">7040 Setup-ObsidianVault</span><span class="d">Easy-button Obsidian + AitherOS plugin deployment.</span><span class="tag">70-external-integrations</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-external-integrations/7050_Sync-CloudflareTunnel.ps1" data-tag="70-external-integrations" data-search="7050 sync-cloudflaretunnel sync cloudflare named tunnel ingress from source-of-truth yaml. 70-external-integrations"><span class="n">7050 Sync-CloudflareTunnel</span><span class="d">Sync Cloudflare Named Tunnel ingress from source-of-truth YAML.</span><span class="tag">70-external-integrations</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-external-integrations/7051_Patch-CloudflareTunnelRule.ps1" data-tag="70-external-integrations" data-search="7051 patch-cloudflaretunnelrule patch a single cloudflare tunnel ingress rule&#x27;s service, in place. 70-external-integrations"><span class="n">7051 Patch-CloudflareTunnelRule</span><span class="d">Patch a SINGLE Cloudflare tunnel ingress rule&#x27;s service, in place.</span><span class="tag">70-external-integrations</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0701_New-Branch.ps1" data-tag="70-git" data-search="0701 new-branch creates a new git branch from the current or specified base branch. 70-git"><span class="n">0701 New-Branch</span><span class="d">Creates a new Git branch from the current or specified base branch.</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0702_Commit-Changes.ps1" data-tag="70-git" data-search="0702 commit-changes stages and commits changes with a conventional commit message. 70-git"><span class="n">0702 Commit-Changes</span><span class="d">Stages and commits changes with a conventional commit message.</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0703_Create-PullRequest.ps1" data-tag="70-git" data-search="0703 create-pullrequest creates a github pull request using the github cli. 70-git"><span class="n">0703 Create-PullRequest</span><span class="d">Creates a GitHub Pull Request using the GitHub CLI.</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0704_Switch-GitHubAccount.ps1" data-tag="70-git" data-search="0704 switch-githubaccount switch between github accounts (git identity + gh cli auth). 70-git"><span class="n">0704 Switch-GitHubAccount</span><span class="d">Switch between GitHub accounts (git identity + gh CLI auth).</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0705_Sync-OpenSource.ps1" data-tag="70-git" data-search="0705 sync-opensource synchronizes aitherzero with the public open-source repository. 70-git"><span class="n">0705 Sync-OpenSource</span><span class="d">Synchronizes AitherZero with the public open-source repository.</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0706_Sync-AllRepos.ps1" data-tag="70-git" data-search="0706 sync-allrepos commits and pushes changes to all repositories in a single operation. 70-git"><span class="n">0706 Sync-AllRepos</span><span class="d">Commits and pushes changes to ALL repositories in a single operation.</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0707_Package-PublicRelease.ps1" data-tag="70-git" data-search="0707 package-publicrelease packages a curated public-safe release bundle from the monorepo. 70-git"><span class="n">0707 Package-PublicRelease</span><span class="d">Packages a curated public-safe release bundle from the monorepo.</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0708_Setup-AgenticWorkflows.ps1" data-tag="70-git" data-search="0708 setup-agenticworkflows sets up github agentic workflows (gh-aw) with all required secrets and compiled workflows. 70-git"><span class="n">0708 Setup-AgenticWorkflows</span><span class="d">Sets up GitHub Agentic Workflows (gh-aw) with all required secrets and compiled workflows.</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0897_Import-RoadmapToGitHub.ps1" data-tag="70-git" data-search="0897 import-roadmaptogithub sync roadmap items to/from github via aitheratlas + aitherflow. 70-git"><span class="n">0897 Import-RoadmapToGitHub</span><span class="d">Sync ROADMAP items to/from GitHub via AitherAtlas + AitherFlow.</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-git/0898_Submit-SessionLog.ps1" data-tag="70-git" data-search="0898 submit-sessionlog automated ide session logger for aitheros. 70-git"><span class="n">0898 Submit-SessionLog</span><span class="d">Automated IDE session logger for AitherOS.</span><span class="tag">70-git</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-maintenance/7001_Cleanup-Docker.ps1" data-tag="70-maintenance" data-search="7001 cleanup-docker cleans up docker resources to free disk space. 70-maintenance"><span class="n">7001 Cleanup-Docker</span><span class="d">Cleans up Docker resources to free disk space.</span><span class="tag">70-maintenance</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-maintenance/7002_Validate-Environment.ps1" data-tag="70-maintenance" data-search="7002 validate-environment validates the aitheros environment configuration. 70-maintenance"><span class="n">7002 Validate-Environment</span><span class="d">Validates the AitherOS environment configuration.</span><span class="tag">70-maintenance</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-maintenance/7003_Repair-DeployRoot.ps1" data-tag="70-maintenance" data-search="7003 repair-deployroot diagnose and self-heal drift between the repo tree and the tree the fleet deploys from. 70-maintenance"><span class="n">7003 Repair-DeployRoot</span><span class="d">Diagnose and self-heal drift between the repo tree and the tree the fleet DEPLOYS FROM.</span><span class="tag">70-maintenance</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-maintenance/7004_Register-DeployRootSelfHeal.ps1" data-tag="70-maintenance" data-search="7004 register-deployrootselfheal register 7003_repair-deployroot as an unattended self-heal task, and page when it cannot fix. 70-maintenance"><span class="n">7004 Register-DeployRootSelfHeal</span><span class="d">Register 7003_Repair-DeployRoot as an unattended self-heal task, and page when it cannot fix.</span><span class="tag">70-maintenance</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-maintenance/9010_Scan-DiskUsage.ps1" data-tag="70-maintenance" data-search="9010 scan-diskusage scans local drives for large files and potential cleanup candidates. 70-maintenance"><span class="n">9010 Scan-DiskUsage</span><span class="d">Scans local drives for large files and potential cleanup candidates.</span><span class="tag">70-maintenance</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/70-maintenance/9020_Optimize-GPUMemory.ps1" data-tag="70-maintenance" data-search="9020 optimize-gpumemory reclaim vram and system ram by killing non-essential gpu/memory consumers. 70-maintenance"><span class="n">9020 Optimize-GPUMemory</span><span class="d">Reclaim VRAM and system RAM by killing non-essential GPU/memory consumers.</span><span class="tag">70-maintenance</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/80-testing/0402_Run-UnitTests.ps1" data-tag="80-testing" data-search="0402 run-unittests execute unit tests for aitherzero 80-testing"><span class="n">0402 Run-UnitTests</span><span class="d">Execute unit tests for AitherZero</span><span class="tag">80-testing</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/80-testing/0403_Run-IntegrationTests.ps1" data-tag="80-testing" data-search="0403 run-integrationtests execute integration tests for aitherzero 80-testing"><span class="n">0403 Run-IntegrationTests</span><span class="d">Execute integration tests for AitherZero</span><span class="tag">80-testing</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/80-testing/0404_Run-PSScriptAnalyzer.ps1" data-tag="80-testing" data-search="0404 run-psscriptanalyzer run psscriptanalyzer on aitherzero codebase 80-testing"><span class="n">0404 Run-PSScriptAnalyzer</span><span class="d">Run PSScriptAnalyzer on AitherZero codebase</span><span class="tag">80-testing</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/80-testing/0405_Run-PythonTest.ps1" data-tag="80-testing" data-search="0405 run-pythontest execute python pytest tests for aitheros 80-testing"><span class="n">0405 Run-PythonTest</span><span class="d">Execute Python pytest tests for AitherOS</span><span class="tag">80-testing</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/80-testing/0410_Audit-OpenSourceReadiness.ps1" data-tag="80-testing" data-search="0410 audit-opensourcereadiness audits the aitherzero codebase for content that should not be in the public repo. 80-testing"><span class="n">0410 Audit-OpenSourceReadiness</span><span class="d">Audits the AitherZero codebase for content that should not be in the public repo.</span><span class="tag">80-testing</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/80-testing/0810_Validate-MCPServers.ps1" data-tag="80-testing" data-search="0810 validate-mcpservers validates all mcp servers are built, configured, and can start correctly. 80-testing"><span class="n">0810 Validate-MCPServers</span><span class="d">Validates all MCP servers are built, configured, and can start correctly.</span><span class="tag">80-testing</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/80-testing/0885_Run-AdvancedSimulation.ps1" data-tag="80-testing" data-search="0885 run-advancedsimulation runs advanced simulations and syncs results to gh pages. 80-testing"><span class="n">0885 Run-AdvancedSimulation</span><span class="d">Runs advanced simulations and syncs results to GH Pages.</span><span class="tag">80-testing</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/80-testing/8001_Test-ServiceHealth.ps1" data-tag="80-testing" data-search="8001 test-servicehealth tests the health of aitheros services. 80-testing"><span class="n">8001 Test-ServiceHealth</span><span class="d">Tests the health of AitherOS services.</span><span class="tag">80-testing</span></a><a class="row-item" href="https://github.com/Aitherium/AitherZero/blob/main/library/automation-scripts/80-testing/8010_Benchmark-InferenceModes.ps1" data-tag="80-testing" data-search="8010 benchmark-inferencemodes benchmark all aitheros inference modes: vllm vs ollama vs hybrid. 80-testing"><span class="n">8010 Benchmark-InferenceModes</span><span class="d">Benchmark all AitherOS inference modes: vLLM vs Ollama vs Hybrid.</span><span class="tag">80-testing</span></a></div><div class="empty js-empty" style="display:none">Nothing matches that.</div></div></div></section>
 
 <section id="features"><div class="wrap">
   <h2>What you get</h2>
@@ -352,6 +545,8 @@ cd AitherZero
 
 
 
+<section class="uni" id="universe"><div class="wrap"><h2>One estate, six doors</h2><p class="sub">These projects are organs of the same system — the same identity plane, the same agent runtime, the same operational discipline. Follow any of them.</p><div class="uni-stage"><canvas class="uni-canvas" aria-hidden="true"></canvas><div class="uni-nodes"><a class="orb" href="https://aitherium.com" data-id="aitherium" data-kind="the os" style="--orb:var(--cyan)"><span class="k">the os</span><span class="n">aitherium.com</span><span class="d">The Living OS these four repos are cut from. Open, no login.</span></a><a class="orb" href="https://aitherium.github.io/aither-adk/" data-id="aither-adk" data-kind="python" style="--orb:var(--accent-warm)"><span class="k">python</span><span class="n">Aither ADK</span><span class="d">Build agent fleets. Any backend, effort-routed, real memory.</span></a><a class="orb" href="https://aitherium.github.io/aither-skills/" data-id="aither-skills" data-kind="markdown" style="--orb:var(--cyan)"><span class="k">markdown</span><span class="n">aither-skills</span><span class="d">Operational procedures an agent can load and run. MIT.</span></a><a class="orb" href="https://aitherium.github.io/aitherkvcache/" data-id="aitherkvcache" data-kind="cuda" style="--orb:var(--lavender)"><span class="k">cuda</span><span class="n">aither-kvcache</span><span class="d">Sub-byte KV cache compression for LLM inference.</span></a><a class="orb here" href="https://aitherium.github.io/AitherZero/" data-id="AitherZero" data-kind="powershell" style="--orb:var(--mint)"><span class="k">powershell</span><span class="n">AitherZero</span><span class="d">Numbered, discoverable automation and declarative playbooks.</span></a><a class="orb" href="https://blog.aitherium.com" data-id="blog" data-kind="writing" style="--orb:var(--coral)"><span class="k">writing</span><span class="n">The Blog</span><span class="d">How all of it is actually built, measured and operated.</span></a></div></div></div></section>
+
 <footer><div class="wrap"><div class="row">
   <span class="el"><span class="n">47</span><span class="s">Ai</span></span>
   <div>
@@ -361,6 +556,7 @@ cd AitherZero
   <span class="sp"></span>
   <a href="https://github.com/Aitherium/AitherZero">GitHub</a>
   <a href="https://github.com/Aitherium/AitherZero/blob/main/LICENSE">License</a>
+  <a href="https://blog.aitherium.com">Blog</a>
   <a href="https://aitherium.com">aitherium.com</a>
 </div></div></footer>
 <script>
@@ -375,6 +571,318 @@ document.querySelectorAll('.code').forEach(function(box){
   });
   box.appendChild(b);
 });
+
+/* catalogue: filter rows that are ALREADY in the HTML. Nothing is fetched and
+   nothing is rendered client-side, so the full inventory is present with JS off
+   and for anything crawling the page. */
+(function(){
+  var p = document.querySelector('[data-catalogue]');
+  if(!p) return;
+  var q = p.querySelector('.js-q');
+  var rows = Array.prototype.slice.call(p.querySelectorAll('.row-item'));
+  var chips = Array.prototype.slice.call(p.querySelectorAll('.chip'));
+  var out = p.querySelector('.js-count');
+  var empty = p.querySelector('.js-empty');
+  var tag = '';
+  function apply(){
+    var t = (q ? q.value : '').trim().toLowerCase(), n = 0;
+    rows.forEach(function(r){
+      var okTag = !tag || r.getAttribute('data-tag') === tag;
+      var okQ = !t || (r.getAttribute('data-search')||'').indexOf(t) !== -1;
+      var show = okTag && okQ;
+      r.style.display = show ? '' : 'none';
+      if(show) n++;
+    });
+    if(out) out.textContent = n + ' of ' + rows.length;
+    if(empty) empty.style.display = n ? 'none' : 'block';
+  }
+  if(q) q.addEventListener('input', apply);
+  chips.forEach(function(c){
+    c.addEventListener('click', function(){
+      var v = c.getAttribute('data-tag');
+      tag = (tag === v) ? '' : v;
+      chips.forEach(function(x){
+        x.setAttribute('aria-pressed', x.getAttribute('data-tag') === tag ? 'true' : 'false');
+      });
+      apply();
+    });
+  });
+  apply();
+})();
+
+/* KV-cache calculator: the arithmetic is the actual KV cache formula --
+   2 (K and V) x layers x kv_heads x head_dim x tokens x batch x bytes-per-element.
+   Compression is applied as bits/16 against fp16, which is what the quantizer
+   really does; no fudge factor. */
+(function(){
+  var c = document.getElementById('kvcalc');
+  if(!c) return;
+  var ids = ['layers','heads','dim','ctx','batch','bits'];
+  var el = {};
+  ids.forEach(function(k){ el[k] = c.querySelector('#kv-'+k); });
+  function num(k){ return Math.max(0, parseFloat(el[k] && el[k].value) || 0); }
+  function fmt(mb){
+    if(mb >= 1024) return (mb/1024).toFixed(mb/1024 >= 100 ? 0 : 2) + ' GB';
+    return mb.toFixed(mb < 10 ? 2 : 0) + ' MB';
+  }
+  function calc(){
+    var elems = 2 * num('layers') * num('heads') * num('dim') * num('ctx') * num('batch');
+    var bits = num('bits') || 4;
+    var fp16 = elems * 2 / 1048576;
+    var packed = elems * (bits/8) / 1048576;
+    var ratio = packed > 0 ? fp16/packed : 0;
+    var set = function(k, v){
+      var n = c.querySelector('[data-out="'+k+'"]');
+      if(n) n.textContent = v;
+    };
+    set('fp16', fmt(fp16));
+    set('packed', fmt(packed));
+    set('saved', fmt(Math.max(0, fp16-packed)));
+    set('ratio', ratio ? ratio.toFixed(1)+'x' : '--');
+    var fill = c.querySelector('.js-fill');
+    if(fill) fill.style.width = (fp16 > 0 ? Math.max(1.5, (packed/fp16)*100) : 0) + '%';
+    var pct = c.querySelector('.js-pct');
+    if(pct) pct.textContent = fp16 > 0 ? ((packed/fp16)*100).toFixed(1)+'% of fp16' : '';
+  }
+  ids.forEach(function(k){
+    if(el[k]) { el[k].addEventListener('input', calc); el[k].addEventListener('change', calc); }
+  });
+  calc();
+})();
+</script>
+<script>/* ═══════════════════════════════════════════════════════════════════════════
+   AITHERIUM UNIVERSE STRIP — flight paths between the public repos
+   @element-universe v1
+
+   Source of truth for the motion layer of the universe strip on every public
+   static page. tools/gen_public_pages.py INLINES this file verbatim, the same
+   way it inlines .ELEMENT/web/aitherium.css, and check_pages_truth.py asserts
+   a published page still carries the current copy.
+
+   WHY THIS IS NOT @aitheros/bead-space
+       bead-space is the real thing: a d3-force universe explorer with live
+       AitherOS adapters (agents, compute, mesh, platform, work). Using it here
+       would mean npm-installing seven d3 packages and running esbuild inside
+       four sync workflows, then inlining ~60-80KB into every landing page — to
+       lay out SIX fixed navigational nodes that never move and carry no live
+       data. That is the wrong trade: it adds a build dependency to a pipeline
+       whose whole virtue is that it is pure static generation.
+       So this is a purpose-built ~4KB renderer that deliberately speaks
+       bead-space's node shape ({id, label, kind, href}), read straight off the
+       rendered DOM. If the strip ever needs live fleet data, swap this for the
+       real bead-space bundle without touching the markup or the CSS.
+
+   PROGRESSIVE ENHANCEMENT, NOT A DEPENDENCY
+       The orbs are real <a> elements emitted in the HTML. Navigation works with
+       JavaScript off, with canvas unsupported, and if this file fails to parse.
+       Everything below only draws the connective tissue between them. Under
+       prefers-reduced-motion it renders the paths once, statically, and stops —
+       it never animates.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var stage = document.querySelector('.uni-stage');
+  if (!stage) return;
+
+  var canvas = stage.querySelector('.uni-canvas');
+  if (!canvas || typeof canvas.getContext !== 'function') return;
+
+  var ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  var reduced =
+    window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var orbEls = Array.prototype.slice.call(stage.querySelectorAll('.orb'));
+  if (orbEls.length < 2) return;
+
+  var accent =
+    (getComputedStyle(document.documentElement).getPropertyValue('--accent') || '').trim() ||
+    '#2AD7D7';
+
+  var nodes = [];
+  var here = null;
+  var paths = [];
+  var W = 0;
+  var H = 0;
+  var raf = 0;
+
+  // ── layout ───────────────────────────────────────────────────────────────
+  function measure() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var sr = stage.getBoundingClientRect();
+    W = sr.width;
+    H = sr.height;
+    if (W < 2 || H < 2) return false;
+
+    canvas.width = Math.max(1, Math.round(W * dpr));
+    canvas.height = Math.max(1, Math.round(H * dpr));
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    nodes = orbEls.map(function (el) {
+      var r = el.getBoundingClientRect();
+      return {
+        el: el,
+        // bead-space node shape, read off the DOM rather than a second data blob
+        id: el.getAttribute('data-id') || '',
+        kind: el.getAttribute('data-kind') || 'repo',
+        href: el.getAttribute('href') || '',
+        x: r.left - sr.left + r.width / 2,
+        y: r.top - sr.top + r.height / 2,
+        // Paths anchor to the TOP EDGE, not the centre. A quadratic only reaches
+        // half its control-point offset, so centre-anchored arcs peaked inside
+        // the orb row and were covered by the cards (which sit at z-index 1).
+        ty: r.top - sr.top + 5,
+        here: el.classList.contains('here')
+      };
+    });
+
+    here =
+      nodes.filter(function (n) {
+        return n.here;
+      })[0] || nodes[0];
+
+    // One flight path from the lit node to each sibling. The control point is
+    // pushed perpendicular to the chord so paths bow instead of overlapping
+    // into a single straight bar when the orbs wrap onto one row.
+    paths = nodes
+      .filter(function (n) {
+        return n !== here;
+      })
+      .map(function (n, i) {
+        var mx = (here.x + n.x) / 2;
+        var my = (here.ty + n.ty) / 2;
+        var dx = n.x - here.x;
+        var dy = n.ty - here.ty;
+        var len = Math.sqrt(dx * dx + dy * dy) || 1;
+        // Always bow toward the top of the stage (canvas y grows downward), into
+        // the padding band .uni-stage reserves. Alternating the sign put half the
+        // arcs underneath the orb row where they were invisible.
+        var bow = Math.min(78, 26 + len * 0.22) * (dx >= 0 ? -1 : 1);
+        return {
+          a: here,
+          b: n,
+          cx: mx + (-dy / len) * bow,
+          cy: my + (dx / len) * bow,
+          // deterministic offsets: no Math.random, so the strip looks identical
+          // on every load and in every screenshot
+          seeds: [i * 0.37 % 1, (i * 0.37 + 0.5) % 1]
+        };
+      });
+
+    return true;
+  }
+
+  function pointAt(p, t) {
+    var u = 1 - t;
+    return {
+      x: u * u * p.a.x + 2 * u * t * p.cx + t * t * p.b.x,
+      y: u * u * p.a.ty + 2 * u * t * p.cy + t * t * p.b.ty
+    };
+  }
+
+  // ── paint ────────────────────────────────────────────────────────────────
+  function draw(now) {
+    ctx.clearRect(0, 0, W, H);
+
+    for (var i = 0; i < paths.length; i++) {
+      var p = paths[i];
+
+      ctx.globalAlpha = 0.16;
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(p.a.x, p.a.ty);
+      ctx.quadraticCurveTo(p.cx, p.cy, p.b.x, p.b.ty);
+      ctx.stroke();
+
+      if (reduced) continue;
+
+      // travellers: small motes drifting out along each path
+      for (var s = 0; s < p.seeds.length; s++) {
+        var t = (p.seeds[s] + now / 7400) % 1;
+        var pt = pointAt(p, t);
+        // fade in and out at the endpoints so motes do not pop
+        var fade = Math.sin(t * Math.PI);
+        ctx.globalAlpha = 0.5 * fade;
+        ctx.fillStyle = accent;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 1.9, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // the lit node's halo
+    if (here) {
+      ctx.globalAlpha = reduced ? 0.13 : 0.1 + 0.045 * Math.sin(now / 1150);
+      ctx.fillStyle = accent;
+      ctx.beginPath();
+      ctx.arc(here.x, here.y, 46, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  function frame(ts) {
+    draw(ts || 0);
+    raf = window.requestAnimationFrame(frame);
+  }
+
+  function start() {
+    if (!measure()) return;
+    if (raf) window.cancelAnimationFrame(raf);
+    // Paint one frame SYNCHRONOUSLY before scheduling the loop. measure() has
+    // just resized the canvas, which clears it, and requestAnimationFrame does
+    // not fire in a background tab -- so without this the strip renders blank
+    // and only appears once the tab is focused. Measured 2026-08-02: a
+    // backgrounded tab painted 0 pixels indefinitely.
+    draw(0);
+    if (reduced || !window.requestAnimationFrame) return;
+    raf = window.requestAnimationFrame(frame);
+  }
+
+  // Pause when the strip is off-screen or the tab is hidden — a landing page
+  // has no business burning a phone battery on a decoration nobody is looking at.
+  function stop() {
+    if (raf) {
+      window.cancelAnimationFrame(raf);
+      raf = 0;
+    }
+  }
+
+  var visible = true;
+  if (window.IntersectionObserver) {
+    new window.IntersectionObserver(
+      function (entries) {
+        visible = entries[0].isIntersecting;
+        if (visible && !document.hidden) start();
+        else stop();
+      },
+      { threshold: 0.02 }
+    ).observe(stage);
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden || !visible) stop();
+    else start();
+  });
+
+  var resizeTimer = 0;
+  window.addEventListener('resize', function () {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(start, 140);
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+})();
 </script>
 </body>
 </html>
