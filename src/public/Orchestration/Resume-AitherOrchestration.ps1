@@ -130,10 +130,34 @@ function Resume-AitherOrchestration {
                     throw "Playbook not found: $($status.PlaybookName)"
                 }
 
-                # Resume execution via orchestration engine
+                # The sequence to resume. Previously this passed -LoadPlaybook and
+                # -ContinueOnError, NEITHER of which is a parameter of
+                # Invoke-OrchestrationSequence, whose -Scripts is Mandatory -- so every
+                # resume threw on parameter binding. It also never passed any notion of
+                # what had already run, so even a bound call would have re-executed
+                # completed steps.
+                $sequence = @($playbook.Sequence)
+                if (-not $sequence -or $sequence.Count -eq 0) {
+                    throw "Playbook '$($status.PlaybookName)' has no Sequence to resume"
+                }
+
+                # Which steps already succeeded, by INDEX. A count cannot answer this.
+                $completedIndices = @(
+                    $status.Results |
+                        Where-Object { $_.Success } |
+                        ForEach-Object { [int]$_.Index }
+                )
+                $failedIndices = @(
+                    $status.Results |
+                        Where-Object { -not $_.Success } |
+                        ForEach-Object { [int]$_.Index }
+                )
+
                 $resumeParams = @{
-                    LoadPlaybook    = $status.PlaybookName
-                    ContinueOnError = $true
+                    Scripts          = $sequence
+                    CompletedIndices = $completedIndices
+                    FailedIndices    = $failedIndices
+                    ExecutionId      = $status.ExecutionId
                 }
                 if ($RetryFailed) {
                     $resumeParams.RetryFailed = $true

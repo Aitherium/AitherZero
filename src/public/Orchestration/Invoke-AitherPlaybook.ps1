@@ -318,7 +318,21 @@ function Invoke-AitherPlaybook {
                         Write-AitherLog -Level Information -Message "    Parameters: $($itemParams | ConvertTo-Json -Compress)" -Source 'Invoke-AitherPlaybook'
                     }
                 }
-                return
+
+                # A playbook may opt in to a DEEP dry run: instead of only listing the
+                # sequence, each step is invoked with -DryRun so the script's own
+                # dry-run path runs. Listing proves the playbook parses; it cannot
+                # prove the steps would work, which is the whole question a rehearsal
+                # before a destructive migration is asking.
+                #
+                # Opt-in, so the existing playbooks are unaffected. Invoke-AitherScript
+                # additionally refuses to execute any step that does not declare -DryRun.
+                $dryRunMode = Get-AitherMember $Playbook 'DryRunMode'
+                if ($dryRunMode -ne 'Execute') {
+                    return
+                }
+
+                Write-AitherLog -Level Information -Message "[DRY RUN] DryRunMode=Execute - invoking each step's own dry-run path" -Source 'Invoke-AitherPlaybook'
             }
 
             # Execute sequence
@@ -500,7 +514,11 @@ function Invoke-AitherPlaybook {
                 }
 
                 # Sequential execution
+                # Step index is stamped onto every result: resume needs to know WHICH
+                # steps completed, and a count cannot identify them.
+                $stepIndex = -1
                 foreach ($item in $expandedSequence) {
+                    $stepIndex++
                     # StrictMode-safe optional-key access (see DryRun branch note).
                     $scriptId = if ($item -is [System.Collections.IDictionary]) { Get-AitherMember $item 'Script' } else { $null }
 
@@ -688,10 +706,11 @@ function Invoke-AitherPlaybook {
                     $scriptStartTime = Get-Date
                     try {
                         # Pass Verbose preference explicitly
-                        $result = Invoke-AitherScript -Script $scriptId -Parameters $scriptParams -ErrorAction Stop -ShowOutput:$ShowOutput -ShowTranscript:$ShowTranscript -Verbose:$VerbosePreference
+                        $result = Invoke-AitherScript -Script $scriptId -Parameters $scriptParams -ErrorAction Stop -ShowOutput:$ShowOutput -ShowTranscript:$ShowTranscript -DryRun:$DryRun -Verbose:$VerbosePreference
                         $duration = (Get-Date) - $scriptStartTime
 
                         $scriptResult = [PSCustomObject]@{
+                            Index    = $stepIndex
                             Script   = $scriptId
                             Success  = $true
                             Duration = $duration
@@ -706,6 +725,7 @@ function Invoke-AitherPlaybook {
                         $duration = (Get-Date) - $scriptStartTime
 
                         $scriptResult = [PSCustomObject]@{
+                            Index    = $stepIndex
                             Script   = $scriptId
                             Success  = $false
                             Duration = $duration
@@ -717,6 +737,24 @@ function Invoke-AitherPlaybook {
                         $failed++
 
                         Write-AitherLog -Message "Script failed: $scriptId - $($_.Exception.Message)" -Level Error -Source 'Invoke-AitherPlaybook'
+
+                        # OnFailure names a script to run with the failure context --
+                        # a handler, not a log line. Without this a playbook could not
+                        # drive its own rollback, so the migration playbook's rollback
+                        # step had to be invoked by the cutover script itself.
+                        $onFailure = Get-AitherMember $Playbook 'OnFailure'
+                        if ($onFailure) {
+                            try {
+                                Write-AitherLog -Message "Invoking OnFailure handler: $onFailure" -Level Warning -Source 'Invoke-AitherPlaybook'
+                                Invoke-AitherScript -Script $onFailure -ErrorAction Stop -ShowOutput:$ShowOutput
+                            }
+                            catch {
+                                # Must not mask the original failure, must not vanish:
+                                # a rollback that did not run is the most important
+                                # thing on the page.
+                                Write-AitherLog -Message "OnFailure handler '$onFailure' FAILED: $($_.Exception.Message)" -Level Error -Source 'Invoke-AitherPlaybook'
+                            }
+                        }
 
                         if (-not $effectiveContinueOnError) {
                             break
@@ -742,6 +780,30 @@ function Invoke-AitherPlaybook {
             }
 
             Write-AitherLog -Message "Playbook execution completed: $completed/$($sequence.Count) succeeded, $failed failed" -Level Information -Source 'Invoke-AitherPlaybook'
+
+            # Persist the execution record. Until this existed, per-step Results were
+            # built in memory and discarded on return, and the three consumers of the
+            # execution-history store all read a directory nothing ever wrote -- each
+            # failing soft to empty, which reads as "no executions have run".
+            # Resume is impossible without this: it is the only record of WHICH steps
+            # completed.
+            try {
+                if (Get-Command Write-AitherExecutionRecord -ErrorAction SilentlyContinue) {
+                    Write-AitherExecutionRecord `
+                        -ExecutionId ($script:AitherExecutionId ?? [guid]::NewGuid().ToString()) `
+                        -PlaybookName $Playbook.Name `
+                        -Status $(if ($failed -eq 0) { 'Completed' } else { 'Failed' }) `
+                        -Results $scriptResults `
+                        -StartTime $startTime `
+                        -Variables $mergedVariables | Out-Null
+                }
+            }
+            catch {
+                # Never fail a completed playbook because bookkeeping failed, but never
+                # swallow it either -- a silent write failure here is what makes resume
+                # unusable later, at the worst possible moment.
+                Write-AitherLog -Message "Failed to persist execution record: $($_.Exception.Message)" -Level Warning -Source 'Invoke-AitherPlaybook'
+            }
 
             return $result
         }

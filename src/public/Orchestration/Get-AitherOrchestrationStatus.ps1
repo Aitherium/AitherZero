@@ -89,7 +89,10 @@ function Get-AitherOrchestrationStatus {
         try {
             try {
                 $moduleRoot = Get-AitherModuleRoot
-                $historyPath = Join-Path $moduleRoot 'library' 'execution-history'
+                # Canonical store, written by Write-AitherExecutionRecord. This used to
+                # read 'library/execution-history' while Get-AitherExecutionHistory read
+                # 'library/reports/execution-history' -- and NOTHING wrote either one.
+                $historyPath = Join-Path $moduleRoot 'library' 'reports' 'execution-history'
 
                 if (-not (Test-Path $historyPath)) {
                     return @()
@@ -113,15 +116,19 @@ function Get-AitherOrchestrationStatus {
                             continue
                         }
 
-                        # Determine status
+                        # Prefer the status the writer recorded. The derivation below
+                        # keys on Completed, which is a COUNT: a run that failed at step
+                        # 1 has Completed=0, which is falsy, so it reported 'Running'
+                        # forever and Resume refused to touch it ("already running").
                         $status = 'Unknown'
-                        if ($execution.Completed) {
-                            if ($execution.Failed -gt 0) {
-                                $status = 'Failed'
-                            }
-                            else {
-                                $status = 'Completed'
-                            }
+                        if ($execution.Status) {
+                            $status = $execution.Status
+                        }
+                        elseif ($execution.Failed -gt 0) {
+                            $status = 'Failed'
+                        }
+                        elseif ($execution.Completed -gt 0) {
+                            $status = 'Completed'
                         }
                         elseif ($execution.StartTime) {
                             $status = 'Running'
@@ -144,6 +151,10 @@ function Get-AitherOrchestrationStatus {
                             TotalScripts     = $execution.Total
                             RunningScripts   = if ($execution.Running) { $execution.Running } else { 0 }
                             FailedScripts    = if ($execution.Failed) { $execution.Failed } else { 0 }
+                            # Per-step detail. Resume needs to know WHICH steps
+                            # completed, not how many -- with SkipFailed the completed
+                            # indices are not contiguous, so a count cannot identify them.
+                            Results          = if ($execution.Results) { $execution.Results } else { @() }
                         }
 
                         $statuses += $statusObj

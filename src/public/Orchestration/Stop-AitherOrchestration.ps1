@@ -111,7 +111,9 @@ process { try {
             # Stop execution (implementation depends on orchestration engine)
             # For now, mark as stopped in history
             $moduleRoot = Get-AitherModuleRoot
-            $historyPath = Join-Path $moduleRoot 'library' 'execution-history'
+            # Canonical store (see Write-AitherExecutionRecord). Was 'library/execution-history',
+            # which disagreed with Get-AitherExecutionHistory and which nothing wrote.
+            $historyPath = Join-Path $moduleRoot 'library' 'reports' 'execution-history'
             $historyFile = Join-Path $historyPath "$($status.ExecutionId).json"
 
             if (Test-Path $historyFile) {

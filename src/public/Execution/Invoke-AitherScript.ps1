@@ -585,6 +585,33 @@ function Invoke-AitherScript {
                     $paramHash.GetEnumerator() | ForEach-Object {
                         Write-AitherLog -Level Information -Message "    -$($_.Key): $($_.Value)" -Source 'Invoke-AitherScript'
                     }
+
+                    # If the script implements its OWN dry-run, run it that way so the
+                    # path is actually exercised. Logging "would execute" proves only
+                    # that we found the file -- it can never catch a broken -DryRun
+                    # branch, which is precisely what a migration rehearsal must catch.
+                    #
+                    # Capability-gated on purpose: a script that does NOT declare
+                    # -DryRun is never invoked here, because "run it and hope it is
+                    # read-only" is how a rehearsal becomes a destructive action.
+                    $supportsDryRun = $false
+                    try {
+                        $scriptCmd = Get-Command -Name $scriptPath -CommandType ExternalScript -ErrorAction Stop
+                        $supportsDryRun = $scriptCmd.Parameters.ContainsKey('DryRun')
+                    }
+                    catch {
+                        Write-AitherLog -Level Warning -Message "  Could not inspect parameters of $scriptPath : $($_.Exception.Message)" -Source 'Invoke-AitherScript'
+                    }
+
+                    if ($supportsDryRun) {
+                        Write-AitherLog -Level Information -Message "  Script declares -DryRun; executing its dry-run path" -Source 'Invoke-AitherScript'
+                        $dryParams = @{} + $paramHash
+                        $dryParams['DryRun'] = $true
+                        & $scriptPath @dryParams
+                    }
+                    else {
+                        Write-AitherLog -Level Information -Message "  Script does not declare -DryRun; listed only (not executed)" -Source 'Invoke-AitherScript'
+                    }
                     continue
                 }
 
