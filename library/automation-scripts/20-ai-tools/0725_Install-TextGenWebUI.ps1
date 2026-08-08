@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 # Stage: AI Tools
 # Dependencies: Git, Python
 # Description: Installs Oobabooga Text Generation WebUI

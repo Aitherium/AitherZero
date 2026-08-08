@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Main CLI for AitherOS interaction.
     

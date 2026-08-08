@@ -1,4 +1,4 @@
-function Invoke-AitherSetup {
+﻿function Invoke-AitherSetup {
     <#
     .SYNOPSIS
         One command to set up AitherOS — full auto, interactive menu, or targeted modules.

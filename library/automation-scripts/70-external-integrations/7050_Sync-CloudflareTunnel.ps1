@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Sync Cloudflare Named Tunnel ingress from source-of-truth YAML.

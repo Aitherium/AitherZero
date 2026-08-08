@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 # Stage: AI Tools
 # Dependencies: 0761 (AitherNode), 0720 (AitherOS Venv)
 # Description: Sets up Aither's Web Developer Toolkit (Neocities, Cloudflare Tunnel)

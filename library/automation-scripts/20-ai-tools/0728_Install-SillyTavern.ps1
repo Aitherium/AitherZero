@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 # Stage: AI Tools
 # Dependencies: Git, Node.js
 # Description: Installs SillyTavern (LLM Frontend)

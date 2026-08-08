@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Diagnose and self-heal drift between the repo tree and the tree the fleet DEPLOYS FROM.

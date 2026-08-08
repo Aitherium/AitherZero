@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Patch a SINGLE Cloudflare tunnel ingress rule's service, in place.

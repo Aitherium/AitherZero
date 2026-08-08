@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Automated IDE session logger for AitherOS.
 

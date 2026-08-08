@@ -1,4 +1,4 @@
-# _init.ps1
+﻿# _init.ps1
 # Common initialization for automation scripts
 # Locates the project root and imports the core module
 

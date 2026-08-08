@@ -1,4 +1,4 @@
-@{
+﻿@{
     Name        = "node-onboard"
     Description = "Onboard THIS machine as a secure AitherOS cluster node (Windows / Linux / macOS) — one cross-platform playbook, CLI args, zero drift"
     Version     = "1.0.0"

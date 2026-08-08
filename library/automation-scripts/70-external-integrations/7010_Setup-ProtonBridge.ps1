@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Fully automated Proton Mail Bridge setup for AitherOS SMTP relay.
 .DESCRIPTION

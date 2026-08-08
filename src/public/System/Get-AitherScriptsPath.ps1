@@ -1,4 +1,4 @@
-function Get-AitherScriptsPath {
+﻿function Get-AitherScriptsPath {
     <#
     .SYNOPSIS
         Robustly locates the automation-scripts directory.

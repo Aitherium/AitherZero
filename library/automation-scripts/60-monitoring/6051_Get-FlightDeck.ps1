@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Unified Flight Deck — shows ALL in-flight requests, queues, GPU state, and background processes.

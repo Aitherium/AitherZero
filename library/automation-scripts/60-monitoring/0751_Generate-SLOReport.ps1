@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Generate SLO report from Prometheus metrics and error budget data.
 

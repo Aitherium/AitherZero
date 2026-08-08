@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Register 7003_Repair-DeployRoot as an unattended self-heal task, and page when it cannot fix.

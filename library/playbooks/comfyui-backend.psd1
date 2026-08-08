@@ -1,4 +1,4 @@
-@{
+﻿@{
     Name        = "comfyui-backend"
     Description = "Stand up a ComfyUI image-generation backend on THIS machine and register it so your Canvas/Iris jobs run on your own hardware — one command, install -> models -> serve -> register"
     Version     = "1.0.0"

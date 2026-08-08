@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Fully automated WhatsApp Cloud API integration setup for AitherOS.

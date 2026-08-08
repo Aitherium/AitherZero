@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Easy-button Obsidian + AitherOS plugin deployment.
     Auto-detects vault, builds/installs plugin, seeds config, scaffolds folders, loads data.

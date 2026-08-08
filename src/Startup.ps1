@@ -1,4 +1,4 @@
-# Set module root
+﻿# Set module root
 $script:ModuleRoot = $PSScriptRoot
 
 # Resolve the PROJECT root for either shipped layout (2026-07-25).

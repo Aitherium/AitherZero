@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Sets up GitHub Agentic Workflows (gh-aw) with all required secrets and compiled workflows.
