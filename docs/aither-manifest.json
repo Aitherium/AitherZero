@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1",
+  "name": "AitherZero",
+  "description": "Infrastructure automation: numbered, idempotent scripts for provisioning, repair and fleet operations.",
+  "url": "https://aitherium.github.io/AitherZero/",
+  "repository": "https://github.com/Aitherium/AitherZero",
+  "kind": "platform",
+  "language": "PowerShell",
+  "license": "Apache-2.0",
+  "metrics": {
+    "automation scripts": {
+      "value": 79,
+      "as_of": "2026-08-10T08:33:23Z"
+    },
+    "platform scripts": {
+      "value": 98,
+      "as_of": "2026-08-10T08:33:23Z"
+    }
+  },
+  "generated_at": "2026-08-10T08:33:23Z",
+  "version": "v2.3.0"
+}
