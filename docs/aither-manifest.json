@@ -10,5 +10,15 @@
   "pairs_with": [
     "awrecover"
   ],
-  "includes": []
+  "includes": [],
+  "metrics": {
+    "files": {
+      "value": 1550,
+      "as_of": "2026-08-21T02:00:52-07:00"
+    },
+    "tests": {
+      "value": 35,
+      "as_of": "2026-08-21T02:00:52-07:00"
+    }
+  }
 }
