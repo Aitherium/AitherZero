@@ -332,11 +332,19 @@ jobs:
         run: |
           set -euo pipefail
           test -f "$ZIP" || { echo "::error::$ZIP was not produced"; exit 1; }
-          flags=()
-          [ "$PRERELEASE" = "true" ] && flags+=(--prerelease)
-          gh release view "$TAG" >/dev/null 2>&1 \
-            || gh release create "$TAG" --title "AitherZero $TAG" \
-                 --notes-file release-notes.md "${flags[@]:-}"
+          # An explicit branch, not an array. `"${flags[@]:-}"` expands to one
+          # EMPTY argument when the array is empty, and gh reports
+          # `no matches found for ''` -- which names neither the flag nor the
+          # step's intent. Two literal commands cannot do that.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "release $TAG already exists - reusing it"
+          elif [ "$PRERELEASE" = "true" ]; then
+            gh release create "$TAG" --title "AitherZero $TAG" \
+              --notes-file release-notes.md --prerelease
+          else
+            gh release create "$TAG" --title "AitherZero $TAG" \
+              --notes-file release-notes.md
+          fi
           gh release upload "$TAG" "$ZIP" --clobber
 
   publish-gallery:
