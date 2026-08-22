@@ -93,8 +93,23 @@ jobs:
           $mod = Get-Module AitherZero
           Write-Host "Module version: $($mod.Version)"
           Write-Host "Exported functions: $($mod.ExportedFunctions.Count)"
-          if ($mod.ExportedFunctions.Count -lt 100) {
-            throw "Expected 100+ exported functions, got $($mod.ExportedFunctions.Count)"
+          # FLOOR 80, not 100. This repo's src/ is a deliberately CURATED
+          # subset: sync-aitherzero.yml does `rm -rf _zero/src` and restores
+          # only an allowlisted PUBLIC_SRC set, excluding agent/thread
+          # internals. Measured 2026-08-22: this tree builds 87 exported
+          # functions (98 src/*.ps1) where the monorepo builds 198 (213).
+          #
+          # The old floor of 100 predates that curation -- v2.3.0 shipped 192
+          # -- so it had quietly become unsatisfiable, and since it THROWS in a
+          # fail-fast matrix it cancelled every other platform and skipped
+          # packaging. That is why no release has been cut since April: not a
+          # policy, not a decision, just a stale number nobody re-derived.
+          #
+          # Kept as a real floor rather than deleted: it is the only thing
+          # asserting the module is not gutted. If this fires, do NOT lower it
+          # again -- compare src/ against the PUBLIC_SRC allowlist first.
+          if ($mod.ExportedFunctions.Count -lt 80) {
+            throw "Expected 80+ exported functions, got $($mod.ExportedFunctions.Count) -- compare src/ against PUBLIC_SRC in sync-aitherzero.yml before touching this floor"
           }
 
       - name: Upload test results
