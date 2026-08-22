@@ -296,14 +296,28 @@ jobs:
 
           $notes | Set-Content -Path release-notes.md
 
+      # `gh`, not a third-party action: the org's Actions allowlist rejects
+      # unlisted actions with a startup_failure -- zero jobs, no log, and
+      # nothing naming the action. v2.3.1 produced no release that way while
+      # this file was byte-identical to the one that shipped v2.3.0; the file
+      # had not changed, the policy had. gh is preinstalled on every runner
+      # and cannot be de-allowlisted.
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          body_path: release-notes.md
-          draft: false
-          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-          files: |
-            AitherZero-${{ steps.version.outputs.version }}.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          ZIP: AitherZero-${{ steps.version.outputs.version }}.zip
+          PRERELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$ZIP" || { echo "::error::$ZIP was not produced"; exit 1; }
+          flags=()
+          [ "$PRERELEASE" = "true" ] && flags+=(--prerelease)
+          gh release view "$TAG" >/dev/null 2>&1 \
+            || gh release create "$TAG" --title "AitherZero $TAG" \
+                 --notes-file release-notes.md "${flags[@]:-}"
+          gh release upload "$TAG" "$ZIP" --clobber
 
   publish-gallery:
     name: Publish to PSGallery
