@@ -58,7 +58,12 @@ jobs:
             $targets += './library/automation-scripts/'
           }
 
-          $lint = Invoke-ScriptAnalyzer -Path $targets -Recurse -Settings PSGallery -Severity Error
+          # -Path takes ONE string; $targets is an array. Passing it throws
+          # "Cannot convert 'System.Object[]' to the type 'System.String'"
+          # BEFORE any file is analysed -- so this step was not reporting a
+          # clean tree, it was not running at all.
+          $lint = @($targets | ForEach-Object {
+            Invoke-ScriptAnalyzer -Path $_ -Recurse -Settings PSGallery -Severity Error })
           if ($lint.Count -gt 0) {
             $lint | Format-Table -AutoSize
             throw "PSScriptAnalyzer found $($lint.Count) error(s)"

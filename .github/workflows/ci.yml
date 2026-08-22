@@ -79,8 +79,11 @@ jobs:
             $targets += './library/automation-scripts/'
           }
 
-          $errors = Invoke-ScriptAnalyzer -Path $targets -Recurse -Settings PSGallery -Severity Error
-          $warnings = Invoke-ScriptAnalyzer -Path $targets -Recurse -Settings PSGallery -Severity Warning
+          # -Path takes ONE string; $targets is an array (see release.yml).
+          $errors = @($targets | ForEach-Object {
+            Invoke-ScriptAnalyzer -Path $_ -Recurse -Settings PSGallery -Severity Error })
+          $warnings = @($targets | ForEach-Object {
+            Invoke-ScriptAnalyzer -Path $_ -Recurse -Settings PSGallery -Severity Warning })
           if ($warnings.Count -gt 0) {
             Write-Host "::warning::PSScriptAnalyzer found $($warnings.Count) warning(s):"
             $warnings | Format-Table -AutoSize
