@@ -78,7 +78,7 @@ $psm1Content.AppendLine("") | Out-Null
 
 # 5b. Post-init: Load deferred plugins discovered during Startup
 $psm1Content.AppendLine("# region Post-Init: Deferred Plugin Loading") | Out-Null
-$psm1Content.AppendLine("if (`$script:_PendingPluginPaths) {") | Out-Null
+$psm1Content.AppendLine("if (Get-Variable -Name `'_PendingPluginPaths`' -Scope Script -ErrorAction SilentlyContinue) {") | Out-Null
 $psm1Content.AppendLine("    foreach (`$pendingPath in `$script:_PendingPluginPaths) {") | Out-Null
 $psm1Content.AppendLine("        try {") | Out-Null
 $psm1Content.AppendLine("            Register-AitherPlugin -Path `$pendingPath -ErrorAction SilentlyContinue") | Out-Null
