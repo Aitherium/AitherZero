@@ -192,7 +192,7 @@ Write-Ok "AitherZero $((Get-Module AitherZero).Version) imported"
 # -- 4. Playbook --
 if ($Playbook -eq 'none' -or [string]::IsNullOrWhiteSpace($Playbook)) {
     Write-Step "no playbook requested"
-    Write-Ok "try: Invoke-AitherPlaybook dev-workstation    (Get-AitherPlaybook lists the rest)"
+    Write-Ok "try: Invoke-AitherPlaybook dev-workstation   then   Invoke-AitherPlaybook connect   (Get-AitherPlaybook lists the rest)"
     return
 }
 

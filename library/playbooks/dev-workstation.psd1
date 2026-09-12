@@ -127,14 +127,16 @@
 |   DEV WORKSTATION READY                                          |
 +=================================================================+
 |                                                                  |
-|  Open a NEW terminal (PATH), then:                               |
+|  Open a NEW terminal (PATH), then connect (sign in, inference,   |
+|  wire Claude Code / Cursor to the MCP gateway, prove it):        |
 |                                                                  |
-|    adk status          what inference is reachable               |
-|    adk login           connect to your Aitherium account         |
-|    adk quickstart      local GPU inference  (or --cloud)         |
-|    awsh                the terminal that answers you             |
+|    Invoke-AitherPlaybook connect                                 |
+|    Invoke-AitherPlaybook connect -Variables @{ Ide = 'cursor' }  |
 |                                                                  |
-|  Re-run this playbook any time; every step is idempotent.        |
+|  Or by hand: adk login / adk quickstart --cloud / adk mcp setup  |
+|  Then: awsh   adk start   adk claude-model code (DeepSeek Flash) |
+|                                                                  |
+|  Re-run either playbook any time; every step is idempotent.      |
 |                                                                  |
 +=================================================================+
 "@
