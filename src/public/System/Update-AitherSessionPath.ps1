@@ -54,6 +54,8 @@ function Update-AitherSessionPath {
             '/usr/local/bin'
             '/snap/bin'
         )
+        # macOS `pip install --user` console scripts land in ~/Library/Python/<ver>/bin
+        $candidates += @(Get-ChildItem "$HOME/Library/Python/*/bin" -Directory -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })
         $merged = $before + @($candidates | Where-Object { Test-Path $_ })
     }
 

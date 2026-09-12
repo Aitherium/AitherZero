@@ -110,7 +110,9 @@ function Ensure-FeatureEnabled {
     if ($Config.Core -and $Config.Core.NonInteractive -eq $true) {
         $isNonInteractive = $true
     }
-    if ($env:CI -eq 'true' -or $env:AITHERZERO_NONINTERACTIVE -eq '1' -or $env:AITHEROS_NONINTERACTIVE -eq '1') {
+    if ($env:CI -eq 'true' -or $env:AITHERZERO_NONINTERACTIVE -eq '1' -or $env:AITHEROS_NONINTERACTIVE -eq '1' -or $env:AITHERZERO_AUTOENABLE -eq '1') {
+        # AITHERZERO_AUTOENABLE: set by bootstrap.ps1/.sh - the user already
+        # asked for the tool by running the playbook; do not ask again.
         $isNonInteractive = $true
     }
     # A host with no prompt surface (pwsh -Command / -File under a pipe, a

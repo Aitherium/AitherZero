@@ -91,6 +91,14 @@ try {
     if ($PSCmdlet.ShouldProcess("pip", "install $spec")) {
         Write-ScriptLog $display
         & $pyExe @pipArgs
+        if ($LASTEXITCODE -ne 0 -and -not $IsWindows) {
+            # PEP 668: Homebrew / Debian Pythons refuse system-wide installs
+            # ("externally-managed-environment"; measured on macos-latest CI).
+            # A per-user install is the intended escape hatch for a CLI tool.
+            Write-ScriptLog "pip refused a system install; retrying --user --break-system-packages" -Level Warning
+            $userArgs = $pyArgs + @('-m', 'pip', 'install', '--upgrade', '--user', '--break-system-packages', $spec)
+            & $pyExe @userArgs
+        }
         if ($LASTEXITCODE -ne 0) {
             throw "pip exited with code $LASTEXITCODE"
         }
