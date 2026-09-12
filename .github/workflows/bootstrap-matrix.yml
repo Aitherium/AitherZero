@@ -1,0 +1,98 @@
+# Proves the one-paste door on a blank machine of each OS: the real
+# bootstrap.ps1 / bootstrap.sh from this checkout, running the real
+# dev-workstation playbook (package installs, pip awdk, npm awsh, verify).
+# No mocks. If this is green, an attendee can paste the line.
+name: bootstrap-matrix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'bootstrap.ps1'
+      - 'bootstrap.sh'
+      - 'library/playbooks/dev-workstation.psd1'
+      - 'library/playbooks/connect.psd1'
+      - 'library/automation-scripts/**'
+      - 'src/**'
+      - '.github/workflows/bootstrap-matrix.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  windows:
+    name: Windows (PS 5.1 -> pwsh, bootstrap.ps1)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: One-paste bootstrap (from checkout, Windows PowerShell 5.1)
+        shell: powershell
+        env:
+          AITHERZERO_NONINTERACTIVE: '1'
+        run: |
+          # Same entry a user hits: 5.1 host, re-execs under pwsh, runs dev-workstation.
+          ./bootstrap.ps1 -InstallPath "$PWD" -Playbook dev-workstation -NonInteractive
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Tools answer
+        shell: pwsh
+        run: |
+          $env:PATH = [Environment]::GetEnvironmentVariable('PATH','Machine') + ';' + [Environment]::GetEnvironmentVariable('PATH','User') + ';' + $env:PATH
+          adk --help | Select-Object -First 1
+          awsh --version
+      - name: connect (dry-run, no login on CI)
+        shell: pwsh
+        env:
+          AITHERZERO_NONINTERACTIVE: '1'
+        run: |
+          Import-Module ./AitherZero.psd1 -Force
+          Invoke-AitherPlaybook -Name connect -DryRun
+
+  linux:
+    name: Ubuntu (bootstrap.sh -> pwsh lane)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: One-paste bootstrap
+        env:
+          AITHERZERO_ROOT: ${{ github.workspace }}
+        run: sh ./bootstrap.sh --playbook dev-workstation --non-interactive
+      - name: Tools answer
+        run: |
+          export PATH="$HOME/.local/bin:$(npm prefix -g)/bin:$PATH"
+          adk --help | head -1
+          awsh --version
+
+  macos:
+    name: macOS (bootstrap.sh -> pwsh lane)
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: One-paste bootstrap
+        env:
+          AITHERZERO_ROOT: ${{ github.workspace }}
+        run: sh ./bootstrap.sh --playbook dev-workstation --non-interactive
+      - name: Tools answer
+        run: |
+          export PATH="$HOME/.local/bin:$(npm prefix -g)/bin:$PATH"
+          adk --help | head -1
+          awsh --version
+
+  termux-native-lane:
+    name: Termux native lane (Ubuntu container, --native)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container: ubuntu:24.04
+    steps:
+      - name: Minimal box (curl only, like a fresh Termux)
+        run: apt-get update -y && apt-get install -y curl ca-certificates
+      - uses: actions/checkout@v4
+      - name: bootstrap.sh --native (the no-pwsh path phones take)
+        run: sh ./bootstrap.sh --native --playbook dev-workstation --non-interactive
+      - name: Tools answer
+        run: |
+          export PATH="$HOME/.local/bin:$(npm prefix -g)/bin:$PATH"
+          adk --help | head -1
+          awsh --version
