@@ -116,12 +116,16 @@ else {
         throw "PowerShell 7 was installed but 'pwsh' is not on PATH yet. Open a new terminal and re-run."
     }
     Write-Ok "pwsh installed; re-launching under it"
-    # Re-exec THIS script under pwsh. When piped to iex there is no file, so
-    # hand pwsh the same URL/body the user used by writing it to a temp file.
+    # Re-exec THIS script under pwsh. When run via `irm | iex` there is no
+    # file, and $MyInvocation.MyCommand.ScriptBlock is NOT the full script
+    # (measured 2026-09-12: pwsh -File on that dump failed with "terminator
+    # '#>' is missing"). Fetch the canonical file for -Ref instead - the
+    # session that got here just proved it can reach GitHub.
     $self = $MyInvocation.MyCommand.Path
     if (-not $self) {
         $self = Join-Path ([IO.Path]::GetTempPath()) 'aitherzero-bootstrap.ps1'
-        Set-Content -Path $self -Value $MyInvocation.MyCommand.ScriptBlock.ToString() -Encoding UTF8
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+        Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/$Repo/$Ref/bootstrap.ps1" -OutFile $self
     }
     $fwd = @('-Playbook', $Playbook, '-InstallPath', $InstallPath, '-Ref', $Ref)
     if ($Update)         { $fwd += '-Update' }
