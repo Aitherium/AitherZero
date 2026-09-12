@@ -17,7 +17,8 @@
 
 .PARAMETER Playbook
     Playbook to run after install. Default 'dev-workstation'. Pass 'none' to
-    only install + import the framework.
+    only install + import the framework. A comma-separated list runs in order
+    ('dev-workstation,connect' = tools, then sign-in + IDE wiring).
 
 .PARAMETER Variables
     Hashtable forwarded to Invoke-AitherPlaybook -Variables.
@@ -78,6 +79,10 @@ $onMac     = (-not $onWindows) -and (Test-Path '/System/Library/CoreServices')
 $onLinux   = (-not $onWindows) -and (-not $onMac)
 
 if ($NonInteractive) { $env:AITHERZERO_NONINTERACTIVE = '1' }
+# A person who pasted the one-liner asked for the toolchain; never stop them
+# with "Feature 'Python' is disabled in configuration - enable?" (measured
+# 2026-09-12). Auto-enable feature toggles but keep real prompts (login).
+$env:AITHERZERO_AUTOENABLE = '1'
 
 # Refresh this process's PATH from the persisted values so a tool installed
 # a moment ago (pwsh) resolves without a new terminal. Windows-only concept.
@@ -136,7 +141,11 @@ else {
         $env:AITHERZERO_VARIABLES_JSON = ($Variables | ConvertTo-Json -Compress)
     }
     & pwsh -NoProfile -ExecutionPolicy Bypass -File $self @fwd
-    exit $LASTEXITCODE
+    # `exit` inside an `irm | iex` run closes the USER'S window; only a real
+    # file invocation may exit the process.
+    if ($MyInvocation.MyCommand.Path) { exit $LASTEXITCODE }
+    if ($LASTEXITCODE -ne 0) { Write-Warn "bootstrap finished with exit code $LASTEXITCODE" }
+    return
 }
 
 if ($env:AITHERZERO_VARIABLES_JSON -and $Variables.Count -eq 0) {
@@ -200,11 +209,18 @@ if ($Playbook -eq 'none' -or [string]::IsNullOrWhiteSpace($Playbook)) {
     return
 }
 
-Write-Step "playbook: $Playbook"
-$pbArgs = @{ Name = $Playbook }
-if ($Variables.Count -gt 0) { $pbArgs.Variables = $Variables }
-if ($DryRun) { $pbArgs.DryRun = $true }
-$result = Invoke-AitherPlaybook @pbArgs
-if ($result -and $result.PSObject.Properties['Failed'] -and $result.Failed -gt 0) {
-    exit 1
+# Comma-separated list runs in order in THIS pwsh ("dev-workstation,connect"
+# is the whole self-service path in one paste). Stops at the first failure.
+$failed = $false
+foreach ($pb in ($Playbook -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
+    Write-Step "playbook: $pb"
+    $pbArgs = @{ Name = $pb }
+    if ($Variables.Count -gt 0) { $pbArgs.Variables = $Variables }
+    if ($DryRun) { $pbArgs.DryRun = $true }
+    $result = Invoke-AitherPlaybook @pbArgs
+    if ($result -and $result.PSObject.Properties['Failed'] -and $result.Failed -gt 0) { $failed = $true; break }
+}
+if ($failed) {
+    if ($MyInvocation.MyCommand.Path) { exit 1 }
+    Write-Warn "a playbook failed; re-run the same line - every step is idempotent"
 }

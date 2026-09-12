@@ -25,6 +25,9 @@
 
 set -eu
 
+# Never stop the user with "Feature X is disabled - enable?" (see bootstrap.ps1).
+export AITHERZERO_AUTOENABLE=1
+
 REPO="Aitherium/AitherZero"
 PLAYBOOK="${AITHERZERO_PLAYBOOK:-dev-workstation}"
 REF="${AITHERZERO_REF:-main}"
@@ -95,7 +98,13 @@ if [ "$NATIVE" = 1 ]; then
   elif has apt-get; then
     step "packages (apt)"
     run $SUDO apt-get update -y
-    run $SUDO apt-get install -y python3 python3-pip python3-venv git nodejs npm curl
+    run $SUDO apt-get install -y python3 python3-pip python3-venv git curl ca-certificates
+    # Debian/Ubuntu's own `nodejs` is v18 (measured: ubuntu:24.04); awsh needs
+    # Node 20+ (`styleText` from node:util). Use NodeSource's 20.x repo.
+    if ! node --version 2>/dev/null | grep -Eq '^v(2[0-9]|[3-9][0-9])'; then
+      run sh -c "curl -fsSL https://deb.nodesource.com/setup_20.x | $SUDO bash -"
+      run $SUDO apt-get install -y nodejs
+    fi
   elif has dnf; then
     step "packages (dnf)"
     run $SUDO dnf install -y python3 python3-pip git nodejs npm curl
