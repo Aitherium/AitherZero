@@ -113,6 +113,15 @@ function Ensure-FeatureEnabled {
     if ($env:CI -eq 'true' -or $env:AITHERZERO_NONINTERACTIVE -eq '1' -or $env:AITHEROS_NONINTERACTIVE -eq '1') {
         $isNonInteractive = $true
     }
+    # A host with no prompt surface (pwsh -Command / -File under a pipe, a
+    # scheduled task, an agent's tool shell) makes ShouldContinue throw a
+    # NullReferenceException instead of returning $false. Treat it as
+    # non-interactive up front rather than crashing the install step.
+    if (-not $isNonInteractive) {
+        try {
+            if (-not $Host.UI -or -not $Host.UI.RawUI -or [Console]::IsInputRedirected) { $isNonInteractive = $true }
+        } catch { $isNonInteractive = $true }
+    }
 
     # Helper to get nested value
     $val = $Config.$Section
@@ -152,9 +161,17 @@ function Ensure-FeatureEnabled {
             return
         }
 
-        # Interactive mode - prompt user
+        # Interactive mode - prompt user. A prompt that cannot be shown counts
+        # as "no" was the old behaviour; it is a crash on headless hosts, so
+        # fall back to auto-enable (same as non-interactive) if it throws.
         Write-Warning $msg
-        if ($PSCmdlet.ShouldContinue("Enable '$Name' in local configuration?", "Feature Disabled")) {
+        $answer = $false
+        try { $answer = $PSCmdlet.ShouldContinue("Enable '$Name' in local configuration?", "Feature Disabled") }
+        catch {
+            Write-Host "[AUTO] Cannot prompt in this host; auto-enabling '$Name'." -ForegroundColor Yellow
+            $answer = $true
+        }
+        if ($answer) {
             Set-AitherConfig -Section $Section -Key "$Key.Enabled" -Value $true -ErrorAction Stop
             Write-Host "[OK] Enabled '$Name' in config.local.psd1" -ForegroundColor Green
         }

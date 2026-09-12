@@ -36,9 +36,16 @@ function Install-AitherPackage {
     .PARAMETER YumName
         Optional. Specific package name for YUM/DNF. Overrides Name.
 
+    .PARAMETER Command
+        Optional. The executable the package provides (e.g. 'git', 'node').
+        If it already resolves on PATH and -Force is not set, the install is
+        skipped. This is what makes a playbook re-runnable: without it, winget
+        exits non-zero for an already-installed package and the step throws.
+
     .EXAMPLE
-        Install-AitherPackage -Name "git" -WingetId "Git.Git"
+        Install-AitherPackage -Name "git" -WingetId "Git.Git" -Command git
         # Installs "Git.Git" on Winget, but "git" on other providers.
+        # No-op if `git` is already on PATH.
 
     .EXAMPLE
         Install-AitherPackage -Name "nodejs" -Provider "choco" -Version "18.0.0"
@@ -71,11 +78,25 @@ function Install-AitherPackage {
         [string]$AptName,
 
         [Parameter(Mandatory = $false)]
-        [string]$YumName
+        [string]$YumName,
+
+        [Parameter(Mandatory = $false)]
+        [string]$Command
     )
 
     process {
         try {
+            # 0. Already present? Skip unless forced. Checked BEFORE provider
+            #    detection so a machine with no package manager but the tool
+            #    already installed still passes.
+            if ($Command -and -not $Force) {
+                $existing = Get-Command $Command -ErrorAction SilentlyContinue
+                if ($existing) {
+                    Write-AitherLog -Level Information -Message "'$Command' already installed ($($existing.Source)); skipping '$Name'. Use -Force to reinstall." -Source 'Install-AitherPackage'
+                    return
+                }
+            }
+
             # 1. Detect Provider if not specified
             if ([string]::IsNullOrWhiteSpace($Provider)) {
                 if ($IsLinux) {
@@ -162,13 +183,27 @@ function Install-AitherPackage {
                 & $cmd $args
             }
 
-            if ($LASTEXITCODE -eq 0) {
+            # winget reports "already installed, no applicable upgrade" as
+            # 0x8A15002B (APPINSTALLER_CLI_ERROR_PACKAGE_ALREADY_INSTALLED),
+            # which is -1978335189 as a signed int. That is success for our
+            # purposes — the package is there.
+            $alreadyInstalledCodes = @(-1978335189)
+            if ($LASTEXITCODE -eq 0 -or ($Provider -eq 'winget' -and $LASTEXITCODE -in $alreadyInstalledCodes)) {
                 Write-AitherLog -Level Information -Message "Successfully installed $TargetName." -Source 'Install-AitherPackage'
             } else {
                 Write-AitherLog -Level Error -Message "Package installation failed with exit code $LASTEXITCODE" -Source 'Install-AitherPackage'
-                # Don't throw by default to allow script continuation? 
+                # Don't throw by default to allow script continuation?
                 # No, usually installation failure is critical.
                 throw "Failed to install $TargetName"
+            }
+
+            # The installer wrote its bin dir to the persisted PATH; this
+            # process still has the old one. Refresh so the caller's verify
+            # step (`Get-Command node`) sees what was just installed.
+            Update-AitherSessionPath
+
+            if ($Command -and -not (Get-Command $Command -ErrorAction SilentlyContinue)) {
+                Write-AitherLog -Level Warning -Message "'$TargetName' installed but '$Command' is still not on PATH in this session. A new terminal may be required." -Source 'Install-AitherPackage'
             }
         }
         catch {
