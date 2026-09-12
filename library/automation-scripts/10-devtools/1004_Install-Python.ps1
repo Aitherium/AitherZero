@@ -38,7 +38,7 @@ try {
 
     # 2. Install Python
     if ($PSCmdlet.ShouldProcess("System", "Install Python")) {
-        Install-AitherPackage -Name "python" -WingetId "Python.Python.3.12" -ChocoId "python" -BrewName "python@3.12" -AptName "python3" -YumName "python3"
+        Install-AitherPackage -Name "python" -WingetId "Python.Python.3.12" -ChocoId "python" -BrewName "python@3.12" -AptName "python3" -YumName "python3" -Command $(if ($IsWindows) { 'python' } else { 'python3' })
 
         # Ensure venv support on Linux (often separate package)
         if ($IsLinux -and (Get-Command apt-get -ErrorAction SilentlyContinue)) {
@@ -93,5 +93,7 @@ try {
 }
 catch {
     Write-ScriptLog "Python installation failed: $_" -Level Error
-    exit 1
+    # Re-throw: the playbook engine ignores `exit N` by design (see Invoke-AitherScript);
+    # only a terminating error marks this step as failed.
+    throw
 }

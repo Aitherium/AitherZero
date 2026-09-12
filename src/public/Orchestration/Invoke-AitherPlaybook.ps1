@@ -742,8 +742,15 @@ function Invoke-AitherPlaybook {
                         # a handler, not a log line. Without this a playbook could not
                         # drive its own rollback, so the migration playbook's rollback
                         # step had to be invoked by the cutover script itself.
+                        #
+                        # Two shapes are in the wild: a STRING (script id, run as the
+                        # rollback handler) and a HASHTABLE with a Message (every
+                        # shipped playbook: node-onboard, dev-workstation, ...). The
+                        # hashtable used to be stringified and looked up as a script
+                        # named 'System.Collections.Hashtable'. Its Message is
+                        # printed once, below, after the result is built.
                         $onFailure = Get-AitherMember $Playbook 'OnFailure'
-                        if ($onFailure) {
+                        if ($onFailure -is [string] -and $onFailure.Trim()) {
                             try {
                                 Write-AitherLog -Message "Invoking OnFailure handler: $onFailure" -Level Warning -Source 'Invoke-AitherPlaybook'
                                 Invoke-AitherScript -Script $onFailure -ErrorAction Stop -ShowOutput:$ShowOutput
@@ -780,6 +787,23 @@ function Invoke-AitherPlaybook {
             }
 
             Write-AitherLog -Message "Playbook execution completed: $completed/$($sequence.Count) succeeded, $failed failed" -Level Information -Source 'Invoke-AitherPlaybook'
+
+            # OnSuccess / OnFailure @{ Message = ... } blocks: the human-facing
+            # "what now" banner every shipped playbook carries. Never printed
+            # before this — the engine only knew the string (handler) shape.
+            $banner = if ($failed -eq 0) { Get-AitherMember $Playbook 'OnSuccess' } else { Get-AitherMember $Playbook 'OnFailure' }
+            if ($banner -is [System.Collections.IDictionary]) {
+                $bannerMsg = Get-AitherMember $banner 'Message'
+                if ($bannerMsg) {
+                    # '$VarName' placeholders in the banner resolve against the
+                    # merged variables so it can echo ports/paths it was given.
+                    $bannerText = [string]$bannerMsg
+                    foreach ($vk in $mergedVariables.Keys) {
+                        $bannerText = $bannerText.Replace("`$$vk", [string]$mergedVariables[$vk])
+                    }
+                    Write-Host $bannerText -ForegroundColor $(if ($failed -eq 0) { 'Green' } else { 'Red' })
+                }
+            }
 
             # Persist the execution record. Until this existed, per-step Results were
             # built in memory and discarded on return, and the three consumers of the
