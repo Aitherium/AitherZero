@@ -115,7 +115,7 @@ jobs:
         run: |
           $changedTests = "${{ needs.changes.outputs.pester_test_files }}" -split "`n" | Where-Object { $_ -and $_.Trim() }
           $config = New-PesterConfiguration
-$config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
           # The public mirror ships no tests/ (enterprise-gated); Pester throws on a missing path.
           if (-not (@($config.Run.Path.Value) | Where-Object { Test-Path $_ })) { Write-Host 'No test paths in this checkout - skipping Pester.'; exit 0 }
           $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
@@ -153,7 +153,7 @@ $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './te
         run: |
           $changedTests = "${{ needs.changes.outputs.pester_test_files }}" -split "`n" | Where-Object { $_ -and $_.Trim() }
           $config = New-PesterConfiguration
-$config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
           # The public mirror ships no tests/ (enterprise-gated); Pester throws on a missing path.
           if (-not (@($config.Run.Path.Value) | Where-Object { Test-Path $_ })) { Write-Host 'No test paths in this checkout - skipping Pester.'; exit 0 }
           $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
@@ -191,7 +191,7 @@ $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './te
         run: |
           $changedTests = "${{ needs.changes.outputs.pester_test_files }}" -split "`n" | Where-Object { $_ -and $_.Trim() }
           $config = New-PesterConfiguration
-$config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
           # The public mirror ships no tests/ (enterprise-gated); Pester throws on a missing path.
           if (-not (@($config.Run.Path.Value) | Where-Object { Test-Path $_ })) { Write-Host 'No test paths in this checkout - skipping Pester.'; exit 0 }
           $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
