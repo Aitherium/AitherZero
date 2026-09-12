@@ -115,7 +115,9 @@ jobs:
         run: |
           $changedTests = "${{ needs.changes.outputs.pester_test_files }}" -split "`n" | Where-Object { $_ -and $_.Trim() }
           $config = New-PesterConfiguration
-          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+$config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          # The public mirror ships no tests/ (enterprise-gated); Pester throws on a missing path.
+          if (-not (@($config.Run.Path.Value) | Where-Object { Test-Path $_ })) { Write-Host 'No test paths in this checkout - skipping Pester.'; exit 0 }
           $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
           $config.TestResult.Enabled = $true
           $config.TestResult.OutputFormat = 'JUnitXml'
@@ -151,7 +153,9 @@ jobs:
         run: |
           $changedTests = "${{ needs.changes.outputs.pester_test_files }}" -split "`n" | Where-Object { $_ -and $_.Trim() }
           $config = New-PesterConfiguration
-          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+$config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          # The public mirror ships no tests/ (enterprise-gated); Pester throws on a missing path.
+          if (-not (@($config.Run.Path.Value) | Where-Object { Test-Path $_ })) { Write-Host 'No test paths in this checkout - skipping Pester.'; exit 0 }
           $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
           $config.TestResult.Enabled = $true
           $config.TestResult.OutputFormat = 'JUnitXml'
@@ -187,7 +191,9 @@ jobs:
         run: |
           $changedTests = "${{ needs.changes.outputs.pester_test_files }}" -split "`n" | Where-Object { $_ -and $_.Trim() }
           $config = New-PesterConfiguration
-          $config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+$config.Run.Path = if ($changedTests.Count -gt 0) { $changedTests } else { './tests/' }
+          # The public mirror ships no tests/ (enterprise-gated); Pester throws on a missing path.
+          if (-not (@($config.Run.Path.Value) | Where-Object { Test-Path $_ })) { Write-Host 'No test paths in this checkout - skipping Pester.'; exit 0 }
           $config.Filter.ExcludeTag = @('Integration', 'GPU', 'RequiresServices')
           $config.TestResult.Enabled = $true
           $config.TestResult.OutputFormat = 'JUnitXml'
@@ -223,7 +229,7 @@ jobs:
             if ($content -notmatch '#Requires -Version 7\.0') {
               $issues += "$($script.Name): Missing #Requires -Version 7.0"
             }
-            if ($content -notmatch '\[CmdletBinding\(\)\]') {
+            if ($content -notmatch '\[CmdletBinding\(') {   # also matches [CmdletBinding(SupportsShouldProcess)]
               $issues += "$($script.Name): Missing [CmdletBinding()]"
             }
           }
