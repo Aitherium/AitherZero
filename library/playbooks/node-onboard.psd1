@@ -18,8 +18,10 @@
     #       Role    = "sovereign"
     #   }
     #
-    # The single one-liner a customer runs (any OS — AitherZero bootstraps pwsh7 + deps):
-    #   pwsh -NoProfile -Command "iwr -useb https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.ps1 | iex; Invoke-AitherPlaybook node-onboard -Variables @{ Token='<tok>' }"
+    # The single one-liner a customer runs (any OS — bootstrap.ps1/.sh install pwsh7, fetch the
+    # framework, and run THIS playbook; no prior checkout needed):
+    #   Windows : & ([scriptblock]::Create((irm https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.ps1))) -Playbook node-onboard -Variables @{ Token='<tok>' }
+    #   Unix    : curl -fsSL https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.sh | sh -s -- --playbook node-onboard --var Token=<tok>
     #
     # GOAL: enroll the machine as a first-class, observable mesh node — no inbound
     #       ports, reboot-safe service, registers + heartbeats through the tunnel.

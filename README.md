@@ -46,14 +46,43 @@ Beyond ecosystem setup, AitherZero is a general-purpose automation framework you
 
 ## Quick Start
 
-### Prerequisites
+### One paste, blank machine
 
-- **PowerShell 7.4+** — [Install](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
-- **Git**
-- **Python 3.10+** (for AI features)
-- **Docker** (optional, for container features)
+Nothing is required up front — not PowerShell 7, not git. The bootstrap installs
+PowerShell 7 if needed, fetches AitherZero into `~/.aitherzero`, and runs the
+`dev-workstation` playbook: Python, Git, Node.js LTS, GitHub CLI, then
+[`awdk`](https://github.com/Aitherium/awdk) (`adk`) and
+[`awsh`](https://github.com/Aitherium/awsh).
 
-### Install
+```powershell
+# Windows — any PowerShell window (5.1 is fine)
+irm https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.ps1 | iex
+```
+
+```bash
+# macOS / Linux / Termux
+curl -fsSL https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.sh | sh
+```
+
+Pick a different playbook, or install the framework only:
+
+```powershell
+# With parameters (the pipe-to-iex form cannot take them)
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.ps1))) -Playbook node-onboard -Variables @{ Token = '<tok>' }
+
+# Framework only
+$env:AITHERZERO_PLAYBOOK = 'none'; irm https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.ps1 | iex
+```
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.sh | sh -s -- --playbook node-onboard
+```
+
+Every step is idempotent — re-run the same line to repair a partial install.
+On Termux (no PowerShell on Android) `bootstrap.sh` performs the
+`dev-workstation` steps natively with `pkg`.
+
+### From a checkout
 
 ```bash
 git clone https://github.com/Aitherium/AitherZero.git
@@ -74,11 +103,11 @@ Get-AitherStatus
 ### Your First Commands
 
 ```powershell
-# System fingerprint — see what hardware/software you have
-Invoke-AitherScript 1002
+# What playbooks does this checkout ship?
+Get-AitherPlaybook
 
-# Run the quick test suite
-Invoke-AitherPlaybook node-onboard
+# Developer toolchain + adk + awsh (idempotent; add -DryRun to preview)
+Invoke-AitherPlaybook dev-workstation
 
 # List all available scripts
 Get-AitherScript | Format-Table Number, Name, Category
@@ -88,19 +117,22 @@ Get-AitherScript | Format-Table Number, Name, Category
 
 ## Setting Up the Aitherium Ecosystem
 
-### Option 1: AitherNode + AitherADK (Recommended Start)
+### Option 1: Developer workstation (Recommended Start)
 
-Get a local AI compute node with 30+ MCP tools and the agent SDK:
+Python, Git, Node.js LTS, GitHub CLI, then the two Aitherium client tools:
 
 ```powershell
-# Install Python, Node.js, and AI dependencies
-Invoke-AitherPlaybook node-onboard
+Invoke-AitherPlaybook dev-workstation
+# or, with the browser device-flow login at the end:
+Invoke-AitherPlaybook dev-workstation -Variables @{ Login = $true }
+```
 
-# Start AitherNode (MCP server)
-Invoke-AitherScript 0402
+Afterwards, in a new terminal:
 
-# Install AitherADK
-pip install aither-adk
+```powershell
+adk status              # which inference backends are reachable
+adk quickstart          # local GPU inference (or: adk quickstart --cloud)
+awsh                    # the terminal that answers you
 ```
 
 Now build an agent:
@@ -108,24 +140,20 @@ Now build an agent:
 ```python
 from adk import AitherAgent
 
-agent = AitherAgent("my-agent")  # Auto-detects Ollama on localhost
+agent = AitherAgent("my-agent")  # Auto-detects vLLM / Ollama / cloud
 response = await agent.chat("Hello!")
 print(response.content)
 ```
 
-### Option 2: Full Dev Environment
-
-Set up everything for Aitherium development — Python, Node.js, Docker, Ollama, and tooling:
+### Option 2: Enroll this machine as a cluster node
 
 ```powershell
-Invoke-AitherPlaybook node-onboard
+Invoke-AitherPlaybook node-onboard -Variables @{ Token = '<enroll-token>' }
 ```
 
-This automatically:
-1. Detects your hardware (GPU, CPU, RAM)
-2. Installs Python 3.11+, Node.js 20+, Docker
-3. Sets up Ollama with optimal models for your hardware tier
-4. Configures AitherNode as your local MCP server
+Registers the machine with the portal and keeps it heartbeating through the
+tunnel. See the header of `library/playbooks/node-onboard.psd1` for the
+parameters.
 
 ### Option 3: Just the Framework
 
