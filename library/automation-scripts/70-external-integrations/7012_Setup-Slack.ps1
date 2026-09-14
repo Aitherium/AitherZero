@@ -297,7 +297,7 @@ if (-not $SkipDocker) {
 
         # Pass env file to compose
         Push-Location $WorkspaceRoot
-        # D-232: use the wrapper — a raw `-f` into .DEPLOYMENT/compose/ doubles the bind paths.
+        # Use the compose wrapper — a raw `-f` into the compose directory doubles the bind paths.
         & .DEPLOYMENT/scripts/compose.ps1 aitheros --profile communication up -d aither-slack 2>&1 |
             ForEach-Object { Write-Host "    $_" -ForegroundColor Gray }
         Pop-Location

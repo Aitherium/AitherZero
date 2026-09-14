@@ -6,7 +6,7 @@
 
 .DESCRIPTION
     Looks up service port and URL from AitherZero/config/services.psd1 (which mirrors
-    AitherOS/config/services.yaml). Supports service names, aliases, and Docker mode
+    the platform's canonical service registry). Supports service names, aliases, and Docker mode
     hostname resolution. Eliminates hardcoded port assumptions.
 
     In Docker mode (AITHER_DOCKER_MODE=true), resolves to container hostnames instead

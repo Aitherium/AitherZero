@@ -8,7 +8,7 @@
 # `$config.Automation.Foo` is unsafe. Use this to read optional members safely:
 # returns the value if present, else $null. Chain it for nested access.
 #
-# WHY THIS LIVES IN public/ AND NOT private/ (D-844 - do not move it back).
+# WHY THIS LIVES IN public/ AND NOT private/ (do not move it back).
 #   Every automation script dot-sources `library/automation-scripts/_init.ps1`,
 #   which runs `Import-Module <AitherZero.psd1> -Force`. `-Force` REMOVES and
 #   re-imports the module - including while `Invoke-AitherPlaybook` is mid-run
@@ -19,7 +19,7 @@
 #   START of the step AFTER the first step that ran a script - earlier steps
 #   succeeded, then the loop's very first statement failed.
 #   Exporting makes this helper survive the re-import. The `-Force` itself is
-#   the underlying root cause and is tracked separately (D-848).
+#   the underlying root cause and is tracked separately.
 function Get-AitherMember {
     [CmdletBinding()]
     param(
@@ -32,7 +32,7 @@ function Get-AitherMember {
     # `$configs | Get-AitherMember -Name 'x'` silently returned a single value
     # instead of one per input, and every earlier item was dropped without a
     # word. Harmless while this was private and only ever called positionally;
-    # it became a real trap the moment the function was exported (D-844).
+    # it became a real trap the moment the function was exported.
     # (`$objs | Get-AitherMember 'x'` is still an error, correctly: piped, the
     # positional slot 0 is taken by the pipeline object, so a bare 'x' cannot
     # bind to -Name. Pass -Name explicitly when piping.)

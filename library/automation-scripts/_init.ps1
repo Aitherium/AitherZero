@@ -10,7 +10,7 @@ $found = $false
 #   monorepo   <root>/.PRODUCTS/.AITHERZERO/AitherZero.psd1
 #   standalone <root>/AitherZero.psd1     <- the public Aitherium/AitherZero repo
 # Only the monorepo marker used to be accepted. The public repo has no
-# .PRODUCTS/ directory at all, so this walk-up ran to the drive root, found
+# product-vault directory at all, so this walk-up ran to the drive root, found
 # nothing, and threw "FATAL: Could not locate AitherZero project root" — and
 # because EVERY automation script dot-sources this file, not one of the
 # published scripts could run. Monorepo is probed first so a nested checkout
@@ -59,7 +59,7 @@ $projectRoot = $current
 
 # 2. Import Core Module
 #
-# D-848 / root cause of D-844 - DO NOT restore the unconditional `-Force`.
+# ROOT CAUSE of a prior incident - DO NOT restore the unconditional `-Force`.
 #   Every automation script dot-sources this file, and `Import-Module -Force`
 #   REMOVES the module before re-importing it. When a script is run BY the
 #   module (Invoke-AitherPlaybook lives inside AitherZero while it invokes each

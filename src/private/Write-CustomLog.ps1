@@ -28,7 +28,7 @@ if (-not (Get-Variable -Name 'Script:AitherLogPath' -Scope Script -ErrorAction S
     # Fix: use the roots we already computed at the top of the module first, and if we
     # ever do probe for the function, constrain it with -CommandType Function so a miss
     # is answered from the function table and can NEVER trigger module discovery.
-    # D-882: StrictMode makes an unset $script:ProjectRoot THROW rather than
+    # StrictMode makes an unset $script:ProjectRoot THROW rather than
     # return $null, and $script: is not always the module's scope here. Probe
     # before reading so a missing root falls through to the env var instead of
     # taking down the caller.

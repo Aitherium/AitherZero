@@ -163,7 +163,7 @@ function Get-AitherConfigs {
         # No need to import aithercore modules
 
         if (-not $ConfigFile) {
-            # Config location (module is now at .PRODUCTS/.AITHERZERO/)
+            # Config location (the module may sit inside a product vault tree)
             $ConfigFile = Join-Path $moduleRoot 'config/config.psd1'
             if (-not (Test-Path $ConfigFile)) {
                 # Fallback to standard path if not found

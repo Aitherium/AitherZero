@@ -26,10 +26,10 @@ function Get-AitherModuleRoot {
     # HARD FIX (worktree shadow): if THIS module is running from inside a transient
     # workflow worktree (…/.claude/worktrees/<id>/…), map straight back to the MAIN
     # repo root — the directory that CONTAINS .claude/worktrees. Otherwise the
-    # walk-up below re-finds the worktree's OWN .PRODUCTS/.AITHERZERO/config.psd1 and
+    # walk-up below re-finds the worktree's OWN copy of config.psd1 and
     # pins every playbook/script lookup to a STALE checkout (the "Playbook not found"
     # bug: a new playbook committed to the main repo is invisible to the worktree copy).
-    # D-882: read $script:ProjectRoot DEFENSIVELY. The module runs under
+    # Read $script:ProjectRoot DEFENSIVELY. The module runs under
     # StrictMode, where reading a variable that was never set THROWS instead of
     # yielding $null - and $script: does not resolve to the module's scope on
     # every path this function can be reached by (0803's health check hit
@@ -66,7 +66,7 @@ function Get-AitherModuleRoot {
     #   monorepo   <root>/.PRODUCTS/.AITHERZERO/config/config.psd1   (project root = <root>)
     #   standalone <root>/config/config.psd1                          (project root = <root>)
     # The standalone case is what the PUBLIC Aitherium/AitherZero repo ships —
-    # there is no .PRODUCTS/ there at all. Testing only the monorepo marker made
+    # there is no product-vault tree there at all. Testing only the monorepo marker made
     # every walk-up fall through to the depth-2 fallback below, which returned a
     # directory OUTSIDE the repo. Get-AitherConfigs then reported
     # "Base configuration file not found: <parent>/AitherZero/config/config.psd1"
@@ -110,7 +110,7 @@ function Get-AitherModuleRoot {
             return Split-Path (Split-Path $curr -Parent) -Parent
         }
 
-        # Last resort fallback (module is now at .PRODUCTS/.AITHERZERO/, so go up 2 levels)
+        # Last resort fallback (the monorepo layout nests the module 2 levels deep)
         return Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
     }
 

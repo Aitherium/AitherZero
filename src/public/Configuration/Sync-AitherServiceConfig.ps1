@@ -5,7 +5,7 @@
     Synchronizes AitherOS services.yaml to AitherZero services.psd1.
 
 .DESCRIPTION
-    Reads the canonical AitherOS/config/services.yaml and generates an updated
+    Reads the platform's canonical services.yaml and generates an updated
     AitherZero/config/services.psd1 mirror. Detects drift between the two files
     and reports added/removed/changed services.
 
@@ -65,7 +65,7 @@ function Sync-AitherServiceConfig {
             if (Test-Path $c) { $ServicesYamlPath = $c; break }
         }
         if (-not $ServicesYamlPath) {
-            Write-Error "Cannot find AitherOS/config/services.yaml. Use -ServicesYamlPath."
+            Write-Error "Cannot find the canonical services.yaml. Use -ServicesYamlPath."
             return
         }
     }
@@ -183,7 +183,7 @@ json.dump(result, sys.stdout)
     $null = $sb.AppendLine("# ═══════════════════════════════════════════════════════════════════════════════")
     $null = $sb.AppendLine("# AITHER ECOSYSTEM SERVICE REGISTRY")
     $null = $sb.AppendLine("# ═══════════════════════════════════════════════════════════════════════════════")
-    $null = $sb.AppendLine("# AUTO-GENERATED from AitherOS/config/services.yaml by Sync-AitherServiceConfig")
+    $null = $sb.AppendLine("# AUTO-GENERATED from the canonical services.yaml by Sync-AitherServiceConfig")
     $null = $sb.AppendLine("# Last sync: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')")
     $null = $sb.AppendLine("# Source: $ServicesYamlPath")
     $null = $sb.AppendLine("# ═══════════════════════════════════════════════════════════════════════════════")

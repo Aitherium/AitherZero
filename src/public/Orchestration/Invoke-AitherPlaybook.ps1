@@ -612,7 +612,7 @@ function Invoke-AitherPlaybook {
 
                     if (-not $scriptId) { $scriptId = $item }
 
-                    # ── Condition gate for SCRIPT steps (D-849) ──────────────
+                    # ── Condition gate for SCRIPT steps ─────────────────────
                     # `Condition` used to be honored ONLY for Command steps and
                     # for ForEach-expanded items, so a gate written on an
                     # ordinary Script step was silently ignored and the step

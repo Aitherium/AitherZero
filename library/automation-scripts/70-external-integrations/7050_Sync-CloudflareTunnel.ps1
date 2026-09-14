@@ -4,7 +4,7 @@
     Sync Cloudflare Named Tunnel ingress from source-of-truth YAML.
 
 .DESCRIPTION
-    Reads AitherOS/config/cloudflare/tunnel-ingress.yaml and applies it to
+    Reads the repo's cloudflare/tunnel-ingress.yaml and applies it to
     the live tunnel via Cloudflare API. Supports -DryRun for diff preview.
 
     The Cloudflare API tunnel-config schema differs from cloudflared YAML:
@@ -27,7 +27,7 @@ param(
     [switch]$DryRun
 )
 
-# Calculate ProjectRoot (module is at .PRODUCTS/.AITHERZERO/)
+# Calculate ProjectRoot (the module may be nested under a product vault tree)
 $ProjectRoot = $PSScriptRoot
 for ($i = 0; $i -lt 5; $i++) {
     $ProjectRoot = Split-Path $ProjectRoot -Parent

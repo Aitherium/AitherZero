@@ -50,7 +50,7 @@
 
     Use this from the post-commit autosync path. `fleet-autosync.sh`'s `canon-sync` already
     reconciles the deploy tree with origin, and does it better than this script does — it
-    handles the diverged-deploy-root case (D-1642) with logic that has been exercised on
+    handles the diverged-deploy-root case with logic that has been exercised on
     real incidents. Duplicating it here would be a second implementation of the same
     invariant, which is the failure this whole workstream removed. What canon-sync does NOT
     do is verify that a mount the compose file DECLARES is actually attached to the running
@@ -148,7 +148,7 @@ function Get-DeployRoot {
     <#  MEASURED from the running fleet, not read from config.
 
         The compose project label on any running container records the absolute path of the
-        compose file docker actually loaded. Two levels up from `.DEPLOYMENT/compose/` is
+        compose file docker actually loaded. Two levels up from that compose directory is
         the deploy root. If nothing is running we cannot answer, and we say so (exit 2)
         rather than guessing the repo root — guessing is exactly how the wrong tree gets
         verified. #>
@@ -180,7 +180,7 @@ function Get-DeployRoot {
     # (generate-deploy-units.py) do not emit them, so the label scan can never
     # answer on THIS fleet (measured 2026-08-27 — every run since the podman
     # cutover exited 2 'could not determine'). The authority is the
-    # host-local marker the constitution defines (D-967, .DEPLOYMENT/
+    # host-local marker the constitution defines (a deploy-tree
     # .canonical-deploy-root relative to the repo root — NOT tracked, so the
     # fallback path is where the repo root comes from). Reading it is
     # measured, not guessed.
@@ -338,7 +338,7 @@ function Repair-DeployTree {
         if ($behind -gt 0) {
             if ($ahead -gt 0) {
                 # A real merge with local commits, in a tree other sessions are writing to.
-                # Refuse. Forcing this is what D-267 did.
+                # Refuse. Forcing this is what a prior incident did.
                 $script:Repairs.Add("REFUSED to reconcile: deploy tree is behind $behind AND ahead $ahead — needs a human merge, not automation")
             } else {
                 # --ff-only cannot rewrite or discard anything; it declines instead.

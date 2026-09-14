@@ -43,7 +43,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 # Import AitherZero module.
-# D-848: never -Force over an already-loaded AitherZero. This script runs as a
+# Never -Force over an already-loaded AitherZero. This script runs as a
 # step of the test playbooks, and the re-import destroys the session state of
 # the runner executing it (it loses its module-private functions mid-run).
 if (-not (Get-Module -Name 'AitherZero')) {

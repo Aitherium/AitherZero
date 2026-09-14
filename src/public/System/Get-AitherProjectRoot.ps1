@@ -39,7 +39,7 @@ process { try {
             $p -and (
                 (Test-Path (Join-Path $p ".PRODUCTS/.AITHERZERO/config/config.psd1")) -or
                 (Test-Path (Join-Path $p ".PRODUCTS/.AITHERZERO/AitherZero.psd1")) -or
-                # Standalone, excluding the monorepo's own .PRODUCTS/.AITHERZERO
+                # Standalone, excluding the monorepo's own module
                 # directory, which carries the identical marker pair.
                 ((Test-Path (Join-Path $p "config/config.psd1")) -and
                  (Test-Path (Join-Path $p "AitherZero.psd1")) -and

@@ -7,7 +7,7 @@ $script:ModuleRoot = $PSScriptRoot
 #   standalone  <root>/[bin/]                          -> project root is <root>
 #
 # The standalone layout is what the public Aitherium/AitherZero repo ships (it has
-# no .PRODUCTS/ at all). This block previously assumed the monorepo depth
+# no product-vault tree at all). This block previously assumed the monorepo depth
 # unconditionally and climbed 2-3 levels, landing OUTSIDE the repo — and because it
 # also exports $env:AITHERZERO_ROOT, that wrong value propagated into every
 # resolver that trusts the env var. Downstream symptoms: Get-AitherConfigs raised
@@ -26,7 +26,7 @@ $script:ModuleDir = if ((Split-Path $PSScriptRoot -Leaf) -eq 'bin') {
 # Discriminate on the module dir's OWN location, not on marker files. Both layouts
 # put config/config.psd1 + AitherZero.psd1 side by side inside the module directory,
 # so a marker test alone cannot tell them apart — it matched the monorepo's
-# .PRODUCTS/.AITHERZERO and reported THAT as the project root, breaking every
+# own module directory and reported THAT as the project root, breaking every
 # monorepo consumer that expects the outer repo. The parent directory name is the
 # one unambiguous signal.
 $_parentDir = Split-Path $script:ModuleDir -Parent
