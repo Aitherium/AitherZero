@@ -42,7 +42,7 @@ try {
     # Check if already installed and not forced
     if (-not $Force -and (Get-Command gh -ErrorAction SilentlyContinue)) {
          Write-ScriptLog "GitHub CLI is already installed."
-         return
+         exit 0
     }
 
     # Install GitHub CLI
@@ -68,7 +68,5 @@ try {
 
 } catch {
     Write-ScriptLog "GitHub CLI installation failed: $_" -Level Error
-    # Re-throw: the playbook engine ignores `exit N` by design (see Invoke-AitherScript);
-    # only a terminating error marks this step as failed.
-    throw
+    exit 1
 }

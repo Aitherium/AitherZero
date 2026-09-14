@@ -264,7 +264,7 @@ function Show-ModulePicker {
         docker     = @{ Num = 4;  Name = 'Docker Services';   Cat = 'Infrastructure'; Desc = 'Build + start containers' }
         vllm       = @{ Num = 5;  Name = 'vLLM';              Cat = 'AI Inference';   Desc = 'GPU inference server (CUDA)' }
         ollama     = @{ Num = 6;  Name = 'Ollama';             Cat = 'AI Inference';   Desc = 'Local models (CPU/GPU)' }
-        node       = @{ Num = 7;  Name = 'ADK + AitherNode';  Cat = 'Tooling';        Desc = 'Agent framework + MCP server' }
+        node       = @{ Num = 7;  Name = 'ADK + awnode';  Cat = 'Tooling';        Desc = 'Agent framework + MCP server' }
         mcp        = @{ Num = 8;  Name = 'MCP Config';        Cat = 'Tooling';        Desc = 'Claude Code, Cursor, VS Code' }
         connect    = @{ Num = 9;  Name = 'Cloudflare Tunnel'; Cat = 'Networking';     Desc = 'Remote access to your instance' }
         mesh       = @{ Num = 10; Name = 'Mesh Network';      Cat = 'Networking';     Desc = 'Multi-site sync' }

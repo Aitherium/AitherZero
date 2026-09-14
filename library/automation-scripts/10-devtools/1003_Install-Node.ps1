@@ -48,8 +48,7 @@ try {
         }
 
         # Core Install
-        # LTS, not Current: awsh needs Node 20+, and Current can be a pre-release.
-        Install-AitherPackage -Name "nodejs" -WingetId "OpenJS.NodeJS.LTS" -BrewName "node" -AptName "nodejs" -YumName "nodejs" -Command node
+        Install-AitherPackage -Name "nodejs" -WingetId "OpenJS.NodeJS" -BrewName "node" -AptName "nodejs" -YumName "nodejs"
     }
 
     # 3. Verify Installation
@@ -74,7 +73,5 @@ try {
 }
 catch {
     Write-ScriptLog "Node.js installation failed: $_" -Level Error
-    # Re-throw: the playbook engine ignores `exit N` by design (see Invoke-AitherScript);
-    # only a terminating error marks this step as failed.
-    throw
+    exit 1
 }

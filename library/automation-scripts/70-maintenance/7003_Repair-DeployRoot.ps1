@@ -153,18 +153,43 @@ function Get-DeployRoot {
         rather than guessing the repo root — guessing is exactly how the wrong tree gets
         verified. #>
     param([string]$Fallback)
-    $names = & docker ps --format '{{.Names}}' 2>$null
-    if ($LASTEXITCODE -ne 0 -or -not $names) { return $null }
-    foreach ($n in @($names)) {
-        $cf = & docker inspect $n --format '{{index .Config.Labels "com.docker.compose.project.config_files"}}' 2>$null
-        if ($LASTEXITCODE -eq 0 -and $cf) {
-            $first = (@($cf -split ',')[0]).Trim()
-            if ($first) {
-                $composeDir = Split-Path $first -Parent          # ...\.DEPLOYMENT\compose
-                $deployment = Split-Path $composeDir -Parent      # ...\.DEPLOYMENT
-                $root = Split-Path $deployment -Parent            # deploy root
-                if ($root -and (Test-Path $root)) { return $root }
+    # The fleet is rootful podman in the WSL Debian distro; `docker` is not on
+    # the host PATH (measured 2026-08-27: exit-2 'could not determine' on every
+    # run since the cutover — docker ps named nothing, so no compose project
+    # label ever resolved). Podman's compose labels use the same
+    # com.docker.compose.* keys, and `podman ps` carries them directly — ONE
+    # wsl call, never a per-container inspect loop (150 wsl.exe spawns at
+    # ~3s each under a loaded DrvFs was the 8.5-minute runtime, measured
+    # 2026-08-27).
+    $rows = & wsl.exe -d Debian -u root -e sh -c "podman ps --format '{{.Names}}|{{index .Config.Labels \"com.docker.compose.project.config_files\"}}'" 2>$null
+    if ($LASTEXITCODE -eq 0 -and $rows) {
+        foreach ($row in @($rows)) {
+            $cf = (@($row -split '\|', 2)[1]).Trim()
+            if ($cf) {
+                $first = (@($cf -split ',')[0]).Trim()
+                if ($first) {
+                    $composeDir = Split-Path $first -Parent      # ...\.DEPLOYMENT\compose
+                    $deployment = Split-Path $composeDir -Parent  # ...\.DEPLOYMENT
+                    $root = Split-Path $deployment -Parent        # deploy root
+                    if ($root -and (Test-Path $root)) { return $root }
+                }
             }
+        }
+    }
+    # The fleet carries no compose project labels: the quadlet generators
+    # (generate-deploy-units.py) do not emit them, so the label scan can never
+    # answer on THIS fleet (measured 2026-08-27 — every run since the podman
+    # cutover exited 2 'could not determine'). The authority is the
+    # host-local marker the constitution defines (D-967, .DEPLOYMENT/
+    # .canonical-deploy-root relative to the repo root — NOT tracked, so the
+    # fallback path is where the repo root comes from). Reading it is
+    # measured, not guessed.
+    if ($Fallback) {
+        $marker = Join-Path $Fallback '.DEPLOYMENT/.canonical-deploy-root'
+        if (Test-Path $marker) {
+            $line = (Get-Content $marker -ErrorAction SilentlyContinue |
+                     Where-Object { $_ -match '^[A-Za-z]:[\\/]' } | Select-Object -First 1)
+            if ($line -and (Test-Path $line)) { return $line }
         }
     }
     return $null
@@ -263,18 +288,18 @@ function Test-RunningMounts {
     $declared = Get-DeclaredMountSources -ComposePath $composePath
     if ($declared.Count -eq 0) { return @() }
 
-    $running = & docker ps --format '{{.Names}}' 2>$null
+    $running = & wsl.exe -d Debian -u root -e podman ps --format '{{.Names}}' 2>$null
     if ($LASTEXITCODE -ne 0) { return @() }
 
     $needRecreate = @()
     foreach ($name in @($running)) {
-        $svc = & docker inspect $name --format '{{index .Config.Labels "com.docker.compose.service"}}' 2>$null
+        $svc = & wsl.exe -d Debian -u root -e podman inspect $name --format '{{index .Config.Labels "com.docker.compose.service"}}' 2>$null
         if ($LASTEXITCODE -ne 0 -or -not $svc -or -not $declared.ContainsKey($svc)) { continue }
         # `{{println .Destination}}`, NOT `{{"`n"}}`: inside a single-quoted PowerShell
         # string the backtick-n is LITERAL, so the Go template emitted one line containing
         # "/data`n/etc/resolv.conf`n..." and nothing ever matched — every mount reported
         # missing and the first live run produced a screen of false CRITICALs.
-        $actual = & docker inspect $name --format '{{range .Mounts}}{{println .Destination}}{{end}}' 2>$null
+        $actual = & wsl.exe -d Debian -u root -e podman inspect $name --format '{{range .Mounts}}{{println .Destination}}{{end}}' 2>$null
         if ($LASTEXITCODE -ne 0) { continue }
         $actualSet = @($actual) | ForEach-Object { $_.Trim() } | Where-Object { $_ }
         # Only SOURCE-TREE mounts. The generic form is unreliable here: this compose file

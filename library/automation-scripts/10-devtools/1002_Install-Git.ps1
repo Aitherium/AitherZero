@@ -37,7 +37,7 @@ try {
     # 2. Install Git
     # Install-AitherPackage handles OS detection and package manager selection
     if ($PSCmdlet.ShouldProcess("System", "Install Git")) {
-        Install-AitherPackage -Name "git" -WingetId "Git.Git" -Command git
+        Install-AitherPackage -Name "git" -WingetId "Git.Git"
     }
 
     # 3. Verify Installation
@@ -52,7 +52,5 @@ try {
 }
 catch {
     Write-ScriptLog "Git installation failed: $_" -Level Error
-    # Re-throw: the playbook engine ignores `exit N` by design (see Invoke-AitherScript);
-    # only a terminating error marks this step as failed.
-    throw
+    exit 1
 }

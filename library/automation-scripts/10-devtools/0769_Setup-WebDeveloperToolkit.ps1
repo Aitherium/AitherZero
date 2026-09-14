@@ -1,6 +1,6 @@
 ﻿#Requires -Version 7.0
 # Stage: AI Tools
-# Dependencies: 0761 (AitherNode), 0720 (AitherOS Venv)
+# Dependencies: 0761 (awnode), 0720 (AitherOS Venv)
 # Description: Sets up Aither's Web Developer Toolkit (Neocities, Cloudflare Tunnel)
 # Tags: ai, web, neocities, tunnel, deployment
 
@@ -16,7 +16,7 @@
     
     Components:
     - AitherTunnel: Cloudflare Tunnel integration (lib/network/)
-    - mcp_neocities: Neocities deployment tools (AitherNode/tools/mcp/)
+    - mcp_neocities: Neocities deployment tools (awnode/tools/mcp/)
     - neocities-starter: HTML/CSS/JS template (templates/web/)
     - web-developer skill: Documentation and examples (skills/)
     
@@ -88,7 +88,7 @@ $aitherOSRoot = Join-Path $projectRoot "AitherOS"
 $configDir = Join-Path $aitherOSRoot "config"
 $secretsDir = Join-Path $configDir "secrets"
 $networkLibDir = Join-Path $aitherOSRoot "lib/network"
-$mcpToolsDir = Join-Path $aitherOSRoot "AitherNode/tools/mcp"
+$mcpToolsDir = Join-Path $aitherOSRoot "awnode/tools/mcp"
 $templatesDir = Join-Path $aitherOSRoot "templates/web/neocities-starter"
 $skillsDir = Join-Path $aitherOSRoot "skills/web-developer"
 
@@ -373,7 +373,7 @@ if (Test-Path $toolsRegistryPath) {
 Write-Host ""
 Write-Host "📋 Step 6: Checking Python dependencies..." -ForegroundColor Cyan
 
-$requirementsPath = Join-Path $aitherOSRoot "AitherNode/requirements.txt"
+$requirementsPath = Join-Path $aitherOSRoot "awnode/requirements.txt"
 if (Test-Path $requirementsPath) {
     $requirements = Get-Content $requirementsPath -Raw
     $requiredPkgs = @("aiohttp", "pyyaml")

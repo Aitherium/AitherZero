@@ -73,7 +73,7 @@
         Port            = '8080'    # loopback port the server listens on
         ApiKey          = ''        # portal API key - REQUIRED to enrol as YOUR endpoint
         Portal          = 'https://portal.aitherium.com'
-        WithAgent       = $true     # install aither-adk and enrol the device
+        WithAgent       = $true     # install awdk and enrol the device
         StartAgent      = $false    # also run `adk up` (opt-in: it holds the terminal)
         InstallerUrl    = 'https://aitherium.com/install-bonsai.sh'
         DryRun          = $false
@@ -114,7 +114,7 @@
 
         @{
             Name        = "Attach this device to the owner's workspace"
-            Description = "Install aither-adk into its own venv (Debian 12+ is PEP 668) and enrol this device as an endpoint"
+            Description = "Install awdk into its own venv (Debian 12+ is PEP 668) and enrol this device as an endpoint"
             # NO API KEY, NO ENROLMENT. adk falls back to the tenant 'personal' when
             # it has no identity, registering the device somewhere the owner cannot
             # see while reporting success. Skipping is correct; guessing is not.

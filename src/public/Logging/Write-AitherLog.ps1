@@ -137,11 +137,7 @@ function Write-AitherLog {
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$false, Position = 0)]
-    # 'Success' is accepted because ~40 automation scripts log their happy path
-    # with it (`-Level Success`); without it in the set, every one of them threw
-    # a ValidateSet error AFTER the install succeeded. It is recorded as
-    # Information (the sink has no such level) and rendered green on console.
-    [ValidateSet('Trace', 'Debug', 'Information', 'Success', 'Warning', 'Error', 'Critical')]
+    [ValidateSet('Trace', 'Debug', 'Information', 'Warning', 'Error', 'Critical')]
     [string]$Level,
 
     [Parameter(Mandatory=$false, Position = 1, ValueFromPipeline)]
@@ -168,24 +164,19 @@ begin {
 
 process {
     try {
-        $isSuccess = ($Level -eq 'Success')
-        if ($isSuccess) { $Level = 'Information' }
-
         # Use Write-CustomLog directly (loaded from Private/)
         if (Get-Command Write-CustomLog -ErrorAction SilentlyContinue) {
-            Write-CustomLog -Level $Level -Message $(if ($isSuccess) { "[OK] $Message" } else { $Message }) -Source $Source -Data $Data -Exception $Exception -Targets $Targets
+            Write-CustomLog -Level $Level -Message $Message -Source $Source -Data $Data -Exception $Exception -Targets $Targets
         } else {
             # Fallback to simple console output
             $prefix = "[$Level]"
             $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
             Write-Host "$prefix [$timestamp] $Source`: $Message" -ForegroundColor $(
-                if ($isSuccess) { 'Green' } else {
-                    switch ($Level) {
-                        'Error' { 'Red' }
-                        'Warning' { 'Yellow' }
-                        'Critical' { 'Magenta' }
-                        default { 'White' }
-                    }
+                switch ($Level) {
+                    'Error' { 'Red' }
+                    'Warning' { 'Yellow' }
+                    'Critical' { 'Magenta' }
+                    default { 'White' }
                 }
             )
         }
