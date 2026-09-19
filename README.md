@@ -223,8 +223,8 @@ config.psd1                 (master defaults)
 | 0720–0741 | Ai Tools | `0720_Install-StableDiffusionWebUI.ps1`, `0721_Configure-SDWebUI-Models.ps1` |
 | 0769–1033 | Devtools | `0769_Setup-WebDeveloperToolkit.ps1`, `1001_Install-Chocolatey.ps1` |
 | 3214 | Onboarding | `3214_Onboard-ClusterNode.ps1` |
-| 7001–9020 | Maintenance | `7001_Cleanup-Docker.ps1`, `7002_Validate-Environment.ps1` |
-| 7010–7051 | External Integrations | `7010_Setup-ProtonBridge.ps1`, `7012_Setup-Slack.ps1` |
+| 7001–9020 | Maintenance | `7001_Cleanup-Docker.ps1`, `9010_Scan-DiskUsage.ps1` |
+| 7010–7051 | External Integrations | `7010_Setup-ProtonBridge.ps1`, `7051_Patch-CloudflareTunnelRule.ps1` |
 
 ### Key Scripts
 

@@ -48,6 +48,12 @@ $scriptMetadata = @{
 
 # Import modules
 . "$PSScriptRoot/../_init.ps1"
+
+# Layout-aware payload base (see _init.ps1): the monorepo vendors the module
+# under the product-vault tree, while the public standalone checkout IS
+# projectRoot itself. $manifestRel was resolved above for whichever matched.
+$zeroBase = if ($manifestRel) { Split-Path (Join-Path $projectRoot $manifestRel) -Parent } else { $projectRoot }
+
 $testingModule = Join-Path $projectRoot "aithercore/testing/TestingFramework.psm1"
 $loggingModule = Join-Path $projectRoot "aithercore/utilities/Logging.psm1"
 
@@ -325,7 +331,7 @@ try {
 
     # Output configuration
     if (-not $OutputPath) {
-        $OutputPath = Join-Path $projectRoot ".PRODUCTS/.AITHERZERO/library/tests/results"
+        $OutputPath = Join-Path $zeroBase "library/tests/results"
     }
 
     if (-not (Test-Path $OutputPath)) {
@@ -557,10 +563,10 @@ catch {
     # CRITICAL: Always create TestReport file even on catastrophic failure
     # This ensures CI/CD aggregation can process results
     # Use $PSScriptRoot instead of $projectRoot to ensure variable is always available
-    $scriptProjectRoot = Split-Path $PSScriptRoot -Parent
+    $scriptProjectRoot = Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
 
     if (-not $OutputPath) {
-        $OutputPath = Join-Path $scriptProjectRoot ".PRODUCTS/.AITHERZERO/library/tests/results"
+        $OutputPath = Join-Path $scriptProjectRoot "library/tests/results"
     }
 
     if (-not (Test-Path $OutputPath)) {

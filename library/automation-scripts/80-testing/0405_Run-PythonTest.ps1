@@ -86,6 +86,11 @@ if (-not $projectRoot) {
     exit 2
 }
 
+# Layout-aware payload base (see _init.ps1): the monorepo vendors the module
+# under the product-vault tree, while the public standalone checkout IS
+# projectRoot itself. $manifestRel was resolved above for whichever matched.
+$zeroBase = if ($manifestRel) { Split-Path (Join-Path $projectRoot $manifestRel) -Parent } else { $projectRoot }
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Resolve Python
 # ─────────────────────────────────────────────────────────────────────────────
@@ -167,7 +172,7 @@ $pytestArgs += '--tb=short'
 
 # JUnit XML results
 if (-not $OutputPath) {
-    $resultsDir = Join-Path $projectRoot ".PRODUCTS/.AITHERZERO/library/tests/results"
+    $resultsDir = Join-Path $zeroBase "library/tests/results"
     if (-not (Test-Path $resultsDir)) {
         New-Item -ItemType Directory -Path $resultsDir -Force | Out-Null
     }
@@ -267,7 +272,7 @@ Write-Host ""
 
 if (Get-Command Initialize-AitherDashboard -ErrorAction SilentlyContinue) {
     try {
-        Initialize-AitherDashboard -ProjectPath $projectRoot -OutputPath ".PRODUCTS/.AITHERZERO/library/reports"
+        Initialize-AitherDashboard -ProjectPath $projectRoot -OutputPath (Join-Path $zeroBase "library/reports")
 
         $metrics = @{
             PythonTestsRun     = $true
