@@ -41,6 +41,11 @@
         NodeId  = ''
         Role    = 'sovereign'
 
+        # Hardware tier. 'auto' detects the GPU; no GPU => cpu_only, the smallest
+        # working model + enhancement loops (plan spec P5). Pin a profile name to override.
+        Tier      = 'auto'
+        PullModel = $false
+
         # Preview only — validate + show what would run, change nothing.
         DryRun  = $false
     }
@@ -53,6 +58,17 @@
     )
 
     Sequence = @(
+        @{
+            Name            = "Select hardware tier (no GPU => smallest model, CPU-only)"
+            Script          = "32-onboarding/3239_Select-NodeHardwareTier"
+            Description     = "Detect GPU; pick the profile + default model; write ~/.aither/node-hardware.json and export AITHER_HARDWARE_TIER / AITHER_CPU_ONLY / AITHER_NODE_MODEL for the installer"
+            Parameters      = @{
+                Tier      = '$Tier'
+                PullModel = '$PullModel'
+                DryRun    = '$DryRun'
+            }
+            ContinueOnError = $false
+        }
         @{
             Name            = "Onboard cluster node (OS-detected installer)"
             Script          = "32-onboarding/3214_Onboard-ClusterNode"
