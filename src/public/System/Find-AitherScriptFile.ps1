@@ -87,10 +87,22 @@ function Find-AitherScriptFile {
         $strictPattern = "${ScriptId}_*.ps1"
         Write-Verbose "Trying strict pattern: $strictPattern"
         # Search recursively but exclude _archive
-        $found = Get-ChildItem -Path $ScriptsPath -Filter $strictPattern -Recurse -ErrorAction SilentlyContinue |
+        $strictMatches = @(Get-ChildItem -Path $ScriptsPath -Filter $strictPattern -Recurse -ErrorAction SilentlyContinue |
             Where-Object { $_.DirectoryName -notmatch '_archive' } |
-            Select-Object -First 1
-        if ($found) {
+            Sort-Object FullName)
+        # A number used by more than one live script is AMBIGUOUS. Picking the first
+        # match ran whichever script enumeration order happened to surface -- asking for
+        # 3050 meaning the regulated deploy silently ran the GHCR deploy. Refuse and name
+        # the candidates so the caller disambiguates with '<category>/<file name>'.
+        if ($strictMatches.Count -gt 1) {
+            $candidates = $strictMatches | ForEach-Object {
+                "$($_.Directory.Name)/$($_.BaseName)"
+            }
+            throw ("Ambiguous script number '$ScriptId': $($strictMatches.Count) scripts share it " +
+                "($($candidates -join ', ')). Pass '<category>/<script name>' instead.")
+        }
+        if ($strictMatches.Count -eq 1) {
+            $found = $strictMatches[0]
             Write-Verbose "Found strict match: $($found.FullName)"
             return $found
         }
