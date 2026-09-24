@@ -1,6 +1,6 @@
 {
   "generatedFrom": "automation-scripts",
-  "scriptCount": 66,
+  "scriptCount": 72,
   "categories": [
     {
       "category": "10-devtools",
@@ -12,7 +12,7 @@
     },
     {
       "category": "32-onboarding",
-      "scripts": 5
+      "scripts": 11
     },
     {
       "category": "60-monitoring",
@@ -1520,6 +1520,214 @@
       "configKeys": []
     },
     {
+      "id": "3260",
+      "name": "Install-AWDK",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3260_Install-AWDK.ps1",
+      "synopsis": "Install awdk — the Aither ADK (`adk` CLI) — via pip.",
+      "params": [
+        {
+          "name": "Extras",
+          "type": "s",
+          "enum": [],
+          "default": "shell,platform,node",
+          "mandatory": false,
+          "help": "Comma-separated pip extras. Default 'shell,platform,node'. Empty string"
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Reinstall even if `adk` already resolves."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print the pip command without running it."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3261",
+      "name": "Install-AWSH",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3261_Install-AWSH.ps1",
+      "synopsis": "Install awsh — the terminal that answers you — via npm.",
+      "params": [
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Reinstall even if `awsh` already resolves."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print the npm command without running it."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3262",
+      "name": "Test-DevWorkstation",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3262_Test-DevWorkstation.ps1",
+      "synopsis": "Verify the developer workstation toolchain: every tool resolves AND answers.",
+      "params": [
+        {
+          "name": "RequireGitHubCLI",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Treat `gh` as required (default: optional)."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "List the checks without running them."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3263",
+      "name": "Connect-Aitherium",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3263_Connect-Aitherium.ps1",
+      "synopsis": "Connect this machine to an Aitherium account via `adk login` (browser device flow).",
+      "params": [
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Log in again even if already authenticated."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print what would run."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3264",
+      "name": "Connect-Inference",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3264_Connect-Inference.ps1",
+      "synopsis": "Make sure this machine has an inference backend: reuse one that is UP, else `adk quickstart`.",
+      "params": [
+        {
+          "name": "Mode",
+          "type": "e",
+          "enum": [
+            "cloud",
+            "local"
+          ],
+          "default": "cloud",
+          "mandatory": false,
+          "help": "cloud (default) or local."
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Run quickstart even if a backend is already UP."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print what would run."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3265",
+      "name": "Connect-IDE",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3265_Connect-IDE.ps1",
+      "synopsis": "Wire an IDE / coding agent to the Aitherium MCP gateway (`adk mcp setup`).",
+      "params": [
+        {
+          "name": "Ide",
+          "type": "e",
+          "enum": [
+            "claude-code",
+            "cursor",
+            "windsurf",
+            "vscode",
+            "none"
+          ],
+          "default": "claude-code",
+          "mandatory": false,
+          "help": "claude-code (default), cursor, windsurf, vscode. 'none' skips the write"
+        },
+        {
+          "name": "Mode",
+          "type": "e",
+          "enum": [
+            "remote",
+            "local"
+          ],
+          "default": "remote",
+          "mandatory": false,
+          "help": "remote (default) or local."
+        },
+        {
+          "name": "ProjectDir",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Where the IDE config is written. Default: current directory."
+        },
+        {
+          "name": "BakeToken",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Pass --bake-token to adk mcp setup."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print what would run."
+        }
+      ],
+      "configKeys": []
+    },
+    {
       "id": "0650",
       "name": "Sync-Observability",
       "category": "60-monitoring",
@@ -3016,6 +3224,14 @@
     {
       "name": "comfyui-backend",
       "file": "comfyui-backend.psd1"
+    },
+    {
+      "name": "connect",
+      "file": "connect.psd1"
+    },
+    {
+      "name": "dev-workstation",
+      "file": "dev-workstation.psd1"
     },
     {
       "name": "node-onboard",

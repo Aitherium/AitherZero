@@ -33,8 +33,8 @@ AitherZero is a **PowerShell 7+ automation framework** designed to get you up an
 
 | Product | What it is | Install with AitherZero |
 |---------|-----------|------------------------|
-| [**awnode**](https://github.com/Aitherium/aither) | Lightweight MCP compute node — 30+ AI tools, runs standalone or mesh-connected | `Invoke-AitherScript 0402` |
-| [**AitherADK**](https://github.com/Aitherium/aither/tree/main/awdk) | Agent Development Kit — build agents in 3 lines | `pip install awdk` |
+| [**awnode**](https://github.com/Aitherium/aither) | Lightweight MCP compute node — 30+ AI tools, runs standalone or mesh-connected | `Invoke-AitherPlaybook node-onboard` |
+| [**AitherADK**](https://github.com/Aitherium/aither/tree/main/awdk) | Agent Development Kit — build agents in 3 lines | `Invoke-AitherPlaybook dev-workstation` (or `pip install awdk`) |
 | [**AitherDesktop**](https://github.com/Aitherium) | Native desktop client (Windows/Linux) with MCP, watchdog, and home widget | `Invoke-AitherPlaybook node-onboard` |
 | [**AitherConnect**](https://github.com/Aitherium) | Browser extension (Chrome/Edge) — connects to any awnode instance | `Invoke-AitherPlaybook node-onboard` |
 | [**AitherSDK**](https://github.com/Aitherium/aithersdk) | Python client library — `pip install aithersdk` | Auto-installed with ADK |
@@ -74,11 +74,11 @@ Get-AitherStatus
 ### Your First Commands
 
 ```powershell
-# System fingerprint — see what hardware/software you have
+# Install Git (idempotent — skips when git already resolves)
 Invoke-AitherScript 1002
 
-# Run the quick test suite
-Invoke-AitherPlaybook node-onboard
+# Preview the developer-workstation playbook without changing anything
+Invoke-AitherPlaybook dev-workstation -DryRun
 
 # List all available scripts
 Get-AitherScript | Format-Table Number, Name, Category
@@ -93,14 +93,14 @@ Get-AitherScript | Format-Table Number, Name, Category
 Get a local AI compute node with 30+ MCP tools and the agent SDK:
 
 ```powershell
-# Install Python, Node.js, and AI dependencies
-Invoke-AitherPlaybook node-onboard
+# Install Python, Git, Node.js, gh, awdk (the `adk` CLI) and awsh
+Invoke-AitherPlaybook dev-workstation
 
-# Start awnode (MCP server)
-Invoke-AitherScript 0402
+# Sign in, pick inference, wire your IDE to the MCP gateway, verify
+Invoke-AitherPlaybook connect
 
-# Install AitherADK
-pip install awdk
+# Start a local agent in the current project
+adk start
 ```
 
 Now build an agent:
@@ -113,19 +113,14 @@ response = await agent.chat("Hello!")
 print(response.content)
 ```
 
-### Option 2: Full Dev Environment
+### Option 2: Join this machine to your cluster
 
-Set up everything for Aitherium development — Python, Node.js, Docker, Ollama, and tooling:
+Enroll THIS machine as a secure node of your own cluster (single-use, token-gated
+enrollment; Windows / Linux / macOS):
 
 ```powershell
 Invoke-AitherPlaybook node-onboard
 ```
-
-This automatically:
-1. Detects your hardware (GPU, CPU, RAM)
-2. Installs Python 3.11+, Node.js 20+, Docker
-3. Sets up Ollama with optimal models for your hardware tier
-4. Configures awnode as your local MCP server
 
 ### Option 3: Just the Framework
 
@@ -141,25 +136,21 @@ No AI dependencies — just the PowerShell module, config system, script engine,
 
 ## Connect to Your AI Assistant (MCP)
 
-AitherZero exposes 25+ tools to AI coding assistants via the [Model Context Protocol](https://modelcontextprotocol.io):
+AitherZero's agent tools ship in [awdk](https://github.com/Aitherium/aither/tree/main/awdk)
+as the bundled `aitherzero` tool pack — `az_inventory`, `az_describe_script`,
+`az_plan_playbook`, `az_generate_config`, `az_validate_config`, `az_export_schema`
+and `az_scaffold_script`. Any awdk agent gets them with no extra setup, and the
+same tools run from a shell:
 
-```json
-{
-  "servers": {
-    "aitherzero": {
-      "command": "node",
-      "args": ["./library/integrations/mcp-server/dist/index.js"],
-      "env": {
-        "AITHERZERO_ROOT": "/path/to/AitherZero"
-      }
-    }
-  }
-}
+```bash
+pip install awdk
+python -m adk.toolpacks.aitherzero --root /path/to/AitherZero inventory
+python -m adk.toolpacks.aitherzero --root /path/to/AitherZero plan-playbook dev-workstation
 ```
 
-Your AI assistant can then: run automation scripts, execute playbooks, query configuration, manage git workflows, and orchestrate deployments — all through natural language.
-
-Works with **GitHub Copilot**, **Claude**, **Cursor**, and any MCP-compatible client.
+To reach them from **Claude Code**, **Cursor** or any MCP-compatible client, run the
+`connect` playbook (or `adk mcp setup` by hand), which wires the client to the
+MCP gateway.
 
 ---
 
@@ -275,6 +266,8 @@ Invoke-AitherPlaybook node-onboard
 
 | Playbook | Description |
 |----------|-------------|
+| `dev-workstation` | Bootstrap THIS machine as a developer workstation: Python, Git, Node.js, gh, awdk (`adk`) and awsh — what `bootstrap.ps1` / `bootstrap.sh` run by default |
+| `connect` | Sign in, choose inference, wire your IDE to the MCP gateway, verify |
 | `node-onboard` | Onboard THIS machine as a secure AitherOS cluster node (Windows / Linux / macOS) |
 
 Run `Get-AitherPlaybook` to list what your checkout actually ships — additional
@@ -333,7 +326,6 @@ AitherZero/
 ├── library/
 │   ├── automation-scripts/      # 178+ numbered scripts
 │   ├── playbooks/               # Orchestration playbooks
-│   ├── integrations/mcp-server/ # MCP server for AI assistants
 │   └── templates/               # Script templates
 ├── config/
 │   ├── config.psd1              # Master configuration
