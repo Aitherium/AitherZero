@@ -176,6 +176,44 @@ function Find-AitherScriptFile {
         }
     }
 
+    # 7. _archive fallback (plan spec 2.1). Every pass above excludes _archive so a
+    #    live script always wins, but playbooks still sequence scripts that were
+    #    retired into _archive (0214_Manage-WSL, 0011_Get-SystemInfo, ...). With no
+    #    fallback those steps failed 'Script not found' although the file ships.
+    #    Resolve them LAST, loudly: a deprecation warning names the archived file so
+    #    the playbook gets repointed. A number shared by several archived scripts is
+    #    refused exactly like a live collision.
+    if (-not $found) {
+        $archiveDirs = @(Get-ChildItem -Path $ScriptsPath -Directory -Recurse -Filter '_archive' -ErrorAction SilentlyContinue)
+        $leafId = ($ScriptId -split '/')[-1]
+        foreach ($archiveDir in $archiveDirs) {
+            $archiveHit = $null
+            $archiveExact = Join-Path $archiveDir.FullName $(if ($leafId -match '\.ps1$') { $leafId } else { "$leafId.ps1" })
+            if (Test-Path $archiveExact) {
+                $archiveHit = Get-Item $archiveExact
+            }
+            elseif ($leafId -match '^\d{4}$') {
+                $archiveMatches = @(Get-ChildItem -Path $archiveDir.FullName -Filter "${leafId}_*.ps1" -ErrorAction SilentlyContinue |
+                    Sort-Object FullName)
+                if ($archiveMatches.Count -gt 1) {
+                    throw ("Ambiguous script number '$ScriptId': $($archiveMatches.Count) archived scripts share it " +
+                        "($(($archiveMatches | ForEach-Object BaseName) -join ', ')). Pass the full script name instead.")
+                }
+                if ($archiveMatches.Count -eq 1) { $archiveHit = $archiveMatches[0] }
+            }
+            else {
+                $archivePattern = if ($leafId -match '\.ps1$') { "*$leafId" } else { "*${leafId}*.ps1" }
+                $archiveHit = Get-ChildItem -Path $archiveDir.FullName -Filter $archivePattern -ErrorAction SilentlyContinue |
+                    Sort-Object FullName | Select-Object -First 1
+            }
+            if ($archiveHit) {
+                Write-Warning ("Script '$ScriptId' resolved from _archive ($($archiveHit.Name)); it is deprecated. " +
+                    "Repoint the caller at a live script.")
+                return $archiveHit
+            }
+        }
+    }
+
     Write-Verbose "Find-AitherScriptFile: Searching for '$ScriptId' in '$ScriptsPath'"
     Write-Verbose "Pattern: $pattern"
 
