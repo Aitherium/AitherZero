@@ -1,4 +1,4 @@
-@{
+﻿@{
     Name        = "connect"
     Description = "Self-service connect: sign in to Aitherium (browser device flow), make sure inference is reachable, wire your IDE to the MCP gateway, prove it"
     Version     = "1.0.0"

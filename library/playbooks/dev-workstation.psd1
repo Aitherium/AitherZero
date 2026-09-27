@@ -1,4 +1,4 @@
-@{
+﻿@{
     Name        = "dev-workstation"
     Description = "Bootstrap THIS machine as an Aitherium developer workstation: Python + Git + Node + gh, then awdk (adk) and awsh — one playbook, any OS, re-runnable"
     Version     = "1.0.0"
