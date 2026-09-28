@@ -1,55 +1,53 @@
-﻿#Requires -Version 7.0
+#Requires -Version 7.0
 
 <#
 .SYNOPSIS
     Toggle between AitherOS and gaming mode with a single command.
 
 .DESCRIPTION
-    Gaming mode releases ALL GPU + system resources so games get full performance:
-      - Stops all Docker containers
-      - Kills GPU processes holding VRAM
-      - Stops Docker Desktop + WSL2
-      - Optionally compacts WSL2 VHDX
+    Since 2026-09-27 the fleet runs as podman quadlets in the awnix WSL distro, so gaming
+    mode is the owner's GPU verb set (AitherOS/dev/tools/fleet_verbs.py, the same as
+    awdesk, awsh /gpu, adk gpu and awnode):
 
-    Resume brings everything back up: Docker Desktop, containers, health checks.
+      Switch-AitherGamingMode           = gpu sleep: gaming lock, model posture gaming
+                                          (MicroScheduler lanes to the DGX Spark), park every
+                                          5090 GPU unit. The rest of the fleet stays up.
+      Switch-AitherGamingMode -Resume   = gpu wake: GPU units back one at a time, previous
+                                          posture, lanes home, lock released. Refused while
+                                          awnix reports "GPU access blocked" (needs a
+                                          maintenance restart) or a game is running.
 
-    This is the AitherShell wrapper around scripts/Switch-GamingMode.ps1.
-    Just type: Start-Gaming / Stop-Gaming from any AitherShell prompt.
+    -Legacy runs the pre-awnix scripts/Switch-GamingMode.ps1 (Docker Desktop: stop compose,
+    stop the Docker service, terminate docker-desktop). On awnix it frees no fleet VRAM.
 
 .PARAMETER Resume
-    Bring everything back online (Docker Desktop → containers → health checks).
+    gpu wake instead of gpu sleep.
 
-.PARAMETER SkipCompact
-    Skip VHDX compaction when entering gaming mode (faster shutdown).
+.PARAMETER Legacy
+    Use the Docker Desktop script (Stack/ComposeFile/SkipCompact apply only here).
 
-.PARAMETER ComposeFile
-    Override the compose file used (default: auto-detected).
-
-.EXAMPLE
-    Switch-AitherGamingMode
-    # Enter gaming mode — free all GPU resources
+.PARAMETER Force
+    gpu wake only: wake even while a game is running.
 
 .EXAMPLE
-    Switch-AitherGamingMode -Resume
-    # Resume AitherOS — bring all services back up
-
-.EXAMPLE
-    Stop-Gaming
-    # Alias: enter gaming mode
-
-.EXAMPLE
-    Start-Gaming
-    # Alias: resume AitherOS from gaming mode
+    Stop-Gaming      # gpu sleep
+    Start-Gaming     # gpu wake
 
 .NOTES
     Part of the AitherZero System module.
-    Copyright © 2025 Aitherium Corporation
+    Copyright (c) 2025 Aitherium Corporation
 #>
 function Switch-AitherGamingMode {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter()]
         [switch]$Resume,
+
+        [Parameter()]
+        [switch]$Legacy,
+
+        [Parameter()]
+        [switch]$Force,
 
         [Parameter()]
         [switch]$SkipCompact,
@@ -62,44 +60,34 @@ function Switch-AitherGamingMode {
         [string]$Stack = 'Auto'
     )
 
-    begin {
-        # Resolve the backing script
-        $projectRoot = Get-AitherProjectRoot
-        $scriptPath  = Join-Path $projectRoot 'scripts' 'Switch-GamingMode.ps1'
+    process {
+        if (-not $Legacy) {
+            $verb = if ($Resume) { 'gpu wake' } else { 'gpu sleep' }
+            if ($PSCmdlet.ShouldProcess('AitherOS fleet (awnix)', $verb)) {
+                Invoke-AitherFleetVerb -Verb $verb -Force:$Force
+            } else {
+                Invoke-AitherFleetVerb -Verb $verb -DryRun
+            }
+            return
+        }
 
+        $projectRoot = Get-AitherProjectRoot
+        $scriptPath = Join-Path $projectRoot 'scripts' 'Switch-GamingMode.ps1'
         if (-not (Test-Path $scriptPath)) {
             Write-AitherError -Message "Gaming mode script not found at: $scriptPath" -ErrorAction Stop
             return
         }
-    }
-
-    process {
-        # Build argument list
         $argList = @('-NoProfile', '-File', $scriptPath)
-
         if ($Resume)      { $argList += '-Resume' }
         if ($SkipCompact) { $argList += '-SkipCompact' }
         if ($ComposeFile) { $argList += '-ComposeFile'; $argList += $ComposeFile }
         if ($Stack -ne 'Auto') { $argList += '-Stack'; $argList += $Stack }
-
-        $action = if ($Resume) { 'Resume AitherOS services' } else { 'Enter gaming mode (release GPU + services)' }
-
+        $action = if ($Resume) { 'Resume AitherOS services (Docker Desktop)' } else { 'Enter gaming mode (Docker Desktop)' }
         if ($PSCmdlet.ShouldProcess('AitherOS', $action)) {
-            Write-Host ""
-            if ($Resume) {
-                Write-Host "  🚀 Resuming AitherOS..." -ForegroundColor Cyan
-            } else {
-                Write-Host "  🎮 Entering gaming mode..." -ForegroundColor Yellow
-            }
-            Write-Host ""
-
-            # The script self-elevates, so we can just invoke it directly
             try {
                 & pwsh @argList
-                $exitCode = $LASTEXITCODE
-
-                if ($exitCode -and $exitCode -ne 0) {
-                    Write-AitherError -Message "Gaming mode script exited with code $exitCode"
+                if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
+                    Write-AitherError -Message "Gaming mode script exited with code $LASTEXITCODE"
                 }
             }
             catch {
@@ -108,5 +96,3 @@ function Switch-AitherGamingMode {
         }
     }
 }
-
-
