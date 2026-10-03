@@ -1498,7 +1498,7 @@
           "enum": [],
           "default": null,
           "mandatory": false,
-          "help": "Authenticated Veil edge base (e.g. https://portal.aitherium.com). Preferred path: the register goes"
+          "help": "Authenticated Veil edge base (e.g. https://api.aitherium.com). Preferred path: the register goes"
         },
         {
           "name": "SessionCookie",

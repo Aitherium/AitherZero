@@ -19,7 +19,7 @@
       on a 3s timeout before routing a job there.
 
     AUTH (FAIL-CLOSED): registration is tenant-scoped. It goes through the authenticated portal edge
-    (portal.aitherium.com) — an unauthenticated register lands in a fabricated 'public' tenant that
+    (api.aitherium.com) — an unauthenticated register lands in a fabricated 'public' tenant that
     the caller's own session will never discover, so the node would look registered and never receive
     a job. This script fails LOUD if the register response is not tenant-owned, and VERIFIES by reading
     the node back through the SAME authenticated listing the resolver uses (a POST 200 proves nothing
@@ -43,7 +43,7 @@
     Friendly node name. Default: the machine hostname. The system keys on name+tenant.
 
 .PARAMETER PortalUrl
-    Authenticated Veil edge base (e.g. https://portal.aitherium.com). Preferred path: the register goes
+    Authenticated Veil edge base (e.g. https://api.aitherium.com). Preferred path: the register goes
     through the session-authenticated proxy so tenant scoping is correct.
 
 .PARAMETER SessionCookie
@@ -54,7 +54,7 @@
     Plan mode: show the exact request, send nothing.
 
 .EXAMPLE
-    ./3253_Register-ImageBackend.ps1 -Address 192.168.1.100 -Port 8188 -PortalUrl https://portal.aitherium.com -SessionCookie $c
+    ./3253_Register-ImageBackend.ps1 -Address 192.168.1.100 -Port 8188 -PortalUrl https://api.aitherium.com -SessionCookie $c
 
 .NOTES
     Stage: Onboarding | Order: 3253 | Platform: Windows/pwsh
@@ -94,7 +94,7 @@ function Resolve-Address {
 # Resolve endpoint configuration for authenticated registration through the Portal.
 function Resolve-Endpoint {
     if (-not $PortalUrl) {
-        LogError "Missing -PortalUrl (e.g., https://portal.aitherium.com)"
+        LogError "Missing -PortalUrl (e.g., https://api.aitherium.com)"
         exit 10
     }
     if (-not $SessionCookie) {
