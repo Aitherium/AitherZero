@@ -40,7 +40,7 @@ of work named `NNNN_Verb-Noun.ps1`.
 | `31-remote` | 18 | gated | Remote/edge node deployment, DGX Spark, quantization |
 | `32-onboarding` | 8 | gated | Node onboarding, mesh join, laptop/ADK setup |
 | `40-lifecycle` | 10 | gated | Service start/stop/restart/scale, autoscale, watchdogs |
-| `50-ai-setup` | 15 | gated | vLLM, model provisioning, voice, workbench, orchestrator |
+| `50-ai-setup` | 16 | gated | vLLM, model provisioning, voice, workbench, orchestrator, KV-holder relay |
 | `60-chaos` | 1 | gated | Chaos-engineering scenarios |
 | `60-monitoring` | 5 | **public** | Observability, service status, flight deck, SLO reports |
 | `60-security` | 9 | gated | Secrets, security mesh, TLS certificates |
