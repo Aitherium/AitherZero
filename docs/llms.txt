@@ -1,0 +1,29 @@
+# AitherZero
+
+> PowerShell 7+ automation framework — numbered, self-describing scripts.
+
+Ops knowledge lives in people's shell history, so the same recovery gets improvised differently every time it is needed.
+
+## Install
+
+```
+git clone https://github.com/Aitherium/AitherZero
+```
+
+## Use it in 30 seconds
+
+Run one numbered script and read what it says it did.
+
+## Composes with
+
+- [awrecover](https://aitherium.github.io/awrecover/) — Labelled snapshots with an all-or-nothing restore.
+
+## Where it lives
+
+- Repo: https://github.com/Aitherium/AitherZero
+- Docs: https://aitherium.github.io/AitherZero/
+- Manifest (keys + the one-line adoption story): https://aitherium.github.io/AitherZero/aither-manifest.json
+
+This repository is mirrored from the AitherOS monorepo by `.github/workflows/sync-aitherzero.yml`; hand edits made here are overwritten on the next sync — change the source instead.
+
+Everything Aitherium, in one file for agents: https://aitherium.com/llms.txt
