@@ -20,7 +20,8 @@
     Steps:
         1. Detect OS -> choose installer (<Gateway>/install.sh | /install.ps1)
         2. Fetch the canonical installer from the gateway
-        3. Run it headless (token via env), wiring -Gateway/-NodeId/-Role
+        3. Run it headless (token via env), as -NodeClass (derived from -Role),
+           which enrols the box AND joins it to the mesh (adk mesh join)
         4. Best-effort verify the reboot-safe service/task is present
 
     Exit Codes:
@@ -35,13 +36,22 @@
     $env:AITHER_NODE_TOKEN. Required.
 
 .PARAMETER Gateway
-    Gateway the node registers through. Default: https://cluster.aitherium.com
+    Where the canonical installer is fetched from. Default:
+    https://cluster.aitherium.com (redirects to aitherium.com/install.*). The
+    installer itself takes no gateway flag; it talks to the platform's own hosts.
 
 .PARAMETER NodeId
-    Node identifier. Default: derived from the hostname by the installer.
+    Node name hint, handed over as AITHER_NODE_NAME. The installer's pairing
+    assigns the registered node id; this names the node where adk honours it.
 
 .PARAMETER Role
-    Node role: sovereign (default), compute, or edge.
+    Node role: sovereign (default), compute, or edge. Picks the installer's
+    -NodeClass unless -NodeClass is given: sovereign -> sovereign,
+    compute -> desktop, edge -> laptop.
+
+.PARAMETER NodeClass
+    Device class the installer enrols as (phone, laptop, desktop, deck, spark,
+    sovereign). A laptop/desktop joins the mesh via Headscale (NAT-friendly).
 
 .PARAMETER DryRun
     Preview the installer + flags without changing anything.
@@ -81,12 +91,18 @@ param(
     [ValidateSet('sovereign', 'compute', 'edge')]
     [string]$Role = 'sovereign',
 
+    [ValidateSet('phone', 'laptop', 'desktop', 'deck', 'spark', 'sovereign')]
+    [string]$NodeClass,
+
     [switch]$DryRun,
     [switch]$PassThru
 )
 
 $ErrorActionPreference = 'Stop'
 $Gateway = $Gateway.TrimEnd('/')
+if (-not $NodeClass) {
+    $NodeClass = switch ($Role) { 'compute' { 'desktop' } 'edge' { 'laptop' } default { 'sovereign' } }
+}
 
 function Write-Step { param([string]$Name, [string]$Status = 'running')
     $icon = switch ($Status) { 'done' { '[OK]' } 'fail' { '[FAIL]' } 'skip' { '[SKIP]' } default { '[..]' } }
@@ -103,6 +119,7 @@ $result = [ordered]@{
     Gateway   = $Gateway
     NodeId    = $NodeId
     Role      = $Role
+    NodeClass = $NodeClass
     Installer = $null
     Steps     = @()
 }
@@ -143,10 +160,11 @@ $result.Steps += @{ step = 'fetch'; status = 'ok' }
 
 # ── 2. Dry run: show what would run, change nothing ──────────────────────────
 if ($DryRun) {
+    $hint = "   (token via AITHER_NODE_TOKEN" + $(if ($NodeId) { ", AITHER_NODE_NAME=$NodeId" } else { '' }) + ")"
     $shown = if ($osName -eq 'windows') {
-        "& <install.ps1> -Gateway $Gateway -Role $Role" + $(if ($NodeId) { " -NodeId $NodeId" } else { '' }) + "   (token via `$env:AITHER_NODE_TOKEN)"
+        "& <install.ps1> -NonInteractive -NodeClass $NodeClass$hint"
     } else {
-        "sh <install.sh> --gateway $Gateway --role $Role" + $(if ($NodeId) { " --node-id $NodeId" } else { '' }) + "   (token via AITHER_NODE_TOKEN)"
+        "sh <install.sh> --non-interactive --node-class $NodeClass$hint"
     }
     Write-Step "Run installer (DRY RUN): $shown" 'skip'
     $result.Steps += @{ step = 'install'; status = 'skipped' }
@@ -156,17 +174,20 @@ if ($DryRun) {
 }
 
 # ── 3. Run the installer headless (token via env, never on a command line) ───
+# install.ps1 / install.sh read AITHER_NODE_TOKEN as their -Token / --token. They
+# take no -Gateway/-Role/-NodeId (install.sh exits 2 on an unknown flag): the role
+# becomes -NodeClass, the node name rides in AITHER_NODE_NAME.
 $prevToken = $env:AITHER_NODE_TOKEN
+$prevNodeName = $env:AITHER_NODE_NAME
 $env:AITHER_NODE_TOKEN = $Token
+if ($NodeId) { $env:AITHER_NODE_NAME = $NodeId }
 Write-Step "Run installer ($osName, headless)" 'running'
 try {
     if (-not $PSCmdlet.ShouldProcess($env:COMPUTERNAME, "onboard as $Role node -> $Gateway")) {
-        $env:AITHER_NODE_TOKEN = $prevToken
         return
     }
     if ($osName -eq 'windows') {
-        $instArgs = @{ Gateway = $Gateway; Role = $Role }
-        if ($NodeId) { $instArgs['NodeId'] = $NodeId }
+        $instArgs = @{ NonInteractive = $true; NodeClass = $NodeClass }
         $installer = [scriptblock]::Create($installerText)
         & $installer @instArgs
     } else {
@@ -174,9 +195,8 @@ try {
         $tmp = [System.IO.Path]::GetTempFileName()
         Set-Content -Path $tmp -Value $installerText -Encoding ASCII
         try {
-            $shArgs = @('--gateway', $Gateway, '--role', $Role)
-            if ($NodeId) { $shArgs += @('--node-id', $NodeId) }
-            & sh $tmp @shArgs
+            $shArgs = @('--non-interactive', '--node-class', $NodeClass)
+            & bash $tmp @shArgs
         } finally { Remove-Item -Path $tmp -Force -ErrorAction SilentlyContinue }
     }
     if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "installer exited with code $LASTEXITCODE" }
@@ -190,6 +210,7 @@ try {
     exit 2
 } finally {
     $env:AITHER_NODE_TOKEN = $prevToken
+    $env:AITHER_NODE_NAME = $prevNodeName
 }
 
 # ── 4. Best-effort verify the reboot-safe service/task is present ────────────

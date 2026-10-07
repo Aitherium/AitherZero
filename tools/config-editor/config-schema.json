@@ -1259,7 +1259,7 @@
           "enum": [],
           "default": "$(if ($env:AITHER_CLUSTER_GATEWAY) { $env:AITHER_CLUSTER_GATEWAY } else { 'https://cluster.aitherium.com' })",
           "mandatory": false,
-          "help": "Gateway the node registers through. Default: https://cluster.aitherium.com"
+          "help": "Where the canonical installer is fetched from. Default:"
         },
         {
           "name": "NodeId",
@@ -1267,7 +1267,7 @@
           "enum": [],
           "default": null,
           "mandatory": false,
-          "help": "Node identifier. Default: derived from the hostname by the installer."
+          "help": "Node name hint, handed over as AITHER_NODE_NAME. The installer's pairing"
         },
         {
           "name": "Role",
@@ -1279,7 +1279,22 @@
           ],
           "default": "sovereign",
           "mandatory": false,
-          "help": "Node role: sovereign (default), compute, or edge."
+          "help": "Node role: sovereign (default), compute, or edge. Picks the installer's"
+        },
+        {
+          "name": "NodeClass",
+          "type": "e",
+          "enum": [
+            "phone",
+            "laptop",
+            "desktop",
+            "deck",
+            "spark",
+            "sovereign"
+          ],
+          "default": null,
+          "mandatory": false,
+          "help": "Device class the installer enrols as (phone, laptop, desktop, deck, spark,"
         },
         {
           "name": "DryRun",
