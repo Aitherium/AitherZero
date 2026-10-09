@@ -158,7 +158,14 @@ foreach ($file in $files) {
 # Playbooks (optional)
 $playbooks = @()
 if ($PlaybookRoot -and (Test-Path $PlaybookRoot)) {
-  foreach ($pf in Get-ChildItem -Path $PlaybookRoot -Recurse -Include '*.psd1','*.yaml','*.yml','*.json' -File) {
+  $pbRoot = (Resolve-Path -LiteralPath $PlaybookRoot).Path
+  # Live playbooks only: skip '_'-prefixed folders (_deprecated, _utilities), the same
+  # rule the script walk applies to _archive. Get-AitherPlaybook never lists them, so a
+  # schema that included them advertised playbooks nothing can run by name.
+  $pbFiles = Get-ChildItem -Path $pbRoot -Recurse -Include '*.psd1','*.yaml','*.yml','*.json' -File |
+    Where-Object { $_.FullName.Substring($pbRoot.Length) -notmatch '[\\/]_[^\\/]*[\\/]' } |
+    Sort-Object FullName
+  foreach ($pf in $pbFiles) {
     $playbooks += [ordered]@{ name = $pf.BaseName; file = $pf.Name }
   }
 }
