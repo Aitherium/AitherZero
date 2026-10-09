@@ -109,6 +109,27 @@ try {
     if (Get-Command Update-AitherSessionPath -ErrorAction SilentlyContinue) { Update-AitherSessionPath }  # absent from a module built before this function existed
     $adk = Get-Command adk -ErrorAction SilentlyContinue
     if (-not $adk) {
+        # Put pip's script dir on PATH ourselves rather than telling the user to.
+        # A python.org install manager puts it under its own pythoncore-* tree
+        # (default scheme), a --user install under USER_BASE; ask Python for both.
+        $sep = [IO.Path]::PathSeparator
+        $probe = 'import os, sysconfig; print(sysconfig.get_path("scripts")); ' +
+                 'print(sysconfig.get_path("scripts", os.name + "_user"))'
+        $dirs = @(& $pyExe @($pyArgs + @('-c', $probe)) 2>$null | ForEach-Object { "$_".Trim() } |
+            Where-Object { $_ -and (Test-Path (Join-Path $_ $(if ($IsWindows) { 'adk.exe' } else { 'adk' }))) })
+        foreach ($d in $dirs) {
+            if (($env:PATH -split $sep) -notcontains $d) { $env:PATH = "$env:PATH$sep$d" }
+            if ($IsWindows) {
+                $userPath = [Environment]::GetEnvironmentVariable('PATH', 'User')
+                if ((@($userPath -split $sep) -notcontains $d)) {
+                    [Environment]::SetEnvironmentVariable('PATH', (@(@($userPath -split $sep | Where-Object { $_ }) + $d) -join $sep), 'User')
+                    Write-ScriptLog "Added $d to your user PATH (new terminals pick it up)"
+                }
+            }
+        }
+        $adk = Get-Command adk -ErrorAction SilentlyContinue
+    }
+    if (-not $adk) {
         $siteArgs = $pyArgs + @('-c', 'import site; print(site.USER_BASE)')
         $userBase = (& $pyExe @siteArgs 2>$null | Out-String).Trim()
         $hint = if ($IsWindows) { "$userBase\Python*\Scripts" } else { "$userBase/bin" }

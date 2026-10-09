@@ -1,6 +1,6 @@
 {
   "generatedFrom": "automation-scripts",
-  "scriptCount": 72,
+  "scriptCount": 74,
   "categories": [
     {
       "category": "10-devtools",
@@ -12,7 +12,7 @@
     },
     {
       "category": "32-onboarding",
-      "scripts": 11
+      "scripts": 13
     },
     {
       "category": "60-monitoring",
@@ -1316,6 +1316,56 @@
       "configKeys": []
     },
     {
+      "id": "3239",
+      "name": "Select-NodeHardwareTier",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3239_Select-NodeHardwareTier.ps1",
+      "synopsis": "Detect this node's GPU and pick its hardware tier + default model. No GPU => the",
+      "params": [
+        {
+          "name": "Tier",
+          "type": "s",
+          "enum": [],
+          "default": "auto",
+          "mandatory": false,
+          "help": "'auto' (default) detects. Any profile name pins it (e.g. 'cpu_only')."
+        },
+        {
+          "name": "OutputFile",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Where to write the profile JSON. Default: ~/.aither/node-hardware.json."
+        },
+        {
+          "name": "GpuProbeJson",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Inject a probe result instead of running nvidia-smi/rocm-smi. JSON: {\"vendor\":\"none\"} or"
+        },
+        {
+          "name": "PullModel",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Pull the default model with ollama when ollama is installed."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Detect and print; write nothing, pull nothing, set no env."
+        }
+      ],
+      "configKeys": []
+    },
+    {
       "id": "3250",
       "name": "Install-ComfyUI",
       "category": "32-onboarding",
@@ -1730,6 +1780,56 @@
           "default": null,
           "mandatory": false,
           "help": "Pass --bake-token to adk mcp setup."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print what would run."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3266",
+      "name": "Onboard-Appliance",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3266_Onboard-Appliance.ps1",
+      "synopsis": "Put a customer appliance repo on THIS machine, enroll it, and deploy it.",
+      "params": [
+        {
+          "name": "Repo",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "GitHub repo as owner/name. Required."
+        },
+        {
+          "name": "Dir",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Where to put it. Default: <home>/<repo name>."
+        },
+        {
+          "name": "Enroll",
+          "type": "s",
+          "enum": [],
+          "default": "$true",
+          "mandatory": false,
+          "help": "Run `adk enroll`. Default $true."
+        },
+        {
+          "name": "Deploy",
+          "type": "s",
+          "enum": [],
+          "default": "$true",
+          "mandatory": false,
+          "help": "Run the repo's deploy/deploy.ps1. Default $true."
         },
         {
           "name": "DryRun",
@@ -3232,6 +3332,10 @@
     }
   ],
   "playbooks": [
+    {
+      "name": "appliance-onboard",
+      "file": "appliance-onboard.psd1"
+    },
     {
       "name": "bootstrap-bonsai-device",
       "file": "bootstrap-bonsai-device.psd1"
