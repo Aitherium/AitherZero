@@ -10,7 +10,8 @@
       1. GitHub sign-in (`gh auth login --web`) when gh is not yet authenticated -
          appliance repos are private.
       2. Clone -Repo into -Dir, or fast-forward it when it is already there.
-      3. `adk enroll` - registers the machine so the vendor can run its fixed list of
+      3. `adk enroll` (`adk enroll --invite <code>` with -Invite) - registers the
+         machine so the vendor can run its fixed list of
          signed commands (status, logs, redeploy). Already-enrolled is a no-op.
       4. `deploy/deploy.ps1` from the repo, which builds and starts the stack.
 
@@ -21,6 +22,11 @@
     Where to put it. Default: <home>/<repo name>.
 .PARAMETER Enroll
     Run `adk enroll`. Default $true.
+.PARAMETER Invite
+    Employee invite code from an onboarding link (/setup-pc?i=<code>), or an awb1. invite
+    token. When set, step 3 runs `adk enroll --invite <code>`, which enrolls this machine
+    under the inviting org with the role the invite carries. Only the last four
+    characters are ever printed.
 .PARAMETER Deploy
     Run the repo's deploy/deploy.ps1. Default $true.
 .PARAMETER DryRun
@@ -39,6 +45,7 @@ param(
     [string]$Dir = '',
     [object]$Enroll = $true,
     [object]$Deploy = $true,
+    [string]$Invite = '',
     [switch]$DryRun
 )
 
@@ -54,6 +61,12 @@ function Invoke-Checked([string]$Exe, [string[]]$Arguments) {
 
 if ($Repo -notmatch '^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$') { throw "-Repo must be owner/name, got '$Repo'" }
 if (-not $Dir) { $Dir = Join-Path $HOME ($Repo.Split('/')[1]) }
+$Invite = "$Invite".Trim()
+if ($Invite -in @('$Invite', '$null')) { $Invite = '' }  # an unset playbook variable
+if ($Invite -and $Invite -notmatch '^[2-9A-HJ-NP-TV-Z]{5}-?[2-9A-HJ-NP-TV-Z]{5}$' -and
+    $Invite -cnotmatch '^awb1\.[A-Za-z0-9._~-]{16,2040}$') {
+    throw "-Invite is not an invite code (expected ABCDE-FGHJK)"
+}
 $interactive = -not ($env:CI -eq 'true' -or $env:AITHERZERO_NONINTERACTIVE -eq '1')
 
 if (Get-Command Update-AitherSessionPath -ErrorAction SilentlyContinue) { Update-AitherSessionPath }
@@ -85,7 +98,23 @@ if (Test-Path (Join-Path $Dir '.git')) {
 if (ConvertTo-Flag $Enroll) {
     $adk = Get-Command adk -ErrorAction SilentlyContinue
     if (-not $adk) { throw "adk not found. Run 32-onboarding/3260_Install-AWDK first." }
-    Invoke-Checked $adk.Source @('enroll')
+    if ($Invite) {
+        # Never echo the code: it admits a person. Print its last four characters only.
+        $hint = $Invite.Substring([Math]::Max(0, $Invite.Length - 4))
+        if ($DryRun) {
+            Write-Host "[DRY RUN] adk enroll --invite ...$hint"
+        } else {
+            Write-Host "+ adk enroll --invite ...$hint"
+            # Interactive runs confirm the org the code belongs to; unattended runs
+            # (CI/remote, no console to answer) pre-confirm with --yes.
+            $enrollArgs = @('enroll', '--invite', $Invite)
+            if (-not $interactive) { $enrollArgs += '--yes' }
+            & $adk.Source @enrollArgs
+            if ($LASTEXITCODE -ne 0) { throw "adk enroll --invite exited with code $LASTEXITCODE" }
+        }
+    } else {
+        Invoke-Checked $adk.Source @('enroll')
+    }
 }
 
 # 4. Deploy

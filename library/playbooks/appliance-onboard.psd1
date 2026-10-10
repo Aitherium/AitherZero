@@ -33,6 +33,9 @@
         Dir    = ''
         Enroll = $true
         Deploy = $true
+        # Employee invite code from an onboarding link (/setup-pc?i=<code>). Set ->
+        # `adk enroll --invite <code>` enrolls this machine under the inviting org.
+        Invite = ''
     }
 
     Prerequisites = @(
@@ -77,12 +80,13 @@
         @{
             Name            = "Clone, enroll, deploy"
             Script          = "32-onboarding/3266_Onboard-Appliance"
-            Description     = "gh auth login if needed, clone or update the repo, adk enroll, deploy/deploy.ps1"
+            Description     = "gh auth login if needed, clone or update the repo, adk enroll (--invite when set), deploy/deploy.ps1"
             Parameters      = @{
                 Repo   = '$Repo'
                 Dir    = '$Dir'
                 Enroll = '$Enroll'
                 Deploy = '$Deploy'
+                Invite = '$Invite'
             }
             ContinueOnError = $false
         }

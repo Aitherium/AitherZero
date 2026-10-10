@@ -1832,6 +1832,14 @@
           "help": "Run the repo's deploy/deploy.ps1. Default $true."
         },
         {
+          "name": "Invite",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Employee invite code from an onboarding link (/setup-pc?i=<code>), or an awb1. invite"
+        },
+        {
           "name": "DryRun",
           "type": "b",
           "enum": [],
