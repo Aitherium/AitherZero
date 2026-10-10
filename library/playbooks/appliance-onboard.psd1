@@ -1,4 +1,4 @@
-@{
+﻿@{
     Name        = "appliance-onboard"
     Description = "Put a customer appliance on THIS machine from a blank Windows/Linux/macOS box: toolchain, sign-in, clone, enroll, deploy — one paste, re-runnable"
     Version     = "1.0.0"
