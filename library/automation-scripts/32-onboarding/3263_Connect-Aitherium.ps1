@@ -50,6 +50,18 @@ if ($DryRun) {
     return
 }
 
+# Unattended (CI/CD, remote deploy): sign in from the environment, never a browser.
+if ($env:AITHER_API_KEY) {
+    & $adk.Source login --api-key $env:AITHER_API_KEY | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "adk login --api-key exited with code $LASTEXITCODE" }
+    Write-Host "Signed in to Aitherium from AITHER_API_KEY"
+    return
+}
+if ($env:AITHER_NODE_TOKEN) {
+    Write-Host "AITHER_NODE_TOKEN set: adk enroll will use the device join token"
+    return
+}
+
 if ($env:CI -eq 'true' -or $env:AITHERZERO_NONINTERACTIVE -eq '1') {
     Write-Warning "Non-interactive session: skipping 'adk login'. Run it yourself when a browser is available."
     return

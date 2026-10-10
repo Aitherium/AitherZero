@@ -64,11 +64,14 @@ foreach ($tool in 'git', 'gh') {
 # 1. GitHub sign-in
 & gh auth status *> $null
 if ($LASTEXITCODE -ne 0) {
-    if (-not $interactive) { throw "gh is not signed in and this session is non-interactive. Run: gh auth login --web" }
+    if (-not $interactive) { throw "gh is not signed in and this session is non-interactive. Set GH_TOKEN, or run: gh auth login --web" }
     Invoke-Checked gh @('auth', 'login', '--web', '--git-protocol', 'https', '--hostname', 'github.com')
     Invoke-Checked gh @('auth', 'setup-git')
 } else {
     Write-Host "GitHub: already signed in"
+    # A GH_TOKEN sign-in (CI/CD) never ran setup-git, so a later `git pull` on a
+    # private repo would prompt or fail; the credential helper is idempotent.
+    Invoke-Checked gh @('auth', 'setup-git')
 }
 
 # 2. Clone or update
