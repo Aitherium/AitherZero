@@ -177,6 +177,10 @@ function Invoke-AitherPlaybook {
         [Parameter(HelpMessage = "Display transcript content after execution.")]
         [switch]$ShowTranscript
     )    begin {
+        # Running a playbook is the consent for every step in it: steps must not
+        # stop on a hidden per-feature Y/N (read by Ensure-FeatureEnabled).
+        $env:AITHERZERO_AUTO_ENABLE_FEATURES = '1'
+
         # Manage logging targets for this execution
         $originalLogTargets = $script:AitherLogTargets
         if ($ShowOutput) {

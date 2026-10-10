@@ -71,11 +71,30 @@ function Install-AitherPackage {
         [string]$AptName,
 
         [Parameter(Mandatory = $false)]
-        [string]$YumName
+        [string]$YumName,
+
+        # Command that proves the package is already there (default: -Name).
+        [Parameter(Mandatory = $false)]
+        [string]$Command
     )
 
     process {
         try {
+            # 0. Already installed? Then do nothing. Re-running an installer over a
+            # working tool is never what a setup playbook means, and on Windows it
+            # can hang for good: the Git setup waits on a hidden "close the apps
+            # using git" dialog while any git process is open. -Force reinstalls.
+            if (-not $Force -and -not $Version) {
+                $probe = if ([string]::IsNullOrWhiteSpace($Command)) { $Name } else { $Command }
+                $found = Get-Command $probe -CommandType Application -ErrorAction SilentlyContinue |
+                    Where-Object { $_.Source -notmatch '[\\/]WindowsApps[\\/]' } |
+                    Select-Object -First 1
+                if ($found) {
+                    Write-AitherLog -Level Information -Message "'$Name' is already installed ($($found.Source)); skipping." -Source 'Install-AitherPackage'
+                    return
+                }
+            }
+
             # 1. Detect Provider if not specified
             if ([string]::IsNullOrWhiteSpace($Provider)) {
                 if ($IsLinux) {
@@ -148,7 +167,9 @@ function Install-AitherPackage {
                 'winget' {
                     $cmd = "winget"
                     # --id is crucial for automation to avoid ambiguity
-                    $args = @("install", "-e", "--id", $TargetName, "--accept-source-agreements", "--accept-package-agreements")
+                    # --silent + --disable-interactivity: an installer UI or a winget prompt
+                    # nobody can see is a setup that hangs forever.
+                    $args = @("install", "-e", "--id", $TargetName, "--source", "winget", "--silent", "--disable-interactivity", "--accept-source-agreements", "--accept-package-agreements")
                     if ($Version) { $args += @("-v", $Version) }
                 }
             }

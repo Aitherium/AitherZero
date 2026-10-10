@@ -113,6 +113,12 @@ function Ensure-FeatureEnabled {
     if ($env:CI -eq 'true' -or $env:AITHERZERO_NONINTERACTIVE -eq '1' -or $env:AITHEROS_NONINTERACTIVE -eq '1') {
         $isNonInteractive = $true
     }
+    # A playbook the person chose to run has already said yes to every step in it;
+    # asking again per feature is a hidden Y/N that stalls a double-clicked setup.
+    # Set by the playbook runner, so sign-in steps can still be interactive.
+    if ($env:AITHERZERO_AUTO_ENABLE_FEATURES -eq '1') {
+        $isNonInteractive = $true
+    }
 
     # Helper to get nested value
     $val = $Config.$Section
