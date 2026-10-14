@@ -1829,7 +1829,7 @@
           "enum": [],
           "default": "$true",
           "mandatory": false,
-          "help": "Run the repo's deploy/deploy.ps1. Default $true."
+          "help": "Run the repo's deploy/deploy.ps1. Default $true. Skipped, not failed, on a"
         },
         {
           "name": "Invite",

@@ -14,6 +14,7 @@
          machine so the vendor can run its fixed list of
          signed commands (status, logs, redeploy). Already-enrolled is a no-op.
       4. `deploy/deploy.ps1` from the repo, which builds and starts the stack.
+         Skipped (exit 0) when neither docker nor podman is installed.
 
     Every step is idempotent; re-running is the way to finish a partial run.
 .PARAMETER Repo
@@ -28,7 +29,8 @@
     under the inviting org with the role the invite carries. Only the last four
     characters are ever printed.
 .PARAMETER Deploy
-    Run the repo's deploy/deploy.ps1. Default $true.
+    Run the repo's deploy/deploy.ps1. Default $true. Skipped, not failed, on a
+    machine with no docker or podman.
 .PARAMETER DryRun
     Print what would run.
 .EXAMPLE
@@ -119,6 +121,16 @@ if (ConvertTo-Flag $Enroll) {
 
 # 4. Deploy
 if (ConvertTo-Flag $Deploy) {
+    # deploy.ps1's preflight throws on a PC with no container engine, and no step
+    # installs one. That throw failed the whole playbook after sign-in and enroll had
+    # already succeeded, and every re-run hit it again. A PC without an engine is a
+    # finished onboarding that simply does not host the stack locally.
+    $engine = 'docker', 'podman' | Where-Object { Get-Command $_ -ErrorAction SilentlyContinue } | Select-Object -First 1
+    if (-not $engine) {
+        Write-Host "`nSkipping the on-PC appliance: no Docker Desktop or podman on this machine."
+        Write-Host "Sign-in and enrollment are done. To also run the appliance on this PC, install Docker Desktop or podman and re-run this playbook."
+        exit 0
+    }
     $deployScript = Join-Path $Dir 'deploy/deploy.ps1'
     if (-not $DryRun -and -not (Test-Path $deployScript)) { throw "$Repo has no deploy/deploy.ps1" }
     Invoke-Checked (Get-Process -Id $PID).Path @('-NoProfile', '-File', $deployScript)
