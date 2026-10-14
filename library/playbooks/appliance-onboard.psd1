@@ -36,6 +36,17 @@
         # Employee invite code from an onboarding link (/setup-pc?i=<code>). Set ->
         # `adk enroll --invite <code>` enrolls this machine under the inviting org.
         Invite = ''
+        # Company app id for the launcher step (the tenant registry id). The tenant's
+        # door passes it only when that tenant opted in (tenant_repos.yaml
+        # `launcher: true`). NO default: this playbook serves every tenant, and empty
+        # skips the launcher, so no tenant gets another tenant's shortcuts or watcher.
+        App    = ''
+        # The tenant's brand (app_name) for the shortcut and Inbox names; default <APP>.
+        AppName = ''
+        # The hosted app the launcher's shortcut opens; default https://<App>.aitherium.com.
+        AppUrl = ''
+        # The app API the Inbox watcher uploads to (required for the watcher: awdk has no default).
+        AppApi = ''
     }
 
     Prerequisites = @(
@@ -89,6 +100,31 @@
                 Invite = '$Invite'
             }
             ContinueOnError = $false
+        }
+        @{
+            Name            = "Launcher, Inbox, agent"
+            Script          = "32-onboarding/3267_Install-AppLauncher"
+            Description     = "Only with -Variables @{ App = '<app>' }: Desktop + Start Menu shortcuts and the <APP> Inbox folder; on an interactive Windows desktop also adk up and the logon Inbox watcher (never on CI, SSH or Linux)"
+            Parameters      = @{
+                App  = '$App'
+                Name = '$AppName'
+                Url  = '$AppUrl'
+                Api  = '$AppApi'
+            }
+            ContinueOnError = $true
+        }
+        @{
+            Name            = "Desk desktop app"
+            Script          = "32-onboarding/3268_Install-Desk"
+            Description     = "Only with -Variables @{ App = '<app>' } on an interactive Windows desktop: the latest public Desk release, SHA256-verified against SHA256SUMS.txt (refused on mismatch), installed silently, ~/.aither/desk-tenant.json written from the tenant variables, Desk started; skipped offline or when already at the latest version"
+            Parameters      = @{
+                App  = '$App'
+                Name = '$AppName'
+                Url  = '$AppUrl'
+                Api  = '$AppApi'
+                Repo = '$Repo'
+            }
+            ContinueOnError = $true
         }
     )
 

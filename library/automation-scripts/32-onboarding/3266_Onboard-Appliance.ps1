@@ -100,6 +100,7 @@ if (Test-Path (Join-Path $Dir '.git')) {
 if (ConvertTo-Flag $Enroll) {
     $adk = Get-Command adk -ErrorAction SilentlyContinue
     if (-not $adk) { throw "adk not found. Run 32-onboarding/3260_Install-AWDK first." }
+    $enrollCode = 0
     if ($Invite) {
         # Never echo the code: it admits a person. Print its last four characters only.
         $hint = $Invite.Substring([Math]::Max(0, $Invite.Length - 4))
@@ -112,10 +113,23 @@ if (ConvertTo-Flag $Enroll) {
             $enrollArgs = @('enroll', '--invite', $Invite)
             if (-not $interactive) { $enrollArgs += '--yes' }
             & $adk.Source @enrollArgs
-            if ($LASTEXITCODE -ne 0) { throw "adk enroll --invite exited with code $LASTEXITCODE" }
+            $enrollCode = $LASTEXITCODE
         }
     } else {
-        Invoke-Checked $adk.Source @('enroll')
+        if ($DryRun) { Write-Host "[DRY RUN] adk enroll" }
+        else { Write-Host "+ adk enroll"; & $adk.Source enroll; $enrollCode = $LASTEXITCODE }
+    }
+    # Exit 4 = signed in (and the invite accepted) but Identity did not register this
+    # machine (402 no plan, 403 quota, unavailable after retries). That is said loudly
+    # and the run goes on: the deploy and the app launcher do not need it, and the
+    # launcher's watcher lists this PC in the company app on its own. Any other
+    # failure (not signed in, invite refused or pending) still stops here.
+    if ($enrollCode -eq 4) {
+        Write-Warning ("adk enroll: this PC was NOT registered with Identity (see the message above). " +
+            "Signed status, logs and redeploy from the Aitherium console will not reach it. " +
+            "The rest of setup continues; run 'adk enroll' again once that is fixed.")
+    } elseif ($enrollCode -ne 0) {
+        throw "adk enroll exited with code $enrollCode"
     }
 }
 
