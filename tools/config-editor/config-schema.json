@@ -1248,7 +1248,7 @@
           "enum": [],
           "default": null,
           "mandatory": false,
-          "help": "Pull the default model with ollama when ollama is installed."
+          "help": "Fetch the orchestrator GGUF from awrtifact (download only; serving is 5020's job)."
         },
         {
           "name": "DryRun",

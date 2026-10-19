@@ -23,7 +23,7 @@
       - process env for later playbook steps and the installer they spawn:
           AITHER_HARDWARE_PROFILE, AITHER_HARDWARE_TIER, AITHER_CPU_ONLY, AITHER_NODE_MODEL,
           AITHER_ENHANCEMENT_LOOPS
-      - optionally `ollama pull <default_model>` when -PullModel and ollama is on PATH.
+      - optionally fetch the orchestrator GGUF from awrtifact (-PullModel, via 5020_Setup-LlamaCpp).
 
 .PARAMETER Tier
     'auto' (default) detects. Any profile name pins it (e.g. 'cpu_only').
@@ -36,7 +36,7 @@
     {"vendor":"nvidia","name":"RTX 4090","vram_mb":24564}. For tests and air-gapped planning.
 
 .PARAMETER PullModel
-    Pull the default model with ollama when ollama is installed.
+    Fetch the orchestrator GGUF from awrtifact (download only; serving is 5020's job).
 
 .PARAMETER DryRun
     Detect and print; write nothing, pull nothing, set no env.
@@ -44,7 +44,7 @@
 .NOTES
     Stage: Onboarding | Order: 3239 | Platform: Windows, Linux, macOS
     Tags: onboarding, hardware, gpu, cpu-only, tier, model-selection
-    Dependencies: none (nvidia-smi / rocm-smi / ollama are optional)
+    Dependencies: none (nvidia-smi / rocm-smi are optional)
     Exit Codes: 0 success | 1 could not write the profile
 #>
 
@@ -187,13 +187,12 @@ $env:AITHER_NODE_MODEL = $result.default_model
 $env:AITHER_ENHANCEMENT_LOOPS = "$($result.enhancement.loops)".ToLower()
 
 if ($PullModel) {
-    if (Get-Command ollama -ErrorAction SilentlyContinue) {
-        & ollama pull $result.default_model
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "[WARN] ollama pull $($result.default_model) exited $LASTEXITCODE" -ForegroundColor Yellow
-        }
+    $setup = Join-Path $PSScriptRoot '..' '50-ai-setup' '5020_Setup-LlamaCpp.ps1'
+    if (Test-Path $setup) {
+        try { & $setup -SkipStart }
+        catch { Write-Host "[WARN] GGUF fetch failed: $_" -ForegroundColor Yellow }
     } else {
-        Write-Host "[SKIP] ollama not installed; model pull deferred to the node installer" -ForegroundColor Yellow
+        Write-Host "[SKIP] 5020_Setup-LlamaCpp.ps1 not found; model fetch deferred to the node installer" -ForegroundColor Yellow
     }
 }
 

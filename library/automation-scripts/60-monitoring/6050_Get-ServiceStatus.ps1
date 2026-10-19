@@ -63,7 +63,7 @@ $KnownServices = @(
     @{ Name = "Orchestrator"; Port = 8767;  Health = "/health";     Icon = "🎯" }
     @{ Name = "Mind";         Port = 8125;  Health = "/health";     Icon = "💭" }
     @{ Name = "Oracle";       Port = 8104;  Health = "/health";     Icon = "🦙" }
-    @{ Name = "Ollama";       Port = 11434; Health = "/api/tags";   Icon = "🦙" }
+    @{ Name = "LlamaCpp";     Port = 8200;  Health = "/health";     Icon = "🦙" }
     @{ Name = "ComfyUI";      Port = 8188;  Health = "/";           Icon = "🎨" }
 )
 

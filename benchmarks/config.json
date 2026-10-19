@@ -11,7 +11,7 @@
         },
         "embedding": {
             "enabled": true,
-            "tests": ["single_doc", "batch_small", "batch_large", "gpu_vs_ollama"],
+            "tests": ["single_doc", "batch_small", "batch_large", "gpu_vs_cpu"],
             "batch_sizes": [50, 100, 500, 1000]
         },
         "image": {

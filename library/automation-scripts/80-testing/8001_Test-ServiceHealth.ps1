@@ -62,7 +62,7 @@ $ServiceDefinitions = @{
     Oracle       = @{ Port = 8104;  Endpoint = "/health"; ExpectedStatus = "healthy" }
     Canvas       = @{ Port = 8108;  Endpoint = "/health"; ExpectedStatus = "healthy" }
     Secrets      = @{ Port = 8111;  Endpoint = "/health"; ExpectedStatus = "healthy" }
-    Ollama       = @{ Port = 11434; Endpoint = "/api/tags"; ExpectedStatus = $null }
+    LlamaCpp     = @{ Port = 8200; Endpoint = "/health"; ExpectedStatus = $null }
 }
 
 function Test-ServiceHealth {

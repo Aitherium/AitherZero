@@ -4,7 +4,7 @@
 .SYNOPSIS
     Make sure this machine has an inference backend: reuse one that is UP, else `adk quickstart`.
 .DESCRIPTION
-    Reads `adk status`. If any backend (vLLM, Ollama, Genesis, awnode, cloud
+    Reads `adk status`. If any backend (vLLM, llama.cpp, Genesis, awnode, cloud
     Gateway) is already UP, does nothing — running `adk setup`/`quickstart`
     next to a live vLLM starts a second one and OOMs the GPU (awdk's own
     AGENT_PROMPT warns about this). Otherwise runs `adk quickstart --cloud`

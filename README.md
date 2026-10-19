@@ -108,7 +108,7 @@ Now build an agent:
 ```python
 from adk import AitherAgent
 
-agent = AitherAgent("my-agent")  # Auto-detects Ollama on localhost
+agent = AitherAgent("my-agent")  # Auto-detects a local llama.cpp / vLLM server
 response = await agent.chat("Hello!")
 print(response.content)
 ```
@@ -171,7 +171,7 @@ AitherZero is entirely **config-driven**. Override defaults with a local file:
             Docker = @{ Enabled = $true }
         }
         AI = @{
-            Ollama  = @{ Enabled = $true }
+            LlamaCpp = @{ Enabled = $true }
             ComfyUI = @{ Enabled = $false }
         }
     }
@@ -197,7 +197,7 @@ config.psd1                 (master defaults)
 | Variable | Purpose |
 |----------|---------|
 | `AITHERZERO_NONINTERACTIVE=1` | Skip all prompts |
-| `AITHEROS_SKIP_OLLAMA=1` | Skip Ollama/model setup |
+| `AITHEROS_SKIP_LOCAL_MODEL=1` | Skip llama.cpp/model setup |
 | `AITHEROS_SKIP_VEIL=1` | Skip Veil dashboard build |
 
 ---
@@ -299,7 +299,7 @@ and are not included in the public release.
 ├──────────────────────────────────────────────────────────┤
 │              Aitherium Ecosystem                          │
 │  awnode · AitherADK · AitherDesktop · AitherConnect  │
-│  AitherVeil · AitherSDK · Ollama · vLLM                  │
+│  AitherVeil · AitherSDK · llama.cpp · vLLM               │
 └──────────────────────────────────────────────────────────┘
 ```
 

@@ -7,7 +7,7 @@
     Toggle to free VRAM on NVIDIA GPU by terminating Windows desktop apps that
     silently consume GPU memory (Steam, NVIDIA Overlay, Photos, Radeon, etc.).
     
-    Also provides modes for RAM optimization (Ollama model unload, Docker cache drop).
+    Also provides modes for RAM optimization (WSL2 page-cache drop, Docker cache drop).
     
     Designed for 128GB DDR5 + RTX 5090 systems where VRAM is the bottleneck.
     
@@ -19,7 +19,7 @@
 .PARAMETER Mode
     What to reclaim:
       - VRAM   : Kill GPU-hogging Windows processes (default)
-      - RAM    : Force WSL2 memory reclaim + Ollama cleanup
+      - RAM    : Force WSL2 memory reclaim
       - Full   : Both VRAM + RAM reclamation
       - Status : Show current usage without changing anything
 
@@ -204,23 +204,6 @@ function Show-Status {
         Write-Host "    ✓ No VRAM-hogging processes detected!" -ForegroundColor Green
     }
 
-    # Ollama status
-    Write-Host ""
-    Write-Host "  🦙 Ollama Models:" -ForegroundColor Yellow
-    try {
-        $ollamaPs = & ollama ps 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            foreach ($line in $ollamaPs) {
-                if ($line -match 'GPU|CPU') {
-                    Write-Host "    $line"
-                }
-            }
-        }
-    }
-    catch {
-        Write-Host "    Ollama not running" -ForegroundColor DarkGray
-    }
-
     Write-Host ""
     return $found
 }
@@ -269,42 +252,9 @@ function Invoke-VRAMReclaim {
 function Invoke-RAMReclaim {
     <#
     .SYNOPSIS
-        Reclaim system RAM — drop WSL2 caches, unload idle Ollama models.
+        Reclaim system RAM — drop WSL2 caches.
     #>
     param([switch]$WhatIf)
-
-    # 1. Unload idle Ollama models from memory
-    Write-Host "  Checking Ollama for idle models..." -ForegroundColor Cyan
-    try {
-        $ollamaPs = & ollama ps 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            # Parse loaded models
-            foreach ($line in $ollamaPs) {
-                if ($line -match '^(\S+)\s') {
-                    $modelName = $Matches[1]
-                    if ($modelName -eq 'NAME') { continue } # Header
-                    if ($WhatIf) {
-                        Write-Host "  [DRY RUN] Would unload Ollama model: $modelName" -ForegroundColor Yellow
-                    }
-                    else {
-                        Write-Host "  Unloading Ollama model: $modelName..." -ForegroundColor Cyan
-                        # Send generate request with keep_alive=0 to unload
-                        try {
-                            $body = @{ model = $modelName; keep_alive = 0 } | ConvertTo-Json
-                            Invoke-RestMethod -Uri "http://localhost:11434/api/generate" -Method Post -Body $body -ContentType "application/json" -TimeoutSec 10 | Out-Null
-                            Write-Host "  ✓ Unloaded: $modelName" -ForegroundColor Green
-                        }
-                        catch {
-                            Write-Host "  ✗ Failed to unload $modelName : $_" -ForegroundColor Red
-                        }
-                    }
-                }
-            }
-        }
-    }
-    catch {
-        Write-Host "  Ollama not accessible" -ForegroundColor DarkGray
-    }
 
     # 2. Force WSL2 to drop cached memory
     Write-Host "  Dropping WSL2 page cache..." -ForegroundColor Cyan
@@ -343,7 +293,7 @@ if (-not $Force -and -not $DryRun) {
     Write-Host ""
     $action = switch ($Mode) {
         'VRAM'  { "Kill $($found.Count) VRAM-consuming processes" }
-        'RAM'   { "Reclaim system RAM (unload Ollama models, drop WSL2 cache)" }
+        'RAM'   { "Reclaim system RAM (drop WSL2 cache)" }
         'Full'  { "Kill $($found.Count) VRAM processes AND reclaim system RAM" }
     }
     $confirm = Read-Host "  $action? [Y/n]"

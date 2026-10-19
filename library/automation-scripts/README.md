@@ -33,7 +33,7 @@ of work named `NNNN_Verb-Noun.ps1`.
 | `08-aitheros` | 11 | gated | AitherOS-specific config, snapshots, internal-product integrations |
 | `09-restore` | 10 | gated | Backup/restore pipeline (secrets, filesystem, Postgres, volumes) |
 | `10-devtools` | 23 | **public** | Dev tool installation (git, node, python, CLIs, build tools) |
-| `20-ai-tools` | 13 | **public** | AI desktop tools (ComfyUI, Stable Diffusion, Ollama, local LLM) |
+| `20-ai-tools` | 13 | **public** | AI desktop tools (ComfyUI, Stable Diffusion, local LLM) |
 | `20-build` | 9 | gated | Container image builds and publishing |
 | `26-roboflow` | 11 | gated | Roboflow 3D asset pipeline (project-specific) |
 | `30-deploy` | 29 | gated | Deployment targets: compose, K8s/K3s, cloud, rings, partners |
