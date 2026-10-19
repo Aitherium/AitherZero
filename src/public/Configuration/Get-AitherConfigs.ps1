@@ -273,7 +273,7 @@ function Get-AitherConfigs {
                         }
                     }
                     else {
-                        # Handle dot notation keys in $New (e.g., "AI.Ollama.Enabled")
+                        # Handle dot notation keys in $New (e.g., "AI.LlamaCpp.Enabled")
                         if ($key -match '\.') {
                             $parts = $key.Split('.')
                             $currentLevel = $merged

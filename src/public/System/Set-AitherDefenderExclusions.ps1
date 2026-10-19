@@ -169,7 +169,7 @@ function Set-AitherDefenderExclusions {
                 $processesToAdd = @(
                     'python.exe', 'pythonw.exe', 'node.exe', 'git.exe',
                     'pwsh.exe', 'code.exe', 'cursor.exe', 'docker.exe',
-                    'cargo.exe', 'go.exe', 'ollama.exe'
+                    'cargo.exe', 'go.exe', 'llama-server.exe'
                 )
                 $extensionsToAdd = @('pyc', 'pyo', 'obj', 'o', 'lock', 'lockb')
 

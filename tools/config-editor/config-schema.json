@@ -1,6 +1,6 @@
 {
   "generatedFrom": "automation-scripts",
-  "scriptCount": 74,
+  "scriptCount": 70,
   "categories": [
     {
       "category": "10-devtools",
@@ -8,7 +8,7 @@
     },
     {
       "category": "20-ai-tools",
-      "scripts": 13
+      "scripts": 10
     },
     {
       "category": "32-onboarding",
@@ -32,7 +32,7 @@
     },
     {
       "category": "80-testing",
-      "scripts": 7
+      "scripts": 6
     },
     {
       "category": "misc",
@@ -1130,110 +1130,6 @@
           "default": null,
           "mandatory": false,
           "help": ""
-        }
-      ],
-      "configKeys": []
-    },
-    {
-      "id": "0737",
-      "name": "Start-Ollama",
-      "category": "20-ai-tools",
-      "file": "20-ai-tools/0737_Start-Ollama.ps1",
-      "synopsis": "Starts the Ollama service.",
-      "params": [
-        {
-          "name": "ShowOutput",
-          "type": "b",
-          "enum": [],
-          "default": null,
-          "mandatory": false,
-          "help": ""
-        },
-        {
-          "name": "Detached",
-          "type": "b",
-          "enum": [],
-          "default": null,
-          "mandatory": false,
-          "help": ""
-        }
-      ],
-      "configKeys": []
-    },
-    {
-      "id": "0740",
-      "name": "Install-Ollama",
-      "category": "20-ai-tools",
-      "file": "20-ai-tools/0740_Install-Ollama.ps1",
-      "synopsis": "Installs and configures Ollama for local LLM inference.",
-      "params": [
-        {
-          "name": "Model",
-          "type": "s",
-          "enum": [],
-          "default": null,
-          "mandatory": false,
-          "help": "The default model to pull (default: llama3.2-vision)."
-        },
-        {
-          "name": "Port",
-          "type": "n",
-          "enum": [],
-          "default": null,
-          "mandatory": false,
-          "help": "The port to run Ollama on (default: 11434)."
-        }
-      ],
-      "configKeys": []
-    },
-    {
-      "id": "0741",
-      "name": "Setup-LocalLLM",
-      "category": "20-ai-tools",
-      "file": "20-ai-tools/0741_Setup-LocalLLM.ps1",
-      "synopsis": "Installs and configures local LLM models via Ollama.",
-      "params": [
-        {
-          "name": "Model",
-          "type": "e",
-          "enum": [
-            "llama3.2",
-            "phi3.5",
-            "qwen2.5:3b",
-            "mistral-nemo",
-            "llama3.1:8b",
-            "gemma2:9b",
-            "gemma3",
-            "qwen2.5:7b",
-            "sealion",
-            "dolphin-mistral",
-            "mythomax",
-            "midnight-rose",
-            "nous-hermes2",
-            "llama3.1:70b",
-            "qwen2.5:72b",
-            "mixtral:8x7b",
-            "codellama:13b",
-            "deepseek-coder:6.7b",
-            "solar:10.7b",
-            "yi:34b",
-            "llama3.2-vision",
-            "llava:13b",
-            "nemotron:8b-instruct",
-            "nemotron:51b-instruct-q4_k_m",
-            "nemotron:70b-instruct-q4_k_m"
-          ],
-          "default": "llama3.2",
-          "mandatory": false,
-          "help": "The local model to use. Categories:"
-        },
-        {
-          "name": "SkipVision",
-          "type": "b",
-          "enum": [],
-          "default": null,
-          "mandatory": false,
-          "help": "Skip pulling vision models (llama3.2-vision)."
         }
       ],
       "configKeys": []
@@ -3264,76 +3160,6 @@
           "default": null,
           "mandatory": false,
           "help": "Stop on first failure. Default: $false"
-        }
-      ],
-      "configKeys": []
-    },
-    {
-      "id": "8010",
-      "name": "Benchmark-InferenceModes",
-      "category": "80-testing",
-      "file": "80-testing/8010_Benchmark-InferenceModes.ps1",
-      "synopsis": "Benchmark all AitherOS inference modes: vLLM vs Ollama vs Hybrid.",
-      "params": [
-        {
-          "name": "Modes",
-          "type": "s",
-          "enum": [],
-          "default": "all",
-          "mandatory": false,
-          "help": "Comma-separated list of modes to benchmark."
-        },
-        {
-          "name": "Quick",
-          "type": "b",
-          "enum": [],
-          "default": null,
-          "mandatory": false,
-          "help": "Fast mode: 1 run per test instead of 3."
-        },
-        {
-          "name": "Neurons",
-          "type": "n",
-          "enum": [],
-          "default": "5",
-          "mandatory": false,
-          "help": "Number of parallel neuron agents for concurrent tests. Default: 5."
-        },
-        {
-          "name": "Save",
-          "type": "b",
-          "enum": [],
-          "default": null,
-          "mandatory": false,
-          "help": "Save results to JSON and Markdown files."
-        },
-        {
-          "name": "NemotronSize",
-          "type": "e",
-          "enum": [
-            "6b",
-            "9b",
-            "12b"
-          ],
-          "default": "6b",
-          "mandatory": false,
-          "help": "Nemotron model size for vLLM/hybrid modes: 6b, 9b, 12b (default: 6b)."
-        },
-        {
-          "name": "SkipModeSwitch",
-          "type": "b",
-          "enum": [],
-          "default": null,
-          "mandatory": false,
-          "help": "Don't switch modes — assume current mode is already set."
-        },
-        {
-          "name": "WarmupSeconds",
-          "type": "n",
-          "enum": [],
-          "default": "15",
-          "mandatory": false,
-          "help": "Seconds to wait after mode switch for model loading. Default: 15."
         }
       ],
       "configKeys": []

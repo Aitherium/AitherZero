@@ -16,7 +16,7 @@
           install-aitheros    Full partner install — deps, profile, deploy, models
           onboard-remote-site Lightweight — ADK + Node + MCP (no Docker needed)
           dev-environment     Dev tools on custom drive paths
-          setup-interactive   Post-clone — pick: vLLM, Ollama, MCP, secrets, tunnel, etc.
+          setup-interactive   Post-clone — pick: vLLM, llama.cpp, MCP, secrets, tunnel, etc.
 
     .PARAMETER Playbook
         Run a specific playbook by name.
@@ -29,7 +29,7 @@
 
     .PARAMETER Modules
         For setup-interactive playbook: comma-separated module keys to run.
-        Valid: prereqs, environment, secrets, docker, vllm, ollama, node, mcp, connect, mesh, desktop
+        Valid: prereqs, environment, secrets, docker, vllm, llamacpp, node, mcp, connect, mesh, desktop
 
     .PARAMETER Profile
         Docker Compose profile: minimal, core, full. Default: core.
@@ -168,7 +168,7 @@
     $setupPlaybooks = @(
         @{ Key = '1'; Name = 'bootstrap';           Desc = 'Fresh system — Docker, K8s, env, boot everything' }
         @{ Key = '2'; Name = 'install-aitheros';    Desc = 'Full install — deps, partner profile, deploy, models' }
-        @{ Key = '3'; Name = 'setup-interactive';   Desc = 'Post-clone — pick modules: vLLM, Ollama, MCP, secrets, tunnel' }
+        @{ Key = '3'; Name = 'setup-interactive';   Desc = 'Post-clone — pick modules: vLLM, llama.cpp, MCP, secrets, tunnel' }
         @{ Key = '4'; Name = 'onboard-remote-site'; Desc = 'Lightweight — ADK + Node + MCP (no Docker)' }
         @{ Key = '5'; Name = 'dev-environment';     Desc = 'Dev tools — Python, Node, Docker, WSL, cloud CLIs' }
     )
@@ -263,7 +263,7 @@ function Show-ModulePicker {
         secrets    = @{ Num = 3;  Name = 'API Keys & Secrets'; Cat = 'Foundation';    Desc = 'GitHub, Anthropic, HuggingFace tokens' }
         docker     = @{ Num = 4;  Name = 'Docker Services';   Cat = 'Infrastructure'; Desc = 'Build + start containers' }
         vllm       = @{ Num = 5;  Name = 'vLLM';              Cat = 'AI Inference';   Desc = 'GPU inference server (CUDA)' }
-        ollama     = @{ Num = 6;  Name = 'Ollama';             Cat = 'AI Inference';   Desc = 'Local models (CPU/GPU)' }
+        llamacpp   = @{ Num = 6;  Name = 'llama.cpp';          Cat = 'AI Inference';   Desc = 'Local GGUF models (CPU/GPU)' }
         node       = @{ Num = 7;  Name = 'ADK + awnode';  Cat = 'Tooling';        Desc = 'Agent framework + MCP server' }
         mcp        = @{ Num = 8;  Name = 'MCP Config';        Cat = 'Tooling';        Desc = 'Claude Code, Cursor, VS Code' }
         connect    = @{ Num = 9;  Name = 'Cloudflare Tunnel'; Cat = 'Networking';     Desc = 'Remote access to your instance' }
