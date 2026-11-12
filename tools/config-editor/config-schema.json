@@ -1139,58 +1139,47 @@
       "name": "Onboard-ClusterNode",
       "category": "32-onboarding",
       "file": "32-onboarding/3214_Onboard-ClusterNode.ps1",
-      "synopsis": "Onboard THIS machine as a secure AitherOS cluster node — cross-platform.",
+      "synopsis": "Onboard a machine as an AitherOS fleet node: join it to the fleet placement",
       "params": [
-        {
-          "name": "Token",
-          "type": "s",
-          "enum": [],
-          "default": "$env:AITHER_NODE_TOKEN",
-          "mandatory": false,
-          "help": "Single-use enrollment token (minted in the portal \"My Nodes\" or via"
-        },
-        {
-          "name": "Gateway",
-          "type": "s",
-          "enum": [],
-          "default": "$(if ($env:AITHER_CLUSTER_GATEWAY) { $env:AITHER_CLUSTER_GATEWAY } else { 'https://cluster.aitherium.com' })",
-          "mandatory": false,
-          "help": "Where the canonical installer is fetched from. Default:"
-        },
         {
           "name": "NodeId",
           "type": "s",
           "enum": [],
-          "default": null,
+          "default": "",
           "mandatory": false,
-          "help": "Node name hint, handed over as AITHER_NODE_NAME. The installer's pairing"
+          "help": "The controller node id, which is also the nodes.yaml name the node transport"
         },
         {
-          "name": "Role",
-          "type": "e",
-          "enum": [
-            "sovereign",
-            "compute",
-            "edge"
-          ],
-          "default": "sovereign",
+          "name": "Controller",
+          "type": "s",
+          "enum": [],
+          "default": "",
           "mandatory": false,
-          "help": "Node role: sovereign (default), compute, or edge. Picks the installer's"
+          "help": "The https URL the joining node dials. Empty = the library default"
         },
         {
-          "name": "NodeClass",
-          "type": "e",
-          "enum": [
-            "phone",
-            "laptop",
-            "desktop",
-            "deck",
-            "spark",
-            "sovereign"
-          ],
+          "name": "PinSha256",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "SHA-256 of the controller's certificate. Empty = 3268's default"
+        },
+        {
+          "name": "Force",
+          "type": "b",
+          "enum": [],
           "default": null,
           "mandatory": false,
-          "help": "Device class the installer enrols as (phone, laptop, desktop, deck, spark,"
+          "help": "Re-join a node the controller already approved."
+        },
+        {
+          "name": "NodeDryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Queue + drain with --node-dry-run: plan only, nothing changes on the node."
         },
         {
           "name": "DryRun",
@@ -1198,7 +1187,7 @@
           "enum": [],
           "default": null,
           "mandatory": false,
-          "help": "Preview the installer + flags without changing anything."
+          "help": "Print the commands; queue nothing."
         },
         {
           "name": "PassThru",
@@ -1206,7 +1195,15 @@
           "enum": [],
           "default": null,
           "mandatory": false,
-          "help": "Return a result object."
+          "help": ""
+        },
+        {
+          "name": "Invoker",
+          "type": "s",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
         }
       ],
       "configKeys": []

@@ -1,67 +1,69 @@
 ﻿@{
     Name        = "node-onboard"
-    Description = "Onboard THIS machine as a secure AitherOS cluster node (Windows / Linux / macOS) — one cross-platform playbook, CLI args, zero drift"
-    Version     = "1.0.0"
+    Description = "Onboard a machine as an AitherOS fleet node: pick its hardware tier, then join it to the fleet placement controller (awrun fleet-join, node id + certificate pin)"
+    Version     = "2.0.0"
     Author      = "AitherZero"
     Category    = "deploy"
 
     # ==========================================================================
-    # CROSS-PLATFORM NODE ONBOARDING PLAYBOOK
+    # FLEET NODE ONBOARDING PLAYBOOK
     # ==========================================================================
     #
     # USAGE:
-    #   Invoke-AitherPlaybook node-onboard -Variables @{ Token = "<enroll-token>" }
-    #   Invoke-AitherPlaybook node-onboard -Variables @{
-    #       Token   = "<enroll-token>"
-    #       Gateway = "https://cluster.aitherium.com"
-    #       NodeId  = "home-lab-01"
-    #       Role    = "sovereign"
-    #   }
+    #   Invoke-AitherPlaybook node-onboard -Variables @{ NodeId = "optiplex-wsl" }
+    #   Invoke-AitherPlaybook node-onboard -Variables @{ NodeId = "awnix"; DryRun = $true }
     #
-    # The single one-liner a customer runs (any OS — AitherZero bootstraps pwsh7 + deps):
-    #   pwsh -NoProfile -Command "iwr -useb https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.ps1 | iex; Invoke-AitherPlaybook node-onboard -Variables @{ Token='<tok>' }"
+    # GOAL: the node becomes an APPROVED member of the fleet placement controller
+    #       (aither-registry, https://127.0.0.1:8149 on the awnix host), verified
+    #       by its certificate pin.
     #
-    # GOAL: enroll the machine as a first-class, observable mesh node — no inbound
-    #       ports, reboot-safe service, registers + heartbeats through the tunnel.
+    # HOW: 3239 picks the hardware tier; 3214 delegates to
+    #      3268_Invoke-FleetMembership -Action join, which queues
+    #      `awrun submit --kind node-op --action fleet-join` and drains it. The
+    #      join token is minted controller-side, bound to the node id, and never
+    #      passed in or printed. (The retired public-gateway installer path and
+    #      its cluster-agent unit are gone.)
     #
-    # HOW: delegates to the canonical, gateway-published installer for the host OS
-    #      (install.sh on Linux/macOS, install.ps1 on Windows) so there is ONE
-    #      source of truth and zero drift between the playbook and the website.
+    # Leaving the fleet: the fleet-node-leave playbook.
     # ==========================================================================
 
     Parameters = @{
-        # REQUIRED: single-use enrollment token (minted in the portal "My Nodes",
-        # or `adk grid enroll`) — or the long-lived cluster PSK.
-        Token   = ''
+        # The controller node id; also the nodes.yaml name the node transport
+        # reaches. Empty => this machine's host name.
+        NodeId     = ''
 
-        # Gateway the node registers through (public tunnel endpoint).
-        Gateway = 'https://cluster.aitherium.com'
+        # The https URL the joining node dials. Empty => the library default
+        # (https://127.0.0.1:8149, right for the awnix host itself).
+        Controller = ''
 
-        # Node identity + role. Empty NodeId => derived from hostname.
-        NodeId  = ''
-        Role    = 'sovereign'
+        # SHA-256 of the controller certificate. Empty => the measured pin
+        # (or $env:AITHER_PLACEMENT_CONTROLLER_SHA256).
+        PinSha256  = ''
+
+        # Re-join a node the controller already approved.
+        Force      = $false
 
         # Hardware tier. 'auto' detects the GPU; no GPU => cpu_only, the smallest
         # working model + enhancement loops (plan spec P5). Pin a profile name to override.
         Tier      = 'auto'
         PullModel = $false
 
-        # Preview only — validate + show what would run, change nothing.
+        # Preview only: validate + show what would run, change nothing.
         DryRun  = $false
     }
 
     Prerequisites = @(
-        "PowerShell 7+ (AitherZero bootstrap installs it on any OS)"
-        "python3 on the node (the installer auto-installs it if missing)"
-        "Network egress to the gateway (no inbound ports required)"
-        "A valid enrollment token or cluster PSK"
+        "PowerShell 7+"
+        "awrun on PATH and python with the AitherOS monorepo (the node-op worker)"
+        "The awnix host's placement controller (aither-registry) running"
+        "The node named in nodes.yaml, reachable by the node transport"
     )
 
     Sequence = @(
         @{
             Name            = "Select hardware tier (no GPU => smallest model, CPU-only)"
             Script          = "32-onboarding/3239_Select-NodeHardwareTier"
-            Description     = "Detect GPU; pick the profile + default model; write ~/.aither/node-hardware.json and export AITHER_HARDWARE_TIER / AITHER_CPU_ONLY / AITHER_NODE_MODEL for the installer"
+            Description     = "Detect GPU; pick the profile + default model; write ~/.aither/node-hardware.json and export AITHER_HARDWARE_TIER / AITHER_CPU_ONLY / AITHER_NODE_MODEL"
             Parameters      = @{
                 Tier      = '$Tier'
                 PullModel = '$PullModel'
@@ -70,15 +72,15 @@
             ContinueOnError = $false
         }
         @{
-            Name            = "Onboard cluster node (OS-detected installer)"
+            Name            = "Join the fleet placement controller (awrun fleet-join)"
             Script          = "32-onboarding/3214_Onboard-ClusterNode"
-            Description     = "Fetch + run the canonical gateway installer for this OS, register + heartbeat the node"
+            Description     = "Delegates to 3268_Invoke-FleetMembership -Action join: mint (controller-side), install, approve, read back"
             Parameters      = @{
-                Token   = '$Token'
-                Gateway = '$Gateway'
-                NodeId  = '$NodeId'
-                Role    = '$Role'
-                DryRun  = '$DryRun'
+                NodeId     = '$NodeId'
+                Controller = '$Controller'
+                PinSha256  = '$PinSha256'
+                Force      = '$Force'
+                DryRun     = '$DryRun'
             }
             ContinueOnError = $false
         }
@@ -88,23 +90,16 @@
         Message = @"
 
 +=================================================================+
-|   NODE ONBOARDED — registered + heartbeating through the tunnel  |
+|   NODE JOINED - approved by the fleet placement controller       |
 +=================================================================+
 |                                                                  |
-|  It now appears in the portal under "My Nodes", online.          |
-|                                                                  |
 |  VERIFY:                                                         |
-|    Linux   : systemctl status aither-cluster-agent               |
-|    Windows : Get-ScheduledTaskInfo -TaskName AitherClusterNodeAgent |
-|    Portal  : portal.aitherium.com -> Nodes                       |
+|    3268_Invoke-FleetMembership.ps1 -Action status -Node <id>     |
 |                                                                  |
 +=================================================================+
 "@
     }
 
-    # Single sequential step — pin the execution options so the runner doesn't
-    # fall back to a global-config lookup for MaxConcurrency (keeps onboarding
-    # self-contained / config-subsystem-independent).
     Options = @{
         Parallel       = $false
         MaxConcurrency = 1
@@ -117,11 +112,11 @@
 +=================================================================+
 |   NODE ONBOARDING FAILED                                         |
 +=================================================================+
-|  COMMON ISSUES:                                                  |
-|    - Token expired / already used -> mint a fresh one in the     |
-|      portal "My Nodes" (single-use, ~60 min TTL)                 |
-|    - python3 missing + no winget/apt -> install Python 3, re-run |
-|    - Gateway unreachable -> check egress to the -Gateway URL     |
+|  The step printed the controller's verdict. COMMON ISSUES:       |
+|    - node not in nodes.yaml / unreachable by the node transport  |
+|    - aither-registry not running on the awnix host               |
+|    - certificate pin mismatch -> re-measure, pass PinSha256      |
+|    - already approved -> set Force to re-join                    |
 +=================================================================+
 "@
     }

@@ -2,244 +2,97 @@
 
 <#
 .SYNOPSIS
-    Onboard THIS machine as a secure AitherOS cluster node — cross-platform.
+    Onboard a machine as an AitherOS fleet node: join it to the fleet placement
+    controller (aither-registry) by node id and certificate pin.
 
 .DESCRIPTION
-    The all-platforms node bring-up an agent (or a human) runs to turn any
-    machine into a first-class, observable AitherOS mesh node: it registers and
-    heartbeats through the Cloudflare tunnel (no inbound ports), behind a
-    reboot-safe service. Security is the single-use enrollment token / cluster PSK.
+    This used to fetch an installer from a retired public gateway, run it with a
+    portal token and look for a cluster-agent unit the fleet no longer runs. That
+    path is gone. Fleet membership has ONE implementation
+    (lib/mesh/fleet_membership.py, driven by awrun's node-op verbs); this script
+    delegates to 3268_Invoke-FleetMembership -Action join, which:
 
-    Like 3213_Onboard-Laptop, this DELEGATES to the canonical installer the
-    gateway publishes — `install.sh` on Linux/macOS, `install.ps1` on Windows —
-    so there is ONE source of truth and zero drift between this playbook and the
-    bytes the website serves. It just detects the OS, fetches the right installer,
-    and runs it headless with the chosen flags. The token is passed via the
-    AITHER_NODE_TOKEN environment variable so it never lands on a command line.
+        1. queues `awrun submit --kind node-op --action fleet-join --node <id>
+           --pin-sha256 <pin>` (the token is minted controller-side, bound to the
+           node id, ttl 600; no token is passed in or printed),
+        2. drains it with AitherOS/dev/tools/awrun_node_op_worker.py --once,
+        3. reads the run back: verdict, node status, approved.
 
-    Steps:
-        1. Detect OS -> choose installer (<Gateway>/install.sh | /install.ps1)
-        2. Fetch the canonical installer from the gateway
-        3. Run it headless (token via env), as -NodeClass (derived from -Role),
-           which enrols the box AND joins it to the mesh (adk mesh join)
-        4. Best-effort verify the reboot-safe service/task is present
-
-    Exit Codes:
-        0 - Success
-        1 - Could not fetch the installer from the gateway
-        2 - Installer reported failure
-        3 - Post-install verification failed
-
-.PARAMETER Token
-    Single-use enrollment token (minted in the portal "My Nodes" or via
-    `adk grid enroll`) — or the long-lived cluster PSK. Can also come from
-    $env:AITHER_NODE_TOKEN. Required.
-
-.PARAMETER Gateway
-    Where the canonical installer is fetched from. Default:
-    https://cluster.aitherium.com (redirects to aitherium.com/install.*). The
-    installer itself takes no gateway flag; it talks to the platform's own hosts.
+    Exit codes (from 3268): 0 joined (or dry-run plan printed), 1 the controller
+    or the node refused, 2 refused parameters, 3 a tool failed.
 
 .PARAMETER NodeId
-    Node name hint, handed over as AITHER_NODE_NAME. The installer's pairing
-    assigns the registered node id; this names the node where adk honours it.
+    The controller node id, which is also the nodes.yaml name the node transport
+    reaches. Empty = this machine's host name, lower-cased into the id alphabet.
 
-.PARAMETER Role
-    Node role: sovereign (default), compute, or edge. Picks the installer's
-    -NodeClass unless -NodeClass is given: sovereign -> sovereign,
-    compute -> desktop, edge -> laptop.
+.PARAMETER Controller
+    The https URL the joining node dials. Empty = the library default
+    (https://127.0.0.1:8149, right for the awnix host itself).
 
-.PARAMETER NodeClass
-    Device class the installer enrols as (phone, laptop, desktop, deck, spark,
-    sovereign). A laptop/desktop joins the mesh via Headscale (NAT-friendly).
+.PARAMETER PinSha256
+    SHA-256 of the controller's certificate. Empty = 3268's default
+    ($env:AITHER_PLACEMENT_CONTROLLER_SHA256, else the measured pin).
+
+.PARAMETER Force
+    Re-join a node the controller already approved.
+
+.PARAMETER NodeDryRun
+    Queue + drain with --node-dry-run: plan only, nothing changes on the node.
 
 .PARAMETER DryRun
-    Preview the installer + flags without changing anything.
-
-.PARAMETER PassThru
-    Return a result object.
+    Print the commands; queue nothing.
 
 .EXAMPLE
-    # Headless (agent / CI) — token via flag:
-    ./3214_Onboard-ClusterNode.ps1 -Token $env:AITHER_NODE_TOKEN
+    ./3214_Onboard-ClusterNode.ps1 -NodeId awnix -DryRun
 
 .EXAMPLE
-    # Named node + role:
-    ./3214_Onboard-ClusterNode.ps1 -Token <tok> -NodeId home-lab-01 -Role sovereign
-
-.EXAMPLE
-    # Preview:
-    ./3214_Onboard-ClusterNode.ps1 -Token <tok> -DryRun
+    ./3214_Onboard-ClusterNode.ps1 -NodeId optiplex-wsl -Controller https://10.0.0.5:8149
 
 .NOTES
     Stage: Onboarding
     Order: 3214
-    Dependencies: none
-    Tags: onboarding, cluster, node, enrollment, mesh, cross-platform, sovereign
+    Dependencies: 3268_Invoke-FleetMembership, awrun, python + the monorepo
+    Tags: onboarding, cluster, node, fleet, placement, join
     AllowParallel: false
 #>
 
-[CmdletBinding(SupportsShouldProcess)]
+[CmdletBinding()]
 param(
-    [Parameter(Position = 0, HelpMessage = "Enrollment token / cluster PSK")]
-    [string]$Token = $env:AITHER_NODE_TOKEN,
-
-    [string]$Gateway = $(if ($env:AITHER_CLUSTER_GATEWAY) { $env:AITHER_CLUSTER_GATEWAY } else { 'https://cluster.aitherium.com' }),
-
-    [string]$NodeId,
-
-    [ValidateSet('sovereign', 'compute', 'edge')]
-    [string]$Role = 'sovereign',
-
-    [ValidateSet('phone', 'laptop', 'desktop', 'deck', 'spark', 'sovereign')]
-    [string]$NodeClass,
-
+    [string]$NodeId = '',
+    [string]$Controller = '',
+    [string]$PinSha256 = '',
+    [switch]$Force,
+    [switch]$NodeDryRun,
     [switch]$DryRun,
-    [switch]$PassThru
+    [switch]$PassThru,
+    # Test seam, handed to 3268: { param([string[]]$Argv) ... return @{ rc; out } }.
+    [scriptblock]$Invoker
 )
 
 $ErrorActionPreference = 'Stop'
-$Gateway = $Gateway.TrimEnd('/')
-if (-not $NodeClass) {
-    $NodeClass = switch ($Role) { 'compute' { 'desktop' } 'edge' { 'laptop' } default { 'sovereign' } }
+
+if (-not $NodeId) {
+    $hostName = if ($env:COMPUTERNAME) { $env:COMPUTERNAME } else { [System.Net.Dns]::GetHostName() }
+    $NodeId = (($hostName.ToLowerInvariant()) -replace '[^a-z0-9._-]', '-').Trim('-', '.', '_')
+    if ($NodeId.Length -gt 63) { $NodeId = $NodeId.Substring(0, 63) }
 }
 
-function Write-Step { param([string]$Name, [string]$Status = 'running')
-    $icon = switch ($Status) { 'done' { '[OK]' } 'fail' { '[FAIL]' } 'skip' { '[SKIP]' } default { '[..]' } }
-    $color = switch ($Status) { 'done' { 'Green' } 'fail' { 'Red' } 'skip' { 'Yellow' } default { 'Cyan' } }
-    Write-Host "$icon $Name" -ForegroundColor $color
+$membership = Join-Path $PSScriptRoot '3268_Invoke-FleetMembership.ps1'
+if (-not (Test-Path -LiteralPath $membership)) {
+    Write-Host "[FAIL] 3268_Invoke-FleetMembership.ps1 is not beside this script; fleet join needs the full AitherZero library and the AitherOS monorepo" -ForegroundColor Red
+    if ($PassThru) { return [pscustomobject]@{ Success = $false; ExitCode = 3; Action = 'fleet-join'; Node = $NodeId } }
+    exit 3
 }
+$call = @{ Action = 'join'; Node = $NodeId; PassThru = $true }
+if ($Controller) { $call.Controller = $Controller }
+if ($PinSha256) { $call.PinSha256 = $PinSha256 }
+if ($Force) { $call.Force = $true }
+if ($NodeDryRun) { $call.NodeDryRun = $true }
+if ($DryRun) { $call.DryRun = $true }
+if ($Invoker) { $call.Invoker = $Invoker }
 
-$osName = if ($IsWindows -or $env:OS -eq 'Windows_NT') { 'windows' }
-          elseif ($IsMacOS) { 'macos' } elseif ($IsLinux) { 'linux' } else { 'unknown' }
+Write-Host "AitherOS fleet node onboarding: $NodeId -> placement controller" -ForegroundColor Cyan
+$r = & $membership @call
 
-$result = [ordered]@{
-    Success   = $false
-    OS        = $osName
-    Gateway   = $Gateway
-    NodeId    = $NodeId
-    Role      = $Role
-    NodeClass = $NodeClass
-    Installer = $null
-    Steps     = @()
-}
-
-Write-Host "AitherOS Cluster Node Onboarding ($osName)" -ForegroundColor Cyan
-Write-Host "=========================================" -ForegroundColor Cyan
-
-if (-not $Token) {
-    Write-Step "Token check" 'fail'
-    Write-Host "  A token is required (-Token, or `$env:AITHER_NODE_TOKEN). Mint one in the portal 'My Nodes'." -ForegroundColor DarkGray
-    if ($PassThru) { return [pscustomobject]$result }
-    exit 2
-}
-
-# ── 1. Choose + fetch the canonical installer for this OS ────────────────────
-$installerPath = if ($osName -eq 'windows') { '/install.ps1' } else { '/install.sh' }
-$installerUrl  = "$Gateway$installerPath"
-$result.Installer = $installerUrl
-
-Write-Step "Fetch installer from $installerUrl" 'running'
-$installerText = $null
-try {
-    $installerText = Invoke-RestMethod -Uri $installerUrl -UseBasicParsing -TimeoutSec 30
-} catch {
-    Write-Step "Fetch installer" 'fail'
-    Write-Host "  $($_.Exception.Message)" -ForegroundColor DarkGray
-    if ($PassThru) { return [pscustomobject]$result }
-    exit 1
-}
-if (-not $installerText -or "$installerText".Length -lt 200) {
-    Write-Step "Fetch installer" 'fail'
-    Write-Host "  Installer payload looked empty/too small." -ForegroundColor DarkGray
-    if ($PassThru) { return [pscustomobject]$result }
-    exit 1
-}
-Write-Step "Fetch installer ($([math]::Round("$installerText".Length/1KB,1)) KB)" 'done'
-$result.Steps += @{ step = 'fetch'; status = 'ok' }
-
-# ── 2. Dry run: show what would run, change nothing ──────────────────────────
-if ($DryRun) {
-    $hint = "   (token via AITHER_NODE_TOKEN" + $(if ($NodeId) { ", AITHER_NODE_NAME=$NodeId" } else { '' }) + ")"
-    $shown = if ($osName -eq 'windows') {
-        "& <install.ps1> -NonInteractive -NodeClass $NodeClass$hint"
-    } else {
-        "sh <install.sh> --non-interactive --node-class $NodeClass$hint"
-    }
-    Write-Step "Run installer (DRY RUN): $shown" 'skip'
-    $result.Steps += @{ step = 'install'; status = 'skipped' }
-    $result.Success = $true
-    if ($PassThru) { return [pscustomobject]$result }
-    exit 0
-}
-
-# ── 3. Run the installer headless (token via env, never on a command line) ───
-# install.ps1 / install.sh read AITHER_NODE_TOKEN as their -Token / --token. They
-# take no -Gateway/-Role/-NodeId (install.sh exits 2 on an unknown flag): the role
-# becomes -NodeClass, the node name rides in AITHER_NODE_NAME.
-$prevToken = $env:AITHER_NODE_TOKEN
-$prevNodeName = $env:AITHER_NODE_NAME
-$env:AITHER_NODE_TOKEN = $Token
-if ($NodeId) { $env:AITHER_NODE_NAME = $NodeId }
-Write-Step "Run installer ($osName, headless)" 'running'
-try {
-    if (-not $PSCmdlet.ShouldProcess($env:COMPUTERNAME, "onboard as $Role node -> $Gateway")) {
-        return
-    }
-    if ($osName -eq 'windows') {
-        $instArgs = @{ NonInteractive = $true; NodeClass = $NodeClass }
-        $installer = [scriptblock]::Create($installerText)
-        & $installer @instArgs
-    } else {
-        # Write to a temp file and run via sh; token rides in the inherited env.
-        $tmp = [System.IO.Path]::GetTempFileName()
-        Set-Content -Path $tmp -Value $installerText -Encoding ASCII
-        try {
-            $shArgs = @('--non-interactive', '--node-class', $NodeClass)
-            & bash $tmp @shArgs
-        } finally { Remove-Item -Path $tmp -Force -ErrorAction SilentlyContinue }
-    }
-    if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "installer exited with code $LASTEXITCODE" }
-    Write-Step "Run installer" 'done'
-    $result.Steps += @{ step = 'install'; status = 'ok' }
-} catch {
-    Write-Step "Run installer" 'fail'
-    Write-Host "  $($_.Exception.Message)" -ForegroundColor DarkGray
-    $result.Steps += @{ step = 'install'; status = 'fail'; error = "$($_.Exception.Message)" }
-    if ($PassThru) { return [pscustomobject]$result }
-    exit 2
-} finally {
-    $env:AITHER_NODE_TOKEN = $prevToken
-    $env:AITHER_NODE_NAME = $prevNodeName
-}
-
-# ── 4. Best-effort verify the reboot-safe service/task is present ────────────
-Write-Step "Verify reboot-safe service" 'running'
-$verified = $false
-try {
-    if ($osName -eq 'windows') {
-        $verified = [bool](Get-ScheduledTask -TaskName 'AitherClusterNodeAgent' -ErrorAction SilentlyContinue)
-    } elseif ($osName -eq 'linux') {
-        $svc = (& systemctl is-enabled aither-cluster-agent 2>$null)
-        $verified = ($LASTEXITCODE -eq 0) -or ($svc -match 'enabled')
-        if (-not $verified) { $verified = Test-Path '/opt/aitheros/dgx_node_agent.py' }  # supervisor fallback
-    } else {
-        $verified = $true  # macOS supervisor path — installer already reported done
-    }
-} catch { $verified = $false }
-
-if ($verified) {
-    Write-Step "Verify reboot-safe service" 'done'
-    $result.Steps += @{ step = 'verify'; status = 'ok' }
-} else {
-    Write-Step "Verify reboot-safe service (not confirmed)" 'skip'
-    $result.Steps += @{ step = 'verify'; status = 'pending' }
-}
-
-$result.Success = $true
-Write-Host ""
-Write-Host "  Node onboarding complete — it should appear in the portal 'My Nodes', online." -ForegroundColor Green
-Write-Host ""
-
-if ($PassThru) { return [pscustomobject]$result }
-exit 0
+if ($PassThru) { return $r }
+exit ([int]$r.ExitCode)
