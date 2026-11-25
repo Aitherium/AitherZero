@@ -137,7 +137,7 @@ function Write-AitherLog {
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$false, Position = 0)]
-    [ValidateSet('Trace', 'Debug', 'Information', 'Warning', 'Error', 'Critical')]
+    [ValidateSet('Trace', 'Debug', 'Information', 'Success', 'Warning', 'Error', 'Critical')]
     [string]$Level,
 
     [Parameter(Mandatory=$false, Position = 1, ValueFromPipeline)]
@@ -173,6 +173,7 @@ process {
             $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
             Write-Host "$prefix [$timestamp] $Source`: $Message" -ForegroundColor $(
                 switch ($Level) {
+                    'Success' { 'Green' }
                     'Error' { 'Red' }
                     'Warning' { 'Yellow' }
                     'Critical' { 'Magenta' }

@@ -8,6 +8,10 @@
   "status": "public",
   "adopt": "Run one numbered script and read what it says it did.",
   "pairs_with": [
+    "awdk",
+    "awsh",
+    "awnix",
+    "awrise",
     "awrecover"
   ],
   "includes": [],

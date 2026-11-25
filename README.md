@@ -33,12 +33,11 @@ AitherZero is a **PowerShell 7+ automation framework** designed to get you up an
 
 | Product | What it is | Install with AitherZero |
 |---------|-----------|------------------------|
-| [**awnode**](https://github.com/Aitherium/aither) | Lightweight MCP compute node — 30+ AI tools, runs standalone or mesh-connected | `Invoke-AitherPlaybook node-onboard` |
-| [**AitherADK**](https://github.com/Aitherium/aither/tree/main/awdk) | Agent Development Kit — build agents in 3 lines | `Invoke-AitherPlaybook dev-workstation` (or `pip install awdk`) |
-| [**AitherDesktop**](https://github.com/Aitherium) | Native desktop client (Windows/Linux) with MCP, watchdog, and home widget | `Invoke-AitherPlaybook node-onboard` |
-| [**AitherConnect**](https://github.com/Aitherium) | Browser extension (Chrome/Edge) — connects to any awnode instance | `Invoke-AitherPlaybook node-onboard` |
-| [**AitherSDK**](https://github.com/Aitherium/aithersdk) | Python client library — `pip install aithersdk` | Auto-installed with ADK |
-| [**AitherVeil**](https://github.com/Aitherium) | Next.js operator dashboard — monitoring, chat, agent management | `Invoke-AitherPlaybook node-onboard` |
+| [**awnix**](https://github.com/Aitherium/awnix) | The Aither World's Linux (CentOS Stream 9), WSL2 via [Windows Goodbye](https://goodbyewindows.sh) | `Invoke-AitherPlaybook dev-stack` |
+| [**awdk**](https://github.com/Aitherium/awdk) | Agent Development Kit (`adk` CLI v4.0+, harness daemon, 2-way Antigravity bridge) | `Invoke-AitherPlaybook dev-stack` (or `pip install awdk`) |
+| [**awsh**](https://github.com/Aitherium/awsh) | Terminal shell (`@aitherium/awsh` v2.0+) with terminal avatars and multi-harness `awsh agent` | `Invoke-AitherPlaybook dev-stack` (or `npm i -g @aitherium/awsh`) |
+| [**aw* Brick Stack**](https://aitherium.github.io/) | Modular offline-first tools: `awrise`, `awgit`, `awm`, `awrelay`, `awdecide`, `awask`, `awrun`, `awfocus`, `awsettings`, `awmine`, `awbrain`, `awrtifact` | `Invoke-AitherPlaybook dev-stack` |
+| [**awnode**](https://github.com/Aitherium/awdk) | Lightweight MCP compute node — 30+ AI tools, runs standalone or mesh-connected | `Invoke-AitherPlaybook node-onboard` |
 
 Beyond ecosystem setup, AitherZero is a general-purpose automation framework you can use for your own projects: CI/CD pipelines, infrastructure provisioning, dev environment setup, and more.
 
@@ -53,7 +52,21 @@ Beyond ecosystem setup, AitherZero is a general-purpose automation framework you
 - **Python 3.10+** (for AI features)
 - **Docker** (optional, for container features)
 
-### Install
+### One-Line Bootstrap (Recommended)
+
+Bootstrap a fresh Windows, Linux, or macOS machine in one paste — installs PowerShell 7 if needed, fetches AitherZero, and runs `dev-workstation` (or pass `dev-stack` for `awnix` + `aw*` bricks + `awdk 4.0+` + `awsh 2.0+`):
+
+```powershell
+# Windows (PowerShell 5.1 or 7+)
+irm https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.ps1 | iex
+```
+
+```bash
+# Linux / macOS
+curl -fsSL https://raw.githubusercontent.com/Aitherium/AitherZero/main/bootstrap.sh | sh
+```
+
+### Install from Source
 
 ```bash
 git clone https://github.com/Aitherium/AitherZero.git
@@ -74,11 +87,11 @@ Get-AitherStatus
 ### Your First Commands
 
 ```powershell
+# Preview the full Aither World dev stack (awnix + aw* bricks + awdk 4.0+ + awsh 2.0+)
+Invoke-AitherPlaybook dev-stack -DryRun
+
 # Install Git (idempotent — skips when git already resolves)
 Invoke-AitherScript 1002
-
-# Preview the developer-workstation playbook without changing anything
-Invoke-AitherPlaybook dev-workstation -DryRun
 
 # List all available scripts
 Get-AitherScript | Format-Table Number, Name, Category
@@ -88,18 +101,19 @@ Get-AitherScript | Format-Table Number, Name, Category
 
 ## Setting Up the Aitherium Ecosystem
 
-### Option 1: awnode + AitherADK (Recommended Start)
+### Option 1: Full Dev Stack — awnix + aw* bricks + awdk 4.0 + awsh 2.0 (Recommended)
 
-Get a local AI compute node with 30+ MCP tools and the agent SDK:
+Get the complete Aither World developer stack on Windows, Linux, or macOS in one idempotent playbook:
 
 ```powershell
-# Install Python, Git, Node.js, gh, awdk (the `adk` CLI) and awsh
-Invoke-AitherPlaybook dev-workstation
+# Install awnix (WSL2 on Windows), toolchain, awdk 4.0+, awsh 2.0+, core 12 aw* bricks, and Antigravity wiring
+Invoke-AitherPlaybook dev-stack
 
 # Sign in, pick inference, wire your IDE to the MCP gateway, verify
 Invoke-AitherPlaybook connect
 
-# Start a local agent in the current project
+# Open the interactive terminal shell (with avatars) or start a local agent
+awsh
 adk start
 ```
 
@@ -136,7 +150,7 @@ No AI dependencies — just the PowerShell module, config system, script engine,
 
 ## Connect to Your AI Assistant (MCP)
 
-AitherZero's agent tools ship in [awdk](https://github.com/Aitherium/aither/tree/main/awdk)
+AitherZero's agent tools ship in [awdk](https://github.com/Aitherium/awdk)
 as the bundled `aitherzero` tool pack — `az_inventory`, `az_describe_script`,
 `az_plan_playbook`, `az_generate_config`, `az_validate_config`, `az_export_schema`
 and `az_scaffold_script`. Any awdk agent gets them with no extra setup, and the
@@ -145,7 +159,7 @@ same tools run from a shell:
 ```bash
 pip install awdk
 python -m adk.toolpacks.aitherzero --root /path/to/AitherZero inventory
-python -m adk.toolpacks.aitherzero --root /path/to/AitherZero plan-playbook dev-workstation
+python -m adk.toolpacks.aitherzero --root /path/to/AitherZero plan-playbook dev-stack
 ```
 
 To reach them from **Claude Code**, **Cursor** or any MCP-compatible client, run the
@@ -204,7 +218,7 @@ config.psd1                 (master defaults)
 
 ## Automation Scripts
 
-71 numbered scripts organized by category:
+77 numbered scripts organized by category:
 
 | Range | Category | Examples |
 |-------|----------|----------|
@@ -213,7 +227,7 @@ config.psd1                 (master defaults)
 | 0701–0898 | Git | `0701_New-Branch.ps1`, `0702_Commit-Changes.ps1` |
 | 0720–0741 | Ai Tools | `0720_Install-StableDiffusionWebUI.ps1`, `0721_Configure-SDWebUI-Models.ps1` |
 | 0769–1033 | Devtools | `0769_Setup-WebDeveloperToolkit.ps1`, `1001_Install-Chocolatey.ps1` |
-| 3214 | Onboarding | `3214_Onboard-ClusterNode.ps1` |
+| 3214–3274 | Onboarding | `3214_Onboard-ClusterNode.ps1`, `3260_Install-AWDK.ps1`, `3261_Install-AWSH.ps1`, `3270_Install-AwBrickStack.ps1`, `3274_Install-Awnix.ps1` |
 | 7001–9020 | Maintenance | `7001_Cleanup-Docker.ps1`, `9010_Scan-DiskUsage.ps1` |
 | 7010–7051 | External Integrations | `7010_Setup-ProtonBridge.ps1`, `7051_Patch-CloudflareTunnelRule.ps1` |
 
@@ -266,9 +280,13 @@ Invoke-AitherPlaybook node-onboard
 
 | Playbook | Description |
 |----------|-------------|
-| `dev-workstation` | Bootstrap THIS machine as a developer workstation: Python, Git, Node.js, gh, awdk (`adk`) and awsh — what `bootstrap.ps1` / `bootstrap.sh` run by default |
+| `dev-stack` | Full Aither World developer stack: `awnix` (WSL2 via Windows Goodbye), Python/Git/Node/gh, `awdk 4.0+`, `@aitherium/awsh 2.0+`, core 12 `aw*` bricks, 2-way Antigravity wiring, `awrise` clock guard, and live verification |
+| `dev-workstation` | Minimal developer workstation: Python, Git, Node.js, gh, `awdk` (`adk`), and `awsh` — what `bootstrap.ps1` / `bootstrap.sh` run by default |
 | `connect` | Sign in, choose inference, wire your IDE to the MCP gateway, verify |
 | `node-onboard` | Onboard THIS machine as a secure AitherOS cluster node (Windows / Linux / macOS) |
+| `appliance-onboard` | Blank machine to enrolled appliance: toolchain, sign-in, repo clone, enroll, verify |
+| `bootstrap-bonsai-device` | Turn a laptop or Linux device into a local Bonsai-27B inference endpoint |
+| `comfyui-backend` | Install ComfyUI, pull an SFW image model pack, start serving, and register as a BYO backend |
 
 Run `Get-AitherPlaybook` to list what your checkout actually ships — additional
 playbooks (build, deploy, CI) are part of the AitherOS Enterprise distribution

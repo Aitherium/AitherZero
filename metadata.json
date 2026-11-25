@@ -1,10 +1,10 @@
 {
-  "ModuleVersion": "2.3.0",
+  "ModuleVersion": "2.4.0",
   "GUID": "a7d4e8f1-2b3c-4d5e-6f7a-8b9c0d1e2f3a",
   "Author": "Aitherium",
   "CompanyName": "Aitherium Corporation",
-  "Copyright": "Copyright © 2025 Aitherium Corporation",
-  "Description": "AitherZero Automation Platform - Proper PowerShell module for infrastructure automation with config-based orchestration",
+  "Copyright": "Copyright © 2025-2026 Aitherium Corporation",
+  "Description": "AitherZero Automation Platform - Cross-platform PowerShell 7+ framework for declarative playbooks, numbered scripts, and Aither World dev-stack onboarding",
   "PowerShellVersion": "7.0",
   "CompatiblePSEditions": [
     "Core"

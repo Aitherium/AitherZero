@@ -5,6 +5,17 @@ All notable changes to AitherZero will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-11-25
+
+### Added
+- **Public `dev-stack` playbook** (`library/playbooks/dev-stack.psd1`) — one-command, idempotent setup for the complete Aither World developer stack across Windows, Linux, and macOS: `awnix` (WSL2 via Windows Goodbye), Python/Git/Node/gh, `awdk 4.0+`, `@aitherium/awsh 2.0+`, the 12 core `aw*` bricks (`awrise`, `awgit`, `awm`, `awrelay`, `awdecide`, `awask`, `awrun`, `awfocus`, `awsettings`, `awmine`, `awbrain`, `awrtifact`), 2-way Google Antigravity integration, `awrise` host clock guard, and a live verification gate.
+- **Public onboarding scripts `3270`–`3274`**: `3270_Install-AwBrickStack.ps1`, `3271_Setup-AntigravityAndAwsh.ps1`, `3272_Setup-AwriseAndEval.ps1`, `3273_Test-DevStack.ps1`, and `3274_Install-Awnix.ps1`.
+
+### Fixed
+- **`Write-AitherLog` & `Write-CustomLog`**: now accept `-Level Success` (rendering green `[OK]` in console and logging at `Information` rank), fixing runtime `ValidateSet` errors across 200+ automation script call sites.
+- **Clean module import**: renamed `Plan-AitherNotebook` to approved verb `New-AitherNotebookPlan` (with backward-compatible alias `Plan-AitherNotebook`), eliminating the unapproved-verb warning on `Import-Module AitherZero`.
+- **Docs & metadata**: refreshed `README.md` with the 1-paste `bootstrap.ps1`/`bootstrap.sh` quickstart, all 7 public playbooks, updated `awdk`/`awsh`/`awnix` links, and synced `CHANGELOG.md` to the public mirror.
+
 ## [2.3.0] - 2026-04-13
 
 ### Added

@@ -58,7 +58,7 @@ function Write-CustomLog {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet('Trace', 'Debug', 'Information', 'Warning', 'Error', 'Critical')]
+        [ValidateSet('Trace', 'Debug', 'Information', 'Success', 'Warning', 'Error', 'Critical')]
         [string]$Level,
 
         [Parameter(Mandatory)]
@@ -78,6 +78,7 @@ function Write-CustomLog {
         'Trace'       = 0
         'Debug'       = 1
         'Information' = 2
+        'Success'     = 2
         'Warning'     = 3
         'Error'       = 4
         'Critical'    = 5
@@ -130,6 +131,7 @@ function Write-CustomLog {
             'Trace' { 'DarkGray' }
             'Debug' { 'Gray' }
             'Information' { 'White' }
+            'Success' { 'Green' }
             'Warning' { 'Yellow' }
             'Error' { 'Red' }
             'Critical' { 'Magenta' }
@@ -140,6 +142,7 @@ function Write-CustomLog {
             'Trace' { '[TRACE]' }
             'Debug' { '[DEBUG]' }
             'Information' { '[INFO]' }
+            'Success' { '[OK]' }
             'Warning' { '[WARN]' }
             'Error' { '[ERROR]' }
             'Critical' { '[CRIT]' }
