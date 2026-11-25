@@ -1,6 +1,6 @@
 {
   "generatedFrom": "automation-scripts",
-  "scriptCount": 70,
+  "scriptCount": 75,
   "categories": [
     {
       "category": "10-devtools",
@@ -12,7 +12,7 @@
     },
     {
       "category": "32-onboarding",
-      "scripts": 13
+      "scripts": 18
     },
     {
       "category": "60-monitoring",
@@ -1744,6 +1744,203 @@
       "configKeys": []
     },
     {
+      "id": "3270",
+      "name": "Install-AwBrickStack",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3270_Install-AwBrickStack.ps1",
+      "synopsis": "Install or upgrade the core aw* Python brick stack.",
+      "params": [
+        {
+          "name": "Source",
+          "type": "e",
+          "enum": [
+            "PyPI",
+            "Local"
+          ],
+          "default": "PyPI",
+          "mandatory": false,
+          "help": "'PyPI' (default) or 'Local'."
+        },
+        {
+          "name": "LocalPackagesDir",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Directory containing `<brick>/pyproject.toml` folders when Source='Local'."
+        },
+        {
+          "name": "Bricks",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Optional comma-separated list of brick names to install instead of the"
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print what would be installed without running pip."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3271",
+      "name": "Setup-AntigravityAndAwsh",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3271_Setup-AntigravityAndAwsh.ps1",
+      "synopsis": "Wire 2-way Google Antigravity integration, probe awsh 2.0 avatars, and optionally start the harness daemon.",
+      "params": [
+        {
+          "name": "StartHarnessDaemon",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Start the local harness daemon via `adk harness up`."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print the commands without running them."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3272",
+      "name": "Setup-AwriseAndEval",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3272_Setup-AwriseAndEval.ps1",
+      "synopsis": "Verify awrise host clock (including split-AWRISE_HOME guard) and optionally schedule an eval wake.",
+      "params": [
+        {
+          "name": "InstallClock",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Run `awrise install-clock` to register the host's native scheduler."
+        },
+        {
+          "name": "EvalScript",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Optional path to a surface-eval Python script to schedule every 30m in awrise."
+        },
+        {
+          "name": "RelayNick",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Optional nick to persist into `AWRELAY_NICK` (User env on Windows)."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print planned actions without changing clock, jobs, or env vars."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3273",
+      "name": "Test-DevStack",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3273_Test-DevStack.ps1",
+      "synopsis": "Live-verify the full Aitherium developer stack (toolchain, awdk 4.0+, awsh 2.0+, aw* bricks, Antigravity, awrise).",
+      "params": [
+        {
+          "name": "RequireGitHubCLI",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Treat `gh` as required (default: optional)."
+        },
+        {
+          "name": "CheckAntigravity",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Include `adk antigravity doctor` in the verification table (non-fatal if Antigravity isn't installed)."
+        },
+        {
+          "name": "CheckAwnix",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "AwnixDistroName",
+          "type": "s",
+          "enum": [],
+          "default": "awnix",
+          "mandatory": false,
+          "help": ""
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "List every check without executing them."
+        }
+      ],
+      "configKeys": []
+    },
+    {
+      "id": "3274",
+      "name": "Install-Awnix",
+      "category": "32-onboarding",
+      "file": "32-onboarding/3274_Install-Awnix.ps1",
+      "synopsis": "Install awnix (the Aither World's Linux) as a WSL2 distro via Windows Goodbye.",
+      "params": [
+        {
+          "name": "DistroName",
+          "type": "s",
+          "enum": [],
+          "default": "awnix",
+          "mandatory": false,
+          "help": "WSL2 distro name to import (default: 'awnix')."
+        },
+        {
+          "name": "InstallDir",
+          "type": "s",
+          "enum": [],
+          "default": "",
+          "mandatory": false,
+          "help": "Directory for the WSL2 virtual disk (default: Windows Goodbye default, `%LOCALAPPDATA%\\awnix\\wsl`)."
+        },
+        {
+          "name": "DryRun",
+          "type": "b",
+          "enum": [],
+          "default": null,
+          "mandatory": false,
+          "help": "Print what would run (or run WindowsGoodbye.ps1 -DryRun) without importing."
+        }
+      ],
+      "configKeys": []
+    },
+    {
       "id": "0650",
       "name": "Sync-Observability",
       "category": "60-monitoring",
@@ -3178,6 +3375,10 @@
     {
       "name": "connect",
       "file": "connect.psd1"
+    },
+    {
+      "name": "dev-stack",
+      "file": "dev-stack.psd1"
     },
     {
       "name": "dev-workstation",
