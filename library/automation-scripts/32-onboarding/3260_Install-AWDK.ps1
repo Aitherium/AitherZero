@@ -38,8 +38,9 @@ param(
 
 function Write-ScriptLog {
     param([string]$Message, [string]$Level = 'Information')
+    $mapped = if ($Level -eq 'Success') { 'Information' } else { $Level }
     if (Get-Command Write-AitherLog -ErrorAction SilentlyContinue) {
-        Write-AitherLog -Message $Message -Level $Level -Source '3260_Install-AWDK'
+        Write-AitherLog -Message $Message -Level $mapped -Source '3260_Install-AWDK'
     } else {
         Write-Host "[$Level] $Message"
     }
